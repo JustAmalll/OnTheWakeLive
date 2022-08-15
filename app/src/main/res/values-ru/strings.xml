@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OnTheWakeLive</string>
+    <string name="hide_password">Скрыть пароль</string>
+    <string name="show_password">Показать пароль</string>
+    <string name="notification_content_title">Пора катать!</string>
+    <string name="notification_content_text">Очередь почти дошла до вас, вы следующий !</string>
+    <string name="validate_first_name_error">Поле Имя не может быть пустым</string>
+    <string name="validate_user_error">Этот человек уже есть в очереди</string>
+    <string name="validate_last_name_error">Поле Фамилия не может быть пустым</string>
+    <string name="validate_phone_number_error">Поле номера телефона не может быть пустым</string>
+    <string name="validate_password_error">Поле пароля не может быть пустым</string>
+    <string name="validate_password_length_error">Пароль должен состоять не менее чем из 6 символов</string>
+    <string name="unknown_error">Произошла неизвестная ошибка</string>
+    <string name="login">Логин</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="password">Пароль</string>
+    <string name="sign_in">Войти</string>
+    <string name="dont_have_an_account_yet">Еще нет учетной записи?</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="user_already_exist">Пользователь уже существует</string>
+    <string name="first_name">Имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="telegram">Телеграм</string>
+    <string name="instagram">Инстаграм</string>
+    <string name="already_have_an_account">Уже есть учетная запись?</string>
+    <string name="couldnt_establish_a_connection">Не удалось установить соединение</string>
+    <string name="add_to_queue">Добавить в очередь</string>
+    <string name="add">Добавить</string>
+    <string name="empty_queue_error">В очереди никого нет</string>
+    <string name="deleted_message">Вы удалились из очереди</string>
+    <string name="undo">Вернуться</string>
+    <string name="add_icon">Иконка добавления</string>
+    <string name="queue">Очередь</string>
+    <string name="left_line">Левая лебедка</string>
+    <string name="right_line">Правая лебедка</string>
+    <string name="delete_icon">Иконка удаления</string>
+    <string name="interval_error">Упс! Интервал для записи минимум 3 человека</string>
+    <string name="already_in_queue_error">Упс! Вы уже в очереди</string>
+    <string name="left_line_admin">Левая линия</string>
+    <string name="right_line_admin">Правая линия</string>
+    <string name="incorrect_data">Неверный номер телефона или пароль</string>
+</resources>

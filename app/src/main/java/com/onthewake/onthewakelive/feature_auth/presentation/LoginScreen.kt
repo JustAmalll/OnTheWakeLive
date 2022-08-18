@@ -5,7 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -22,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.onesignal.OneSignal
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.DefaultTextField
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
@@ -29,6 +33,7 @@ import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.ui.theme.BackgroundColor
 import com.onthewake.onthewakelive.ui.theme.Primary
 import com.onthewake.onthewakelive.ui.theme.darkThemeBgColor
+import com.onthewake.onthewakelive.util.Constants
 
 @Composable
 fun LoginScreen(

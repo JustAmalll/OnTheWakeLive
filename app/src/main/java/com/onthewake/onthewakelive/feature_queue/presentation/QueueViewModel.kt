@@ -4,20 +4,22 @@ import android.app.Application
 import android.content.SharedPreferences
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueService
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueSocketService
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
-import com.onthewake.onthewakelive.util.Constants.ADMIN_USER_ID
+import com.onthewake.onthewakelive.util.Constants.FIRST_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Constants.PREFS_FIRST_NAME
 import com.onthewake.onthewakelive.util.Constants.PREFS_USER_ID
+import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,8 +27,6 @@ import javax.inject.Inject
 class QueueViewModel @Inject constructor(
     private val queueService: QueueService,
     private val queueSocketService: QueueSocketService,
-    private val notificationBuilder: NotificationCompat.Builder,
-    private val notificationManager: NotificationManagerCompat,
     private val context: Application,
     prefs: SharedPreferences
 ) : AndroidViewModel(context) {
@@ -61,19 +61,6 @@ class QueueViewModel @Inject constructor(
 
                             _state.value = state.value.copy(queue = newList)
 
-                            val sortedLeftQueue = newList.filter { it.leftQueue == "true" }
-                            val sortedRightQueue = newList.filter { it.leftQueue == "false" }
-
-                            val userQueueItem = newList.find { it.userId == userId }
-
-                            val leftQueueIndex = sortedLeftQueue.indexOf(userQueueItem)
-                            val rightQueueIndex = sortedRightQueue.indexOf(userQueueItem)
-
-                            if (leftQueueIndex == 0 || rightQueueIndex == 0) {
-                                if (queueItem.isDeleteAction && userId != ADMIN_USER_ID)
-                                    showSimpleNotification()
-                            }
-                            
                         }.launchIn(viewModelScope)
                 }
                 is Resource.Error -> {
@@ -112,34 +99,26 @@ class QueueViewModel @Inject constructor(
 
             val ifUserAlreadyInQueue = allQueue.find { it.userId == userId }
 
-            if (userId == ADMIN_USER_ID) {
-                queueSocketService.addToQueue(
-                    leftQueue = leftQueue, firstName = firstName, timestamp = timestamp
-                )
+            if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID) {
+                queueSocketService.addToQueue(leftQueue, firstName, timestamp)
             } else {
                 if (leftQueue == "true" && ifUserAlreadyInQueue == null ||
                     leftQueue == "false" && ifUserAlreadyInQueue == null
                 ) {
-                    queueSocketService.addToQueue(
-                        leftQueue = leftQueue, firstName = firstName, timestamp = timestamp
-                    )
+                    queueSocketService.addToQueue(leftQueue, firstName, timestamp)
                 } else if (leftQueue == "true" && userItemInLeftQueue != null) {
                     _snackBarEvent.emit(context.getString(R.string.already_in_queue_error))
                 } else if (leftQueue == "false" && userItemInRightQueue != null) {
                     _snackBarEvent.emit(context.getString(R.string.already_in_queue_error))
                 } else if (leftQueue == "true" && userItemInRightQueue != null) {
                     if (leftQueueItems.size - userPositionInRightQueue >= 3) {
-                        queueSocketService.addToQueue(
-                            leftQueue = leftQueue, firstName = firstName, timestamp = timestamp
-                        )
+                        queueSocketService.addToQueue(leftQueue, firstName, timestamp)
                     } else {
                         _snackBarEvent.emit(context.getString(R.string.interval_error))
                     }
                 } else if (leftQueue == "false" && userItemInLeftQueue != null) {
                     if (rightQueueItems.size - userPositionInLeftQueue >= 3) {
-                        queueSocketService.addToQueue(
-                            leftQueue = leftQueue, firstName = firstName, timestamp = timestamp
-                        )
+                        queueSocketService.addToQueue(leftQueue, firstName, timestamp)
                     } else {
                         _snackBarEvent.emit(context.getString(R.string.interval_error))
                     }
@@ -165,12 +144,9 @@ class QueueViewModel @Inject constructor(
                     )
                 )
             }
+
             _state.value = state.value.copy(isQueueLoading = false)
         }
-    }
-
-    private fun showSimpleNotification() {
-        notificationManager.notify(1, notificationBuilder.build())
     }
 
     fun disconnect() {

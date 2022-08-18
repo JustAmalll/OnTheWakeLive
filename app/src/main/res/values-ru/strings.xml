@@ -28,7 +28,7 @@
     <string name="add_to_queue">Добавить в очередь</string>
     <string name="add">Добавить</string>
     <string name="empty_queue_error">В очереди никого нет</string>
-    <string name="deleted_message">Вы удалились из очереди</string>
+    <string name="delete_message">Вы удалились из очереди</string>
     <string name="undo">Вернуться</string>
     <string name="add_icon">Иконка добавления</string>
     <string name="queue">Очередь</string>
@@ -40,4 +40,5 @@
     <string name="left_line_admin">Левая линия</string>
     <string name="right_line_admin">Правая линия</string>
     <string name="incorrect_data">Неверный номер телефона или пароль</string>
+    <string name="admin_delete_message">Вы удалили человека из очереди</string>
 </resources>

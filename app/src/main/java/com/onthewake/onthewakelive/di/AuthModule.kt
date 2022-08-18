@@ -33,8 +33,8 @@ object AuthModule {
     @Provides
     @Singleton
     fun provideAuthRepository(
-        api: AuthApi, prefs: SharedPreferences
-    ): AuthRepository = AuthRepositoryImpl(api, prefs)
+        api: AuthApi, prefs: SharedPreferences, @ApplicationContext context: Context
+    ): AuthRepository = AuthRepositoryImpl(api, prefs, context)
 
     @Provides
     @Singleton

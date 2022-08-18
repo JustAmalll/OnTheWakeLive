@@ -41,7 +41,8 @@
 
     <string name="empty_queue_error">There is no one in the queue</string>
 
-    <string name="deleted_message">You have been removed from the queue</string>
+    <string name="delete_message">You have been removed from the queue</string>
+    <string name="admin_delete_message">You have removed a person from the queue</string>
     <string name="undo">UNDO</string>
     <string name="add_icon">Add Icon</string>
     <string name="queue">Queue</string>

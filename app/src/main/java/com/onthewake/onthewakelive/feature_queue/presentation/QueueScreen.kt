@@ -37,7 +37,8 @@ import com.onthewake.onthewakelive.ui.theme.BackgroundColor
 import com.onthewake.onthewakelive.ui.theme.ItemBgColor
 import com.onthewake.onthewakelive.ui.theme.Primary
 import com.onthewake.onthewakelive.ui.theme.darkThemeBgColor
-import com.onthewake.onthewakelive.util.Constants.ADMIN_USER_ID
+import com.onthewake.onthewakelive.util.Constants.FIRST_ADMIN_USER_ID
+import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
@@ -80,7 +81,9 @@ fun QueueScreen(
         viewModel.snackBarWithActionEvent.collectLatest { deletedItem ->
 
             val result = snackBarHostState.showSnackbar(
-                message = context.getString(R.string.deleted_message),
+                message = if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID)
+                    context.getString(R.string.admin_delete_message)
+                else context.getString(R.string.delete_message),
                 actionLabel = context.getString(R.string.undo)
             )
 
@@ -118,7 +121,7 @@ fun QueueScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (userId == ADMIN_USER_ID) {
+                    if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID) {
                         showDialog.value = true
                     } else {
                         viewModel.firstName?.let { firstName ->
@@ -335,7 +338,10 @@ fun QueueItem(
         shape = RoundedCornerShape(4.dp),
         modifier = Modifier.padding(vertical = 6.dp)
     ) {
-        if (queueItemUserId == userId || userId == ADMIN_USER_ID) {
+        if (queueItemUserId == userId ||
+            userId == FIRST_ADMIN_USER_ID ||
+            userId == SECOND_ADMIN_USER_ID
+        ) {
             SwipeableActionsBox(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -5,6 +5,7 @@ buildscript {
     dependencies {
         classpath "com.google.dagger:hilt-android-gradle-plugin:2.42"
         classpath "org.jetbrains.kotlin:kotlin-serialization:1.7.10"
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:0.13.4'
     }
 }
 

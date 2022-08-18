@@ -33,8 +33,8 @@ fun CustomDialog(
     queue: List<Queue>
 ) {
 
-    val leftQueueButtonState = remember { mutableStateOf(true) }
-    val rightQueueButtonState = remember { mutableStateOf(false) }
+    val leftQueueButtonState = remember { mutableStateOf(false) }
+    val rightQueueButtonState = remember { mutableStateOf(true) }
 
     val firstNameFieldState = remember { mutableStateOf("") }
 

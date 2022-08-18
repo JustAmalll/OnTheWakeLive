@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "dev.amal.onthewakelive"
-        minSdk 21
+        minSdk 26
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -107,4 +107,7 @@ dependencies {
 
     // Lottie
     implementation ('com.airbnb.android:lottie-compose:5.2.0')
+
+    // OneSignal
+    implementation 'com.onesignal:OneSignal:[4.0.0, 4.99.99]'
 }

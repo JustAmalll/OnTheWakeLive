@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.airbnb.lottie.compose.*
 import com.google.accompanist.pager.*
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
@@ -39,6 +40,7 @@ import com.onthewake.onthewakelive.ui.theme.Primary
 import com.onthewake.onthewakelive.ui.theme.darkThemeBgColor
 import com.onthewake.onthewakelive.util.Constants.FIRST_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
@@ -121,24 +123,26 @@ fun QueueScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID) {
-                        showDialog.value = true
-                    } else {
-                        viewModel.firstName?.let { firstName ->
-                            if (pagerState.currentPage == 0) viewModel.addToQueue(
-                                leftQueue = "true",
-                                firstName = firstName,
-                                timestamp = System.currentTimeMillis()
-                            )
-                            else viewModel.addToQueue(
-                                leftQueue = "false",
-                                firstName = firstName,
-                                timestamp = System.currentTimeMillis()
-                            )
+                    if (!viewModel.isAdding.value) {
+                        if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID) {
+                            showDialog.value = true
+                        } else {
+                            viewModel.firstName?.let { firstName ->
+                                if (pagerState.currentPage == 0) viewModel.addToQueue(
+                                    leftQueue = "true",
+                                    firstName = firstName,
+                                    timestamp = System.currentTimeMillis()
+                                )
+                                else viewModel.addToQueue(
+                                    leftQueue = "false",
+                                    firstName = firstName,
+                                    timestamp = System.currentTimeMillis()
+                                )
+                            }
                         }
                     }
                 },
-                backgroundColor = Primary,
+                backgroundColor = Primary
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,

@@ -2,6 +2,7 @@ package com.onthewake.onthewakelive.feature_queue.presentation
 
 import android.app.Application
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -16,6 +17,7 @@ import com.onthewake.onthewakelive.util.Constants.PREFS_USER_ID
 import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
@@ -39,6 +41,8 @@ class QueueViewModel @Inject constructor(
 
     private val _snackBarWithActionEvent = MutableSharedFlow<Queue>()
     val snackBarWithActionEvent = _snackBarWithActionEvent.asSharedFlow()
+
+    val isAdding = mutableStateOf(false)
 
     val firstName = prefs.getString(PREFS_FIRST_NAME, null)
     val userId = prefs.getString(PREFS_USER_ID, null)
@@ -84,9 +88,9 @@ class QueueViewModel @Inject constructor(
 
     fun addToQueue(leftQueue: String, firstName: String, timestamp: Long) {
         viewModelScope.launch {
-            _state.value = state.value.copy(isQueueLoading = true)
+            isAdding.value = true
 
-            val allQueue = _state.value.queue
+            val allQueue = _state.value.queue.sortedWith(compareBy { it.timestamp })
 
             val leftQueueItems = allQueue.filter { it.leftQueue == "true" }
             val rightQueueItems = allQueue.filter { it.leftQueue == "false" }
@@ -113,11 +117,15 @@ class QueueViewModel @Inject constructor(
                 } else if (leftQueue == "true" && userItemInRightQueue != null) {
                     if (leftQueueItems.size - userPositionInRightQueue >= 3) {
                         queueSocketService.addToQueue(leftQueue, firstName, timestamp)
+                    } else if (userPositionInRightQueue - leftQueueItems.size >= 3) {
+                        queueSocketService.addToQueue(leftQueue, firstName, timestamp)
                     } else {
                         _snackBarEvent.emit(context.getString(R.string.interval_error))
                     }
                 } else if (leftQueue == "false" && userItemInLeftQueue != null) {
                     if (rightQueueItems.size - userPositionInLeftQueue >= 3) {
+                        queueSocketService.addToQueue(leftQueue, firstName, timestamp)
+                    } else if (userPositionInLeftQueue - rightQueueItems.size >= 3) {
                         queueSocketService.addToQueue(leftQueue, firstName, timestamp)
                     } else {
                         _snackBarEvent.emit(context.getString(R.string.interval_error))
@@ -125,7 +133,9 @@ class QueueViewModel @Inject constructor(
                 }
             }
 
-            _state.value = state.value.copy(isQueueLoading = false)
+            // delay to prevent duplicate clicks of a button
+            delay(500)
+            isAdding.value = false
         }
     }
 

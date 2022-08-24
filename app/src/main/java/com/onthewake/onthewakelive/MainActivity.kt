@@ -9,12 +9,9 @@ import androidx.compose.material.SnackbarDuration
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.onesignal.OneSignal
 import dagger.hilt.android.AndroidEntryPoint
 import com.onthewake.onthewakelive.navigation.SetupNavGraph
 import com.onthewake.onthewakelive.ui.theme.OnTheWakeLiveTheme
-import com.onthewake.onthewakelive.util.Constants
-import com.onthewake.onthewakelive.util.Constants.ONESIGNAL_APP_ID
 import com.onthewake.onthewakelive.util.SnackBarAppState
 import com.onthewake.onthewakelive.util.rememberSnackBarAppState
 

@@ -2,6 +2,7 @@ package com.onthewake.onthewakelive.feature_auth.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.onesignal.OneSignal
 import com.onthewake.onthewakelive.feature_auth.data.remote.AuthApi
 import com.onthewake.onthewakelive.feature_auth.data.remote.request.AuthRequest
@@ -52,9 +53,11 @@ class AuthRepositoryImpl(
     override suspend fun signIn(
         phoneNumber: String, password: String
     ): AuthResult<Unit> = try {
+
         val response = api.signIn(
             request = AuthRequest(phoneNumber = phoneNumber, password = password)
         )
+
         prefs.edit().apply {
             putString(PREFS_JWT_TOKEN, response.token).apply()
             putString(PREFS_USER_ID, response.userId).apply()

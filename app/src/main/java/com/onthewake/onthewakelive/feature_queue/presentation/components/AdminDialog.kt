@@ -1,10 +1,11 @@
 package com.onthewake.onthewakelive.feature_queue.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,11 +24,10 @@ import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.DefaultTextField
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
-import com.onthewake.onthewakelive.ui.theme.ItemBgColor
-import com.onthewake.onthewakelive.ui.theme.Primary
 
+@ExperimentalMaterial3Api
 @Composable
-fun CustomDialog(
+fun AdminDialog(
     showDialog: (Boolean) -> Unit,
     onAddClicked: (Boolean, String) -> Unit,
     queue: List<Queue>
@@ -40,17 +40,16 @@ fun CustomDialog(
 
     val errorMessage = remember { mutableStateOf("") }
 
-    val darkTheme = isSystemInDarkTheme()
-
     val context = LocalContext.current
 
     Dialog(onDismissRequest = { showDialog(false) }) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colors.ItemBgColor
         ) {
             Box(
-                modifier = Modifier.padding(14.dp),
+                modifier = Modifier
+                    .padding(14.dp)
+                    .background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) {
                 Column {
@@ -59,7 +58,7 @@ fun CustomDialog(
                         text = stringResource(id = R.string.add_to_queue),
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        color = if (darkTheme) Color.White else Color.Black,
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -72,10 +71,14 @@ fun CustomDialog(
                             onClick = {
                                 leftQueueButtonState.value = true
                                 rightQueueButtonState.value = false
-                            }, colors = ButtonDefaults.buttonColors(
-                                backgroundColor = if (leftQueueButtonState.value) Primary
-                                else Color.Gray,
-                                contentColor = Color.White
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (rightQueueButtonState.value)
+                                    MaterialTheme.colorScheme.surfaceVariant
+                                else MaterialTheme.colorScheme.primary,
+                                contentColor = if (rightQueueButtonState.value)
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                else MaterialTheme.colorScheme.onPrimary
                             )
                         ) {
                             Text(text = stringResource(id = R.string.left_line_admin))
@@ -87,9 +90,12 @@ fun CustomDialog(
                                 rightQueueButtonState.value = true
                             },
                             colors = ButtonDefaults.buttonColors(
-                                backgroundColor = if (rightQueueButtonState.value) Primary
-                                else Color.Gray,
-                                contentColor = Color.White
+                                containerColor = if (leftQueueButtonState.value)
+                                    MaterialTheme.colorScheme.surfaceVariant
+                                else MaterialTheme.colorScheme.primary,
+                                contentColor = if (leftQueueButtonState.value)
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                else MaterialTheme.colorScheme.onPrimary
                             )
                         ) {
                             Text(text = stringResource(id = R.string.right_line_admin))
@@ -126,7 +132,7 @@ fun CustomDialog(
                             }
                         }
                     ) {
-                        Text(text = stringResource(id = R.string.add), color = Color.White)
+                        Text(text = stringResource(id = R.string.add))
                     }
                     Spacer(modifier = Modifier.height(10.dp))
                 }

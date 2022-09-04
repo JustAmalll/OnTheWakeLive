@@ -6,12 +6,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,28 +25,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.airbnb.lottie.compose.*
-import com.google.accompanist.pager.*
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.feature_queue.presentation.components.CustomDialog
+import com.onthewake.onthewakelive.feature_queue.presentation.components.AdminDialog
 import com.onthewake.onthewakelive.feature_queue.presentation.components.EmptyContent
-import com.onthewake.onthewakelive.feature_queue.presentation.components.LoadingDialog
-import com.onthewake.onthewakelive.ui.theme.BackgroundColor
-import com.onthewake.onthewakelive.ui.theme.ItemBgColor
-import com.onthewake.onthewakelive.ui.theme.Primary
-import com.onthewake.onthewakelive.ui.theme.darkThemeBgColor
 import com.onthewake.onthewakelive.util.Constants.FIRST_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 
+@ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @Composable
 fun QueueScreen(
@@ -55,55 +54,52 @@ fun QueueScreen(
     val state = viewModel.state.value
     val context = LocalContext.current
     val pagerState = rememberPagerState(pageCount = 2)
-    val showDialog = remember { mutableStateOf(false) }
+    val showDialog = viewModel.showDialog
     val snackBarHostState = remember { SnackbarHostState() }
     val userId = viewModel.userId
 
     val systemUiController = rememberSystemUiController()
     val darkTheme = isSystemInDarkTheme()
+    val surface = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
 
     SideEffect {
         systemUiController.setStatusBarColor(
-            color = Primary, darkIcons = false
+            color = surface, darkIcons = !darkTheme
         )
         systemUiController.setNavigationBarColor(
-            color = if (darkTheme) darkThemeBgColor else Color.White,
+            color = surface,
             darkIcons = !darkTheme
         )
     }
 
     LaunchedEffect(key1 = true) {
         viewModel.snackBarEvent.collectLatest { message ->
-            snackBarHostState.showSnackbar(message = message)
+            snackBarHostState.showSnackbar(message = message, duration = SnackbarDuration.Short)
         }
     }
 
     LaunchedEffect(key1 = true) {
-
         viewModel.snackBarWithActionEvent.collectLatest { deletedItem ->
-
             val result = snackBarHostState.showSnackbar(
                 message = if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID)
                     context.getString(R.string.admin_delete_message)
                 else context.getString(R.string.delete_message),
-                actionLabel = context.getString(R.string.undo)
+                actionLabel = context.getString(R.string.undo),
+                duration = SnackbarDuration.Short
             )
 
-            when (result) {
-                SnackbarResult.ActionPerformed -> {
-                    viewModel.addToQueue(
-                        leftQueue = deletedItem.leftQueue,
-                        firstName = deletedItem.firstName,
-                        timestamp = deletedItem.timestamp
-                    )
-                }
-                SnackbarResult.Dismissed -> {}
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.addToQueue(
+                    leftQueue = deletedItem.leftQueue,
+                    firstName = deletedItem.firstName,
+                    timestamp = deletedItem.timestamp
+                )
             }
         }
     }
 
     if (showDialog.value) {
-        CustomDialog(
+        AdminDialog(
             showDialog = { showDialog.value = it },
             onAddClicked = { leftQueue, firstName ->
                 viewModel.addToQueue(
@@ -116,12 +112,38 @@ fun QueueScreen(
         )
     }
 
-    if (state.isQueueLoading) LoadingDialog()
+    if (state.isQueueLoading) {
+        Dialog(onDismissRequest = {}) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.padding(40.dp)
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+    }
 
     Scaffold(
-        scaffoldState = rememberScaffoldState(snackbarHostState = snackBarHostState),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.queue),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
+                modifier = Modifier.padding(bottom = 76.dp),
                 onClick = {
                     if (!viewModel.isAdding.value) {
                         if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID) {
@@ -141,8 +163,7 @@ fun QueueScreen(
                             }
                         }
                     }
-                },
-                backgroundColor = Primary
+                }
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -150,33 +171,13 @@ fun QueueScreen(
                     tint = Color.White
                 )
             }
-        },
-        topBar = {
-            TopAppBar(backgroundColor = Primary, elevation = 0.dp) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        modifier = Modifier.padding(all = 5.dp),
-                        text = stringResource(id = R.string.queue),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
         }
-    ) { paddingValues ->
-
+    ) { padding ->
         val lifecycleOwner = LocalLifecycleOwner.current
 
         DisposableEffect(key1 = lifecycleOwner) {
             val observer = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_START) viewModel.connectToQueue()
-                else if (event == Lifecycle.Event.ON_STOP) viewModel.disconnect()
+                if (event == Lifecycle.Event.ON_DESTROY) viewModel.disconnect()
             }
             lifecycleOwner.lifecycle.addObserver(observer)
             onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -185,8 +186,7 @@ fun QueueScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = paddingValues.calculateBottomPadding())
-                .background(MaterialTheme.colors.BackgroundColor),
+                .padding(padding),
         ) {
             Tabs(pagerState = pagerState)
 
@@ -205,10 +205,10 @@ fun QueueScreen(
                     )
                 }
             }
-
         }
     }
 }
+
 
 @ExperimentalPagerApi
 @Composable
@@ -225,32 +225,38 @@ fun Tabs(pagerState: PagerState) {
 
     TabRow(
         selectedTabIndex = pagerState.currentPage,
-        backgroundColor = Primary,
         contentColor = Color.White,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+                Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
                 height = 2.dp,
-                color = Color.White
+                color = MaterialTheme.colorScheme.secondaryContainer
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
     ) {
         list.forEachIndexed { index, _ ->
             Tab(
                 icon = {
-                    Icon(imageVector = list[index].second, contentDescription = null)
+                    Icon(
+                        imageVector = list[index].second,
+                        contentDescription = null,
+                        tint = if (pagerState.currentPage == index)
+                            MaterialTheme.colorScheme.onSecondaryContainer
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 },
                 text = {
                     Text(
                         list[index].first,
-                        color = if (pagerState.currentPage == index) Color.White else Color.LightGray
+                        color = if (pagerState.currentPage == index)
+                            MaterialTheme.colorScheme.onSurface
+                        else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
                 selected = pagerState.currentPage == index,
                 onClick = {
-                    scope.launch {
-                        pagerState.animateScrollToPage(index)
-                    }
+                    scope.launch { pagerState.animateScrollToPage(index) }
                 }
             )
         }
@@ -330,15 +336,14 @@ fun QueueItem(
                 modifier = Modifier.padding(end = 20.dp),
                 imageVector = Icons.Default.Delete,
                 contentDescription = stringResource(id = R.string.delete_icon),
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onError
             )
         },
-        background = Color.Red,
+        background = MaterialTheme.colorScheme.error,
         onSwipe = { onSwipeToDelete(queueItemId) },
     )
 
     Surface(
-        elevation = 4.dp,
         shape = RoundedCornerShape(4.dp),
         modifier = Modifier.padding(vertical = 6.dp)
     ) {
@@ -349,14 +354,14 @@ fun QueueItem(
             SwipeableActionsBox(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(shape = RoundedCornerShape(4.dp))
-                    .background(MaterialTheme.colors.ItemBgColor),
-                startActions = listOf(swipeToDelete),
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .clip(shape = RoundedCornerShape(4.dp)),
+                startActions = listOf(swipeToDelete)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = MaterialTheme.colors.ItemBgColor)
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
                         .padding(horizontal = 14.dp, vertical = 12.dp)
                 ) {
                     Text(text = queueItemFirstName)
@@ -364,16 +369,17 @@ fun QueueItem(
             }
         } else {
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                backgroundColor = MaterialTheme.colors.ItemBgColor
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(color = MaterialTheme.colors.ItemBgColor)
                         .padding(horizontal = 14.dp, vertical = 12.dp)
                 ) {
-                    Text(text = queueItemFirstName)
+                    Text(
+                        text = queueItemFirstName,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }

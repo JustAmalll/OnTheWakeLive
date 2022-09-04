@@ -2,6 +2,7 @@ package com.onthewake.onthewakelive.feature_queue.presentation.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,22 +27,21 @@ fun EmptyContent(modifier: Modifier = Modifier) {
     )
 
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
         LottieAnimation(
             composition = compositionResult.value,
             progress = { progress },
             modifier = Modifier.size(240.dp)
         )
-
         Text(
             text = stringResource(id = R.string.empty_queue_error),
-            fontSize = 17.sp
+            fontSize = 17.sp,
+            color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(150.dp))
     }
 
 }

@@ -1,11 +1,11 @@
 package com.onthewake.onthewakelive.core.presentation
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.onthewake.onthewakelive.R
 
+@ExperimentalMaterial3Api
 @Composable
 fun DefaultTextField(
     modifier: Modifier = Modifier,
@@ -24,6 +25,7 @@ fun DefaultTextField(
     errorText: String? = "",
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+    keyboardActions: KeyboardActions = KeyboardActions(onDone = {}),
     isPasswordTextField: Boolean = false
 ) {
 
@@ -36,6 +38,7 @@ fun DefaultTextField(
         label = { Text(text = label) },
         singleLine = true,
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         isError = isError,
         visualTransformation = if (!showPassword && isPasswordTextField)
             PasswordVisualTransformation() else VisualTransformation.None,
@@ -60,7 +63,7 @@ fun DefaultTextField(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = errorText,
-            color = MaterialTheme.colors.error,
+            color = MaterialTheme.colorScheme.error,
             fontSize = 14.sp,
             textAlign = TextAlign.End
         )

@@ -3,6 +3,8 @@ package com.onthewake.onthewakelive.di
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import coil.ImageLoader
+import coil.decode.SvgDecoder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,6 +36,13 @@ object AppModule {
             }
         )
         .build()
+
+    @Provides
+    @Singleton
+    fun provideImageLoader(app: Application): ImageLoader =
+        ImageLoader.Builder(app)
+            .crossfade(true)
+            .build()
 
     @Provides
     @Singleton

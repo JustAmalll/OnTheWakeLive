@@ -2,11 +2,14 @@ package com.onthewake.onthewakelive.feature_queue.presentation
 
 import android.app.Application
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueService
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueSocketService
@@ -25,6 +28,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@ExperimentalPagerApi
 @HiltViewModel
 class QueueViewModel @Inject constructor(
     private val queueService: QueueService,
@@ -43,11 +47,16 @@ class QueueViewModel @Inject constructor(
     val snackBarWithActionEvent = _snackBarWithActionEvent.asSharedFlow()
 
     val isAdding = mutableStateOf(false)
+    val showDialog = mutableStateOf(false)
 
     val firstName = prefs.getString(PREFS_FIRST_NAME, null)
     val userId = prefs.getString(PREFS_USER_ID, null)
 
-    fun connectToQueue() {
+    init {
+        connectToQueue()
+    }
+
+    private fun connectToQueue() {
         getQueue()
 
         viewModelScope.launch {
@@ -55,7 +64,6 @@ class QueueViewModel @Inject constructor(
                 is Resource.Success -> {
                     queueSocketService.observeQueue()
                         .onEach { queueItem ->
-
                             val newList = state.value.queue
                                 .toMutableList().apply {
                                     if (queueItem.isDeleteAction) remove(queueItem.queue)

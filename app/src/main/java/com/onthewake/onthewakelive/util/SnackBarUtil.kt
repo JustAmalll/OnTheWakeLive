@@ -1,9 +1,7 @@
 package com.onthewake.onthewakelive.util
 
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -13,12 +11,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class SnackBarAppState(
-    val scaffoldState: ScaffoldState,
+    val hostState: SnackbarHostState,
     val snackBarScope: CoroutineScope
 ) {
     fun showSnackBar(message: String, duration: SnackbarDuration) {
         snackBarScope.launch {
-            scaffoldState.snackbarHostState.showSnackbar(
+            hostState.showSnackbar(
                 message = message, duration = duration
             )
         }
@@ -27,14 +25,12 @@ class SnackBarAppState(
 
 @Composable
 fun rememberSnackBarAppState(
-    scaffoldState: ScaffoldState = rememberScaffoldState(
-        snackbarHostState = remember { SnackbarHostState() }
-    ),
+    hostState: SnackbarHostState = remember { SnackbarHostState() },
     navController: NavHostController = rememberNavController(),
     snackBarScope: CoroutineScope = rememberCoroutineScope()
-) = remember(scaffoldState, navController, snackBarScope) {
+) = remember(hostState, navController, snackBarScope) {
     SnackBarAppState(
-        scaffoldState = scaffoldState,
+        hostState = hostState,
         snackBarScope = snackBarScope
     )
 }

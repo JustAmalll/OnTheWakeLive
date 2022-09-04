@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -15,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -24,7 +26,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.navigation.Screen
-import com.onthewake.onthewakelive.ui.theme.Primary
+import com.onthewake.onthewakelive.ui.theme.Neutral10
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -41,7 +43,7 @@ fun SplashScreen(
 
     SideEffect {
         systemUiController.setSystemBarsColor(
-            color = Primary, darkIcons = false
+            color = Neutral10, darkIcons = false
         )
     }
 
@@ -60,7 +62,7 @@ fun SplashScreen(
     }
     LaunchedEffect(key1 = true) {
         viewModel.authResults.collect { result ->
-            delay(2000)
+            delay(1400)
             when (result) {
                 is AuthResult.Authorized -> {
                     navController.navigate(Screen.QueueScreen.route) {
@@ -79,12 +81,12 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Primary),
+            .background(Neutral10),
         contentAlignment = Alignment.Center,
     ) {
         Image(
             modifier = Modifier
-                .size(400.dp)
+                .size(600.dp)
                 .scale(scale.value),
             painter = painterResource(id = R.drawable.on_the_wake_logo),
             contentDescription = stringResource(id = R.string.logo)

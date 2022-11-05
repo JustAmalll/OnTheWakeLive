@@ -3,6 +3,7 @@ package com.onthewake.onthewakelive.feature_auth.domain.use_cases
 import android.content.Context
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
+import java.util.*
 
 class ValidationUseCase(
     private val context: Context
@@ -70,4 +71,27 @@ class ValidationUseCase(
         return ValidationResult(successful = true)
     }
 
+    fun validateDateOfBirth(dateOfBirth: String): ValidationResult {
+        if (dateOfBirth.isNotEmpty()) {
+            if (dateOfBirth.takeLast(4) >= Calendar.getInstance().get(Calendar.YEAR).toString()) {
+                return ValidationResult(
+                    successful = false,
+                    errorMessage = context.getString(R.string.validate_date_of_birth_error)
+                )
+            }
+            if (dateOfBirth.take(2).toInt() > 31) {
+                return ValidationResult(
+                    successful = false,
+                    errorMessage = context.getString(R.string.validate_date_of_birth_day_error)
+                )
+            }
+            if (dateOfBirth.drop(2).dropLast(4).toInt() > 12) {
+                return ValidationResult(
+                    successful = false,
+                    errorMessage = context.getString(R.string.validate_date_of_birth_month_error)
+                )
+            }
+        }
+        return ValidationResult(successful = true)
+    }
 }

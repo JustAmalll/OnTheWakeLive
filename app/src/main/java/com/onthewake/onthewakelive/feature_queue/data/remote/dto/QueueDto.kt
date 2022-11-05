@@ -7,14 +7,18 @@ import kotlinx.serialization.Serializable
 data class QueueDto(
     val id: String,
     val userId: String,
-    val leftQueue: String,
     val firstName: String,
+    val lastName: String,
+    val profilePictureFileName: String,
+    val leftQueue: String,
     val timestamp: Long
 ) {
     fun toQueue(): Queue = Queue(
         id = id,
         userId = userId,
         firstName = firstName,
+        lastName = lastName,
+        profilePictureFileName = profilePictureFileName,
         leftQueue = leftQueue,
         timestamp = timestamp
     )

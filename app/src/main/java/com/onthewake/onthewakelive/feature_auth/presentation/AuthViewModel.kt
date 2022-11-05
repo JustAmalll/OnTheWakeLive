@@ -1,13 +1,18 @@
 package com.onthewake.onthewakelive.feature_auth.presentation
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
+import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -17,8 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
-    private val validationUseCase: ValidationUseCase
-) : ViewModel() {
+    private val validationUseCase: ValidationUseCase,
+    private val context: Application
+) : AndroidViewModel(context) {
 
     var state by mutableStateOf(AuthState())
 
@@ -44,12 +50,6 @@ class AuthViewModel @Inject constructor(
             }
             is AuthUiEvent.SignUpPhoneNumberChanged -> {
                 state = state.copy(signUpPhoneNumber = event.value)
-            }
-            is AuthUiEvent.SignUpTelegramChanged -> {
-                state = state.copy(signUpTelegram = event.value)
-            }
-            is AuthUiEvent.SignUpInstagramChanged -> {
-                state = state.copy(signUpInstagram = event.value)
             }
             is AuthUiEvent.SignUpPasswordChanged -> {
                 state = state.copy(signUpPassword = event.value)
@@ -89,10 +89,15 @@ class AuthViewModel @Inject constructor(
                 firstName = state.signUpFirsName,
                 lastName = state.signUpLastName,
                 phoneNumber = state.signUpPhoneNumber,
-                telegram = state.signUpTelegram,
-                instagram = state.signUpInstagram,
                 password = state.signUpPassword
             )
+            context.dataStore.updateData { profile ->
+                profile.copy(
+                    firstName = state.signUpFirsName,
+                    lastName = state.signUpLastName,
+                    phoneNumber = state.signUpPhoneNumber
+                )
+            }
             resultChannel.send(result)
             state = state.copy(isLoading = false)
         }

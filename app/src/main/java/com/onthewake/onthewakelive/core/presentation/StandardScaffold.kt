@@ -1,16 +1,20 @@
 package com.onthewake.onthewakelive.core.presentation
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.navigation.NavHostController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.core.domain.modules.BottomNavItem
 import com.onthewake.onthewakelive.navigation.Screen
+import com.onthewake.onthewakelive.util.Constants
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
@@ -32,17 +36,21 @@ fun StandardScaffold(
             contentDescription = "Profile"
         )
     ),
+    prefs: SharedPreferences,
     topBar: @Composable () -> Unit = {},
     content: @Composable () -> Unit
 ) {
 
+    val userId = prefs.getString(Constants.PREFS_USER_ID, null)
+    val haptic = LocalHapticFeedback.current
+
     Scaffold(
-        topBar = {
-            topBar()
-        },
+        topBar = { topBar() },
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
+                if (userId != Constants.FIRST_ADMIN_USER_ID &&
+                    userId != Constants.SECOND_ADMIN_USER_ID
+                ) NavigationBar {
                     bottomNavItems.forEachIndexed { _, item ->
                         NavigationBarItem(
                             icon = {
@@ -58,6 +66,7 @@ fun StandardScaffold(
                                 item.route
                             ) == true,
                             onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 if (navController.currentDestination?.route != item.route) {
                                     navController.navigate(item.route) {
                                         launchSingleTop = true

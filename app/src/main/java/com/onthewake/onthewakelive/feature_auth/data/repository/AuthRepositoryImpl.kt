@@ -25,8 +25,6 @@ class AuthRepositoryImpl(
         firstName: String,
         lastName: String,
         phoneNumber: String,
-        telegram: String,
-        instagram: String,
         password: String
     ): AuthResult<Unit> = try {
         api.signUp(
@@ -34,8 +32,6 @@ class AuthRepositoryImpl(
                 firstName = firstName,
                 lastName = lastName,
                 phoneNumber = phoneNumber,
-                telegram = telegram,
-                instagram = instagram,
                 password = password
             )
         )

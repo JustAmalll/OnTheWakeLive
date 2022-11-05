@@ -1,7 +1,6 @@
-package com.onthewake.onthewakelive.feature_queue.presentation.components
+package com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.core.presentation.DefaultTextField
+import com.onthewake.onthewakelive.core.presentation.StandardTextField
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
 
@@ -102,7 +100,7 @@ fun AdminDialog(
                         }
                     }
                     Spacer(modifier = Modifier.height(20.dp))
-                    DefaultTextField(
+                    StandardTextField(
                         value = firstNameFieldState.value,
                         onValueChange = { firstNameFieldState.value = it },
                         label = stringResource(id = R.string.first_name),

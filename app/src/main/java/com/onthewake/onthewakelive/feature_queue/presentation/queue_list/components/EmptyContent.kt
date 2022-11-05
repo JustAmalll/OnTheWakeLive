@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.feature_queue.presentation.components
+package com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text

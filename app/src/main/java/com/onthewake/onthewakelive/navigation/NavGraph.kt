@@ -3,16 +3,20 @@ package com.onthewake.onthewakelive.navigation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import coil.ImageLoader
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.feature_auth.presentation.LoginScreen
 import com.onthewake.onthewakelive.feature_auth.presentation.RegisterScreen
 import com.onthewake.onthewakelive.feature_profile.presentation.edit_profile.EditProfileScreen
 import com.onthewake.onthewakelive.feature_profile.presentation.profile.ProfileScreen
-import com.onthewake.onthewakelive.feature_queue.presentation.QueueScreen
+import com.onthewake.onthewakelive.feature_queue.presentation.queue_details.QueueDetailsScreen
+import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.QueueScreen
 import com.onthewake.onthewakelive.feature_splash.SplashScreen
+import com.onthewake.onthewakelive.util.Constants.DETAILS_ARGUMENT_KEY
 
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
@@ -35,13 +39,21 @@ fun SetupNavGraph(
             RegisterScreen(navController = navController)
         }
         composable(route = Screen.QueueScreen.route) {
-            QueueScreen()
+            QueueScreen(navController = navController, imageLoader = imageLoader)
+        }
+        composable(
+            route = Screen.QueueDetailsScreen.route,
+            arguments = listOf(navArgument(DETAILS_ARGUMENT_KEY) {
+                type = NavType.StringType
+            })
+        ) {
+            QueueDetailsScreen(imageLoader = imageLoader, navController = navController)
         }
         composable(route = Screen.ProfileScreen.route) {
-            ProfileScreen()
+            ProfileScreen(navController = navController, imageLoader = imageLoader)
         }
         composable(route = Screen.EditProfileScreen.route) {
-            EditProfileScreen(imageLoader = imageLoader)
+            EditProfileScreen(imageLoader = imageLoader, navController = navController)
         }
     }
 }

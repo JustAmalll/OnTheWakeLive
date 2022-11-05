@@ -1,15 +1,13 @@
-package com.onthewake.onthewakelive.feature_queue.presentation
+package com.onthewake.onthewakelive.feature_queue.presentation.queue_list
 
 import android.app.Application
 import android.content.SharedPreferences
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.rememberPagerState
+import com.google.firebase.storage.FirebaseStorage
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueService
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueSocketService
@@ -21,10 +19,7 @@ import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,6 +29,7 @@ class QueueViewModel @Inject constructor(
     private val queueService: QueueService,
     private val queueSocketService: QueueSocketService,
     private val context: Application,
+    storage: FirebaseStorage,
     prefs: SharedPreferences
 ) : AndroidViewModel(context) {
 
@@ -46,17 +42,15 @@ class QueueViewModel @Inject constructor(
     private val _snackBarWithActionEvent = MutableSharedFlow<Queue>()
     val snackBarWithActionEvent = _snackBarWithActionEvent.asSharedFlow()
 
+    val firebaseStorage = storage
+
     val isAdding = mutableStateOf(false)
     val showDialog = mutableStateOf(false)
 
     val firstName = prefs.getString(PREFS_FIRST_NAME, null)
     val userId = prefs.getString(PREFS_USER_ID, null)
 
-    init {
-        connectToQueue()
-    }
-
-    private fun connectToQueue() {
+    fun connectToQueue() {
         getQueue()
 
         viewModelScope.launch {
@@ -66,13 +60,12 @@ class QueueViewModel @Inject constructor(
                         .onEach { queueItem ->
                             val newList = state.value.queue
                                 .toMutableList().apply {
-                                    if (queueItem.isDeleteAction) remove(queueItem.queue)
+                                    if (queueItem.isDeleteAction) removeIf { it.id == queueItem.queue.id }
                                     else add(0, queueItem.queue)
                                 }
                                 .sortedWith(compareByDescending { it.timestamp })
-
+                            println(newList)
                             _state.value = state.value.copy(queue = newList)
-
                         }.launchIn(viewModelScope)
                 }
                 is Resource.Error -> {
@@ -157,12 +150,13 @@ class QueueViewModel @Inject constructor(
                         id = it.id,
                         userId = it.userId,
                         firstName = it.firstName,
+                        lastName = it.lastName,
+                        profilePictureFileName = it.profilePictureFileName,
                         leftQueue = it.leftQueue,
                         timestamp = it.timestamp
                     )
                 )
             }
-
             _state.value = state.value.copy(isQueueLoading = false)
         }
     }

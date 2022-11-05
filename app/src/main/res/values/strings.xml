@@ -10,11 +10,16 @@
     <string name="validate_first_name_error">The first name can\'t be blank</string>
     <string name="validate_user_error">There is already this user in the queue</string>
     <string name="validate_last_name_error">The last name can\'t be blank</string>
+    <string name="validate_date_of_birth_error">Date of birth can\'t be greater than the current year</string>
+    <string name="validate_date_of_birth_day_error">Birthday can\'t be more than the number of days in a month</string>
+    <string name="validate_date_of_birth_month_error">The month of birth can\'t be greater than the number of months in a year</string>
     <string name="validate_phone_number_error">"The phone number can\'t be blank</string>
     <string name="validate_password_error">The password can\'t be blank</string>
     <string name="validate_password_length_error">The password needs to consist of at least 6 characters</string>
 
     <string name="unknown_error">An unknown error occurred</string>
+    <string name="couldnt_reach_server">Oops! Couldn\'t reach server. Check your internet connection.</string>
+    <string name="something_went_wrong">Oops! Something went wrong. Please try again.</string>
     <string name="incorrect_data">Incorrect phone number or password</string>
 
     <string name="login">Login</string>
@@ -44,12 +49,12 @@
     <string name="delete_message">You have been removed from the queue</string>
     <string name="admin_delete_message">You have removed a person from the queue</string>
     <string name="undo">UNDO</string>
-    <string name="add_icon">Add Icon</string>
+    <string name="add_icon">Add icon</string>
     <string name="queue">Queue</string>
     <string name="left_line">Left Line</string>
-    <string name="right_line">Right Line</string>
-    <string name="left_line_admin">Left Line</string>
-    <string name="right_line_admin">Right Line</string>
+    <string name="right_line">Right line</string>
+    <string name="left_line_admin">Left line</string>
+    <string name="right_line_admin">Right line</string>
     <string name="delete_icon">Delete Icon</string>
 
     <string name="already_in_queue_error">Oops! You are already in queue!</string>
@@ -57,5 +62,21 @@
 
     <string name="logo" translatable="false">OnTheWakeLogo</string>
 
+    <string name="profile">Profile</string>
+    <string name="edit_icon">Edit Icon</string>
+    <string name="not_specified">Not specified</string>
+    <string name="right_arrow">Right arrow</string>
+
+    <string name="details">Details</string>
+    <string name="arrow_back_icon">Arrow Back Icon</string>
+    <string name="date_of_birth">Date of Birth</string>
+
+    <string name="user_picture">User picture</string>
+    <string name="person_icon">Person Icon</string>
+
+    <string name="edit_profile">Edit Profile</string>
+    <string name="edit_profile_date_of_birth">Date of Birth (dd/mm/yyyy)</string>
+    <string name="nothing_to_update">Nothing to update</string>
+    <string name="edit">Edit</string>
 
 </resources>

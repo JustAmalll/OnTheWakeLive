@@ -8,13 +8,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -25,9 +25,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.core.presentation.DefaultTextField
+import com.onthewake.onthewakelive.core.presentation.StandardTextField
+import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.navigation.Screen
+import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @Composable
@@ -39,7 +41,9 @@ fun RegisterScreen(
     val state = viewModel.state
     val snackBarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
+    val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(viewModel, context) {
         viewModel.authResults.collect { result ->
@@ -91,7 +95,7 @@ fun RegisterScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                DefaultTextField(
+                StandardTextField(
                     value = state.signUpFirsName,
                     onValueChange = {
                         viewModel.onEvent(AuthUiEvent.SignUpFirstNameChanged(it))
@@ -105,7 +109,7 @@ fun RegisterScreen(
                     errorText = state.signUpFirsNameError
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                DefaultTextField(
+                StandardTextField(
                     value = state.signUpLastName,
                     onValueChange = {
                         viewModel.onEvent(AuthUiEvent.SignUpLastNameChanged(it))
@@ -119,7 +123,7 @@ fun RegisterScreen(
                     errorText = state.signUpLastNameError
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                DefaultTextField(
+                StandardTextField(
                     value = state.signUpPhoneNumber,
                     onValueChange = {
                         viewModel.onEvent(AuthUiEvent.SignUpPhoneNumberChanged(it))
@@ -133,23 +137,7 @@ fun RegisterScreen(
                     errorText = state.signUpPhoneNumberError
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                DefaultTextField(
-                    value = state.signUpTelegram,
-                    onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignUpTelegramChanged(it))
-                    },
-                    label = stringResource(id = R.string.telegram)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                DefaultTextField(
-                    value = state.signUpInstagram,
-                    onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignUpInstagramChanged(it))
-                    },
-                    label = stringResource(id = R.string.instagram)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                DefaultTextField(
+                StandardTextField(
                     value = state.signUpPassword,
                     onValueChange = {
                         viewModel.onEvent(AuthUiEvent.SignUpPasswordChanged(it))
@@ -172,8 +160,18 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         viewModel.onEvent(AuthUiEvent.SignUp)
                         focusManager.clearFocus()
+                        scope.launch {
+                            context.dataStore.updateData {
+                                it.copy(
+                                    firstName = state.signUpFirsName,
+                                    lastName = state.signUpLastName,
+                                    phoneNumber = state.signUpPhoneNumber
+                                )
+                            }
+                        }
                     },
                     modifier = Modifier.align(Alignment.End)
                 ) {

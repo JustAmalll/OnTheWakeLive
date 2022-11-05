@@ -8,8 +8,8 @@ sealed class EditProfileUiEvent {
     data class EditProfilePhoneNumberChanged(val value: String): EditProfileUiEvent()
     data class EditProfileTelegramChanged(val value: String): EditProfileUiEvent()
     data class EditProfileInstagramChanged(val value: String): EditProfileUiEvent()
-    object EditEditProfile: EditProfileUiEvent()
+    data class EditProfileDateOfBirthChanged(val value: String): EditProfileUiEvent()
+    object EditProfile: EditProfileUiEvent()
 
-    data class PickImage(val uri: Uri?) : EditProfileUiEvent()
     data class CropImage(val uri: Uri?) : EditProfileUiEvent()
 }

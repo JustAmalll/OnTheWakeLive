@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.feature_queue.presentation
+package com.onthewake.onthewakelive.feature_queue.presentation.queue_list
 
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
 

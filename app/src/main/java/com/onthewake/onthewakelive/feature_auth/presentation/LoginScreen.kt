@@ -13,8 +13,10 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -25,7 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.core.presentation.DefaultTextField
+import com.onthewake.onthewakelive.core.presentation.StandardTextField
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.navigation.Screen
 
@@ -41,6 +43,7 @@ fun LoginScreen(
     val focusManager = LocalFocusManager.current
     val systemUiController = rememberSystemUiController()
     val darkTheme = isSystemInDarkTheme()
+    val haptic = LocalHapticFeedback.current
     val systemBarsColor = MaterialTheme.colorScheme.background
 
     SideEffect {
@@ -96,7 +99,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                DefaultTextField(
+                StandardTextField(
                     value = state.signInPhoneNumber,
                     onValueChange = {
                         viewModel.onEvent(AuthUiEvent.SignInPhoneNumberChanged(it))
@@ -110,7 +113,7 @@ fun LoginScreen(
                     errorText = state.signUpPhoneNumber,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                DefaultTextField(
+                StandardTextField(
                     value = state.signInPassword,
                     onValueChange = {
                         viewModel.onEvent(AuthUiEvent.SignInPasswordChanged(it))
@@ -134,6 +137,7 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         viewModel.onEvent(AuthUiEvent.SignIn)
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         focusManager.clearFocus()
                     },
                     modifier = Modifier.align(Alignment.End)

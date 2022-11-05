@@ -4,12 +4,14 @@ import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import coil.ImageLoader
-import coil.decode.SvgDecoder
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import com.google.gson.Gson
+import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
@@ -48,5 +50,12 @@ object AppModule {
     @Singleton
     fun provideSharedPref(app: Application): SharedPreferences =
         app.getSharedPreferences("prefs", MODE_PRIVATE)
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = Gson()
+
+    @Provides
+    fun provideFirebaseStorage() = Firebase.storage
 
 }

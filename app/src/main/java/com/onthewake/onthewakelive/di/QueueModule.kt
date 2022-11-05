@@ -2,16 +2,14 @@ package com.onthewake.onthewakelive.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.onthewake.onthewakelive.feature_queue.data.remote.*
+import com.onthewake.onthewakelive.util.Constants
+import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import com.onthewake.onthewakelive.feature_queue.data.remote.QueueService
-import com.onthewake.onthewakelive.feature_queue.data.remote.QueueServiceImpl
-import com.onthewake.onthewakelive.feature_queue.data.remote.QueueSocketService
-import com.onthewake.onthewakelive.feature_queue.data.remote.QueueSocketServiceImpl
-import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.*
@@ -21,6 +19,9 @@ import io.ktor.client.features.logging.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -45,9 +46,20 @@ object QueueModule {
 
     @Provides
     @Singleton
+    fun provideQueueApi(client: OkHttpClient): QueueApi {
+        return Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+            .create(QueueApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideQueueService(
-        client: HttpClient
-    ): QueueService = QueueServiceImpl(client)
+        client: HttpClient, queueApi: QueueApi
+    ): QueueService = QueueServiceImpl(client, queueApi)
 
     @Provides
     @Singleton

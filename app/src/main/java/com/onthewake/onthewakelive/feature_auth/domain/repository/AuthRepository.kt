@@ -8,8 +8,6 @@ interface AuthRepository {
         firstName: String,
         lastName: String,
         phoneNumber: String,
-        telegram: String,
-        instagram: String,
         password: String
     ): AuthResult<Unit>
 

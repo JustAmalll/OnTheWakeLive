@@ -17,7 +17,7 @@ import com.onthewake.onthewakelive.R
 
 @ExperimentalMaterial3Api
 @Composable
-fun DefaultTextField(
+fun StandardTextField(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,

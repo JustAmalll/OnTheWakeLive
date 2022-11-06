@@ -1,6 +1,5 @@
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_list
 
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -51,6 +50,8 @@ import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.util.Constants.FIRST_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.UserProfileSerializer
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
@@ -429,7 +430,7 @@ fun QueueItem(
                     ) {
 //                        StandardImageView(
 //                            imageLoader = imageLoader,
-//                            model = imageRef.toString()
+//                            model = downloadUrl.toString()
 //                        )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
@@ -484,7 +485,7 @@ fun QueueItem(
                     ) {
 //                        StandardImageView(
 //                            imageLoader = imageLoader,
-//                            model = imageRef
+//                            model = downloadUrl.toString()
 //                        )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {

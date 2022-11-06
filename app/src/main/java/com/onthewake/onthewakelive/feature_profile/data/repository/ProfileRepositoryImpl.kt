@@ -1,8 +1,6 @@
 package com.onthewake.onthewakelive.feature_profile.data.repository
 
 import android.content.Context
-import android.net.Uri
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.google.firebase.storage.FirebaseStorage
 import com.onthewake.onthewakelive.R
@@ -37,6 +35,7 @@ class ProfileRepositoryImpl(
             Resource.Error(context.getString(R.string.something_went_wrong))
         }
     }
+
 
     override suspend fun updateProfile(
         updateProfileData: UpdateProfileData,

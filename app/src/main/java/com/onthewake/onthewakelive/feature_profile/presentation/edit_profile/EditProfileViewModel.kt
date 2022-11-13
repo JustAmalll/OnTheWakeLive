@@ -10,7 +10,6 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.storage.FirebaseStorage
 import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
 import com.onthewake.onthewakelive.feature_profile.domain.module.UpdateProfileData
@@ -19,7 +18,6 @@ import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -99,12 +97,20 @@ class EditProfileViewModel @Inject constructor(
                 profileDateOfBirthError = dateOfBirthResult.errorMessage
             )
             return
+        } else {
+            state = state.copy(
+                profileFirsNameError = null,
+                profileLastNameError = null,
+                profilePhoneNumberError = null,
+                profileDateOfBirthError = null
+            )
         }
 
         viewModelScope.launch {
             state = state.copy(isLoading = true)
 
-            val profilePictureFileName = profilePictureUri.value?.toFile()?.name ?: userProfilePictureUri.value.toUri().toFile().name
+            val profilePictureFileName = profilePictureUri.value?.toFile()?.name
+                ?: userProfilePictureUri.value.toUri().toFile().name
             val profilePictureUri = profilePictureUri.value ?: userProfilePictureUri.value
 
             println(profilePictureFileName)

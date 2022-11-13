@@ -1,15 +1,12 @@
-package com.onthewake.onthewakelive.feature_auth.presentation
+package com.onthewake.onthewakelive.feature_auth.presentation.auth_otp
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.StandardTextField
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
@@ -33,44 +29,35 @@ import com.onthewake.onthewakelive.navigation.Screen
 
 @ExperimentalMaterial3Api
 @Composable
-fun LoginScreen(
+fun OtpScreen(
     navController: NavHostController,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: OtpViewModel = hiltViewModel()
 ) {
     val state = viewModel.state
     val snackBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-    val systemUiController = rememberSystemUiController()
-    val darkTheme = isSystemInDarkTheme()
     val haptic = LocalHapticFeedback.current
-    val systemBarsColor = MaterialTheme.colorScheme.background
-
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = systemBarsColor, darkIcons = !darkTheme
-        )
-    }
 
     LaunchedEffect(viewModel, context) {
         viewModel.authResults.collect { result ->
             when (result) {
                 is AuthResult.Authorized -> {
-                    navController.navigate(Screen.QueueScreen.route)
-                }
-                is AuthResult.IncorrectData -> {
                     snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.incorrect_data)
+                        message = "Registration complete",
+                        duration = SnackbarDuration.Short
                     )
                 }
-                is AuthResult.UnknownError -> {
+                is AuthResult.IncorrectOtp -> {
                     snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.unknown_error)
+                        message = "IncorrectOtp",
+                        duration = SnackbarDuration.Short
                     )
                 }
                 else -> {
                     snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.unknown_error)
+                        message = context.getString(R.string.unknown_error),
+                        duration = SnackbarDuration.Short
                     )
                 }
             }
@@ -93,57 +80,37 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(id = R.string.login),
+                    text = stringResource(id = R.string.verify_phone_number),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 StandardTextField(
-                    value = state.signInPhoneNumber,
+                    value = state.otp,
                     onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignInPhoneNumberChanged(it))
+                        if (it.length <= 6) {
+                            viewModel.onEvent(OtpUiEvent.OtpCodeChanged(it))
+                        }
                     },
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Phone,
+                        keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
-                    label = stringResource(id = R.string.phone_number),
-                    isError = state.signInPhoneNumberError != null,
-                    errorText = state.signInPhoneNumberError,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                StandardTextField(
-                    value = state.signInPassword,
-                    onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignInPasswordChanged(it))
-                    },
-                    label = stringResource(id = R.string.password),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            viewModel.onEvent(AuthUiEvent.SignIn)
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            focusManager.clearFocus()
-                        }
-                    ),
-                    isError = state.signInPasswordError != null,
-                    errorText = state.signInPasswordError,
-                    isPasswordTextField = true
+                    label = "Code",
+                    isError = state.otpError != null,
+                    errorText = state.otpError,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        viewModel.onEvent(AuthUiEvent.SignIn)
+                        viewModel.onEvent(OtpUiEvent.VerifyOtpAndSignUp)
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         focusManager.clearFocus()
                     },
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text(text = stringResource(id = R.string.sign_in))
+                    Text(text = "Verify")
                 }
             }
             Row(

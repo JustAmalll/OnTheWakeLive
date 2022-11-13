@@ -8,7 +8,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -26,10 +28,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.StandardTextField
-import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.navigation.Screen
-import kotlinx.coroutines.launch
+import com.onthewake.onthewakelive.util.toJson
+import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterial3Api
 @Composable
@@ -43,33 +45,38 @@ fun RegisterScreen(
     val focusManager = LocalFocusManager.current
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(viewModel, context) {
         viewModel.authResults.collect { result ->
             when (result) {
-                is AuthResult.Authorized -> {
-                    navController.navigate(Screen.QueueScreen.route)
-                }
-                is AuthResult.UserAlreadyExist -> {
-                    snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.user_already_exist),
-                        duration = SnackbarDuration.Short
-                    )
-                }
-                is AuthResult.UnknownError -> {
-                    snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.unknown_error),
-                        duration = SnackbarDuration.Short
-                    )
-                }
-                else -> {
-                    snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.unknown_error),
-                        duration = SnackbarDuration.Short
-                    )
-                }
+                is AuthResult.OtpTooManyRequests -> snackBarHostState.showSnackbar(
+                    message = "OtpTooManyRequests",
+                    duration = SnackbarDuration.Short
+                )
+                is AuthResult.OtpInvalidCredentials -> snackBarHostState.showSnackbar(
+                    message = "OtpInvalidCredentials",
+                    duration = SnackbarDuration.Short
+                )
+                else -> snackBarHostState.showSnackbar(
+                    message = context.getString(R.string.unknown_error),
+                    duration = SnackbarDuration.Short
+                )
             }
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.navigateUpEvent.collectLatest {
+            navController.navigate(
+                Screen.OtpScreen.passRegisterData(
+                    RegisterData(
+                        firstName = state.signUpFirsName,
+                        lastName = state.signUpLastName,
+                        phoneNumber = state.signUpPhoneNumber,
+                        password = state.signUpPassword
+                    ).toJson()
+                )
+            )
         }
     }
 
@@ -130,7 +137,7 @@ fun RegisterScreen(
                     },
                     label = stringResource(id = R.string.phone_number),
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
+                        keyboardType = KeyboardType.Phone,
                         imeAction = ImeAction.Next
                     ),
                     isError = state.signUpPhoneNumberError != null,
@@ -160,18 +167,9 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
+                        viewModel.onEvent(AuthUiEvent.SendOtp(context))
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        viewModel.onEvent(AuthUiEvent.SignUp)
                         focusManager.clearFocus()
-                        scope.launch {
-                            context.dataStore.updateData {
-                                it.copy(
-                                    firstName = state.signUpFirsName,
-                                    lastName = state.signUpLastName,
-                                    phoneNumber = state.signUpPhoneNumber
-                                )
-                            }
-                        }
                     },
                     modifier = Modifier.align(Alignment.End)
                 ) {

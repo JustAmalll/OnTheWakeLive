@@ -1,6 +1,7 @@
 package com.onthewake.onthewakelive.feature_profile.data.repository
 
 import android.content.Context
+import android.net.Uri
 import androidx.core.net.toUri
 import com.google.firebase.storage.FirebaseStorage
 import com.onthewake.onthewakelive.R
@@ -12,6 +13,8 @@ import com.onthewake.onthewakelive.util.Resource
 import com.onthewake.onthewakelive.util.SimpleResource
 import retrofit2.HttpException
 import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class ProfileRepositoryImpl(
     private val profileApi: ProfileApi,
@@ -36,19 +39,28 @@ class ProfileRepositoryImpl(
         }
     }
 
-
     override suspend fun updateProfile(
         updateProfileData: UpdateProfileData,
         profilePictureUri: String
     ): SimpleResource {
 
-        val profilePictureFileName = updateProfileData.profilePictureFileName
-
         return try {
-            storage.reference.child(profilePictureFileName).putFile(profilePictureUri.toUri())
+            val uri = uploadToFirebaseStorage(
+                storage,
+                updateProfileData.profilePictureFileName,
+                profilePictureUri
+            )
 
             val response = profileApi.updateProfile(
-                updateProfileData = updateProfileData
+                updateProfileData = UpdateProfileData(
+                    firstName = updateProfileData.firstName,
+                    lastName = updateProfileData.lastName,
+                    phoneNumber = updateProfileData.phoneNumber,
+                    instagram = updateProfileData.instagram,
+                    telegram = updateProfileData.telegram,
+                    dateOfBirth = updateProfileData.dateOfBirth,
+                    profilePictureFileName = uri.toString()
+                )
             )
             if (response.successful) {
                 Resource.Success(Unit)
@@ -61,6 +73,20 @@ class ProfileRepositoryImpl(
             Resource.Error(context.getString(R.string.couldnt_reach_server))
         } catch (e: HttpException) {
             Resource.Error(context.getString(R.string.something_went_wrong))
+        }
+    }
+
+    private suspend fun uploadToFirebaseStorage(
+        storage: FirebaseStorage,
+        profilePictureFileName: String,
+        profilePictureUri: String
+    ): Uri {
+        return suspendCoroutine { continuation ->
+            val ref = storage.reference.child(profilePictureFileName)
+
+            ref.putFile(profilePictureUri.toUri()).addOnSuccessListener {
+                ref.downloadUrl.addOnSuccessListener { uri -> continuation.resume(uri) }
+            }
         }
     }
 }

@@ -1,20 +1,19 @@
 package com.onthewake.onthewakelive.feature_auth.presentation
 
-import android.app.Application
-import android.content.Context
+import android.app.Activity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
-import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
+import com.onthewake.onthewakelive.util.findActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,14 +21,16 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
-    private val validationUseCase: ValidationUseCase,
-    private val context: Application
-) : AndroidViewModel(context) {
+    private val validationUseCase: ValidationUseCase
+) : ViewModel() {
 
     var state by mutableStateOf(AuthState())
 
     private val resultChannel = Channel<AuthResult<Unit>>()
     val authResults = resultChannel.receiveAsFlow()
+
+    private val _navigateUpEvent = MutableSharedFlow<Boolean>()
+    val navigateUpEvent = _navigateUpEvent.asSharedFlow()
 
     fun onEvent(event: AuthUiEvent) {
         when (event) {
@@ -54,13 +55,13 @@ class AuthViewModel @Inject constructor(
             is AuthUiEvent.SignUpPasswordChanged -> {
                 state = state.copy(signUpPassword = event.value)
             }
-            is AuthUiEvent.SignUp -> {
-                signUp()
+            is AuthUiEvent.SendOtp -> {
+                sendOtp(event.context.findActivity())
             }
         }
     }
 
-    private fun signUp() {
+    private fun sendOtp(activity: Activity) {
         val firstNameResult = validationUseCase.validateFirstName(state.signUpFirsName)
         val lastNameResult = validationUseCase.validateLastName(state.signUpLastName)
         val phoneNumberResult = validationUseCase.validatePhoneNumber(state.signUpPhoneNumber)
@@ -81,25 +82,19 @@ class AuthViewModel @Inject constructor(
                 signUpPasswordError = passwordResult.errorMessage
             )
             return
+        } else {
+            state = state.copy(
+                signUpFirsNameError = null,
+                signUpLastNameError = null,
+                signUpPhoneNumberError = null,
+                signUpPasswordError = null
+            )
         }
 
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
-            val result = repository.signUp(
-                firstName = state.signUpFirsName,
-                lastName = state.signUpLastName,
-                phoneNumber = state.signUpPhoneNumber,
-                password = state.signUpPassword
-            )
-            context.dataStore.updateData { profile ->
-                profile.copy(
-                    firstName = state.signUpFirsName,
-                    lastName = state.signUpLastName,
-                    phoneNumber = state.signUpPhoneNumber
-                )
-            }
+            _navigateUpEvent.emit(true)
+            val result = repository.sendOtp(state.signUpPhoneNumber, activity)
             resultChannel.send(result)
-            state = state.copy(isLoading = false)
         }
     }
 
@@ -117,6 +112,11 @@ class AuthViewModel @Inject constructor(
                 signInPasswordError = passwordResult.errorMessage
             )
             return
+        } else {
+            state = state.copy(
+                signInPhoneNumberError = null,
+                signInPasswordError = null
+            )
         }
 
         viewModelScope.launch {

@@ -11,6 +11,7 @@ import coil.ImageLoader
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.feature_auth.presentation.LoginScreen
 import com.onthewake.onthewakelive.feature_auth.presentation.RegisterScreen
+import com.onthewake.onthewakelive.feature_auth.presentation.auth_otp.OtpScreen
 import com.onthewake.onthewakelive.feature_profile.presentation.edit_profile.EditProfileScreen
 import com.onthewake.onthewakelive.feature_profile.presentation.profile.ProfileScreen
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_details.QueueDetailsScreen
@@ -37,6 +38,12 @@ fun SetupNavGraph(
         }
         composable(route = Screen.RegisterScreen.route) {
             RegisterScreen(navController = navController)
+        }
+        composable(
+            route = Screen.OtpScreen.route,
+            arguments = listOf(navArgument("registerData") { type = NavType.StringType })
+        ) {
+            OtpScreen(navController = navController)
         }
         composable(route = Screen.QueueScreen.route) {
             QueueScreen(navController = navController, imageLoader = imageLoader)

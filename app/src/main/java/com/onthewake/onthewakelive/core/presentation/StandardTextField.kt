@@ -59,7 +59,7 @@ fun StandardTextField(
             }
         }
     )
-    if (errorText != null && errorText.isNotEmpty()) {
+    if (isError && errorText != null) {
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = errorText,

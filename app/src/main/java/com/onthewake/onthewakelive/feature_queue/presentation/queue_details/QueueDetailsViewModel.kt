@@ -1,6 +1,5 @@
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_details
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -20,8 +19,7 @@ class QueueDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(QueueItemDetailsState())
-    val state: State<QueueItemDetailsState> = _state
+    val state = mutableStateOf(QueueItemDetailsState())
 
     private val _snackBarEvent = MutableSharedFlow<String>()
     val snackBarEvent = _snackBarEvent.asSharedFlow()
@@ -33,29 +31,29 @@ class QueueDetailsViewModel @Inject constructor(
     }
 
     private fun loadQueueItemDetails(queueItemId: String) {
-//        viewModelScope.launch {
-//            _state.value = state.value.copy(isLoading = true)
-//            when (val result = queueService.getQueueDetails(queueItemId)) {
-//                is Resource.Success -> {
-//                    result.data?.let {
-//                        _state.value = state.value.copy(
-//                            firstName = it.firstName,
-//                            lastName = it.lastName,
-//                            phoneNumber = it.phoneNumber,
-//                            profilePictureUri = it.profilePictureUri,
-//                            instagram = it.instagram,
-//                            telegram = it.telegram,
-//                            dateOfBirth = it.dateOfBirth,
-//                            isLoading = false
-//                        )
-//                    }
-//                    _state.value = state.value.copy(isLoading = false)
-//                }
-//                is Resource.Error -> {
-//                    _state.value = state.value.copy(isLoading = false)
-//                    _snackBarEvent.emit(result.message ?: "Unknown Error")
-//                }
-//            }
-//        }
+        viewModelScope.launch {
+            state.value = state.value.copy(isLoading = true)
+            when (val result = queueService.getQueueDetails(queueItemId)) {
+                is Resource.Success -> {
+                    result.data?.let {
+                        state.value = state.value.copy(
+                            firstName = it.firstName,
+                            lastName = it.lastName,
+                            phoneNumber = it.phoneNumber,
+                            profilePictureUri = it.profilePictureUri,
+                            instagram = it.instagram,
+                            telegram = it.telegram,
+                            dateOfBirth = it.dateOfBirth,
+                            isLoading = false
+                        )
+                    }
+                    state.value = state.value.copy(isLoading = false)
+                }
+                is Resource.Error -> {
+                    state.value = state.value.copy(isLoading = false)
+                    _snackBarEvent.emit(result.message ?: "Unknown Error")
+                }
+            }
+        }
     }
 }

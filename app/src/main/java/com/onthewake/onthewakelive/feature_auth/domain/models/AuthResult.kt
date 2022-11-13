@@ -6,4 +6,8 @@ sealed class AuthResult<T>(val data: T? = null) {
     class UserAlreadyExist<T>: AuthResult<T>()
     class IncorrectData<T>: AuthResult<T>()
     class UnknownError<T>: AuthResult<T>()
+    class OtpVerified<T>(): AuthResult<T>()
+    class IncorrectOtp<T>(): AuthResult<T>()
+    class OtpInvalidCredentials<T>: AuthResult<T>()
+    class OtpTooManyRequests<T>: AuthResult<T>()
 }

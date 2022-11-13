@@ -28,9 +28,7 @@ class CropActivityResultContract(
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
-        if (intent == null) {
-            return null
-        }
+        if (intent == null) { return null }
         if (resultCode == RESULT_ERROR) {
             val error = UCrop.getError(intent)
             error?.printStackTrace()

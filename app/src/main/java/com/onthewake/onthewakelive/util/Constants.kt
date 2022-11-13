@@ -1,10 +1,10 @@
 package com.onthewake.onthewakelive.util
 
 object Constants {
-    const val BASE_URL = "http://192.168.1.19:8080"
-    const val WS_BASE_URL = "ws://192.168.1.19:8080"
-//    const val BASE_URL = "https://on-the-wake-live.herokuapp.com"
-//    const val WS_BASE_URL = "ws://on-the-wake-live.herokuapp.com"
+//    const val BASE_URL = "http://192.168.1.3:8080"
+//    const val WS_BASE_URL = "ws://192.168.1.3:8080"
+    const val BASE_URL = "https://on-the-wake-live.herokuapp.com"
+    const val WS_BASE_URL = "ws://on-the-wake-live.herokuapp.com"
 
     const val INSTAGRAM_URL = "https://www.instagram.com"
 

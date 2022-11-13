@@ -2,6 +2,7 @@ package com.onthewake.onthewakelive.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,7 +35,7 @@ object AuthModule {
     @Singleton
     fun provideAuthRepository(
         api: AuthApi, prefs: SharedPreferences, @ApplicationContext context: Context
-    ): AuthRepository = AuthRepositoryImpl(api, prefs, context)
+    ): AuthRepository = AuthRepositoryImpl(api, prefs, FirebaseAuth.getInstance(), context)
 
     @Provides
     @Singleton

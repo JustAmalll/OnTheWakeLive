@@ -9,9 +9,7 @@ import com.onthewake.onthewakelive.util.Resource
 interface QueueService {
 
     suspend fun getQueue(): List<Queue>
-
     suspend fun getQueueDetails(queueItemId: String): Resource<Profile>
-
     suspend fun deleteQueueItem(queueItemId: String): QueueDto?
 
     sealed class Endpoints(val url: String) {

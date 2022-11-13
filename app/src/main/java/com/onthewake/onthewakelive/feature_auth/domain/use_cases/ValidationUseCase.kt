@@ -52,6 +52,12 @@ class ValidationUseCase(
                 errorMessage = context.getString(R.string.validate_phone_number_error)
             )
         }
+//        if (!Patterns.PHONE.matcher(phoneNumber).matches()) {
+//            return ValidationResult(
+//                successful = false,
+//                errorMessage = context.getString(R.string.validate_invalid_phone_number_error)
+//            )
+//        }
         return ValidationResult(successful = true)
     }
 
@@ -91,6 +97,22 @@ class ValidationUseCase(
                     errorMessage = context.getString(R.string.validate_date_of_birth_month_error)
                 )
             }
+        }
+        return ValidationResult(successful = true)
+    }
+
+    fun validateOtp(otp: String): ValidationResult {
+        if (otp.isBlank()) {
+            return ValidationResult(
+                successful = false,
+                errorMessage = context.getString(R.string.validate_otp_error)
+            )
+        }
+        if (otp.length < 6) {
+            return ValidationResult(
+                successful = false,
+                errorMessage = context.getString(R.string.validate_otp_error)
+            )
         }
         return ValidationResult(successful = true)
     }

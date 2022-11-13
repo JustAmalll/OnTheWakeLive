@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.firebase.storage.FirebaseStorage
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueService
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueSocketService
@@ -19,7 +18,10 @@ import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,7 +31,6 @@ class QueueViewModel @Inject constructor(
     private val queueService: QueueService,
     private val queueSocketService: QueueSocketService,
     private val context: Application,
-    storage: FirebaseStorage,
     prefs: SharedPreferences
 ) : AndroidViewModel(context) {
 
@@ -41,8 +42,6 @@ class QueueViewModel @Inject constructor(
 
     private val _snackBarWithActionEvent = MutableSharedFlow<Queue>()
     val snackBarWithActionEvent = _snackBarWithActionEvent.asSharedFlow()
-
-    val firebaseStorage = storage
 
     val isAdding = mutableStateOf(false)
     val showDialog = mutableStateOf(false)

@@ -1,8 +1,11 @@
 package com.onthewake.onthewakelive.feature_auth.data.repository
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
+import com.google.firebase.FirebaseException
+import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.auth.*
 import com.onesignal.OneSignal
 import com.onthewake.onthewakelive.feature_auth.data.remote.AuthApi
 import com.onthewake.onthewakelive.feature_auth.data.remote.request.AuthRequest
@@ -14,12 +17,18 @@ import com.onthewake.onthewakelive.util.Constants.PREFS_FIRST_NAME
 import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
 import com.onthewake.onthewakelive.util.Constants.PREFS_USER_ID
 import retrofit2.HttpException
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class AuthRepositoryImpl(
     private val api: AuthApi,
     private val prefs: SharedPreferences,
+    private val firebaseAuth: FirebaseAuth,
     private val context: Context
 ) : AuthRepository {
+
+    private lateinit var storedVerificationId: String
 
     override suspend fun signUp(
         firstName: String,
@@ -73,6 +82,50 @@ class AuthRepositoryImpl(
         }
     } catch (e: Exception) {
         AuthResult.UnknownError()
+    }
+
+    override suspend fun sendOtp(
+        phoneNumber: String, activity: Activity
+    ): AuthResult<Unit> {
+
+        return suspendCoroutine { continuation ->
+            val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+
+                override fun onVerificationCompleted(credential: PhoneAuthCredential) {}
+
+                override fun onVerificationFailed(exception: FirebaseException) {
+                    if (exception is FirebaseAuthInvalidCredentialsException) {
+                        continuation.resume(AuthResult.OtpInvalidCredentials())
+                    } else if (exception is FirebaseTooManyRequestsException) {
+                        continuation.resume(AuthResult.OtpTooManyRequests())
+                    }
+                }
+
+                override fun onCodeSent(
+                    verificationId: String,
+                    token: PhoneAuthProvider.ForceResendingToken
+                ) {
+                    storedVerificationId = verificationId
+                }
+            }
+
+            val options = PhoneAuthOptions.newBuilder(firebaseAuth)
+                .setPhoneNumber(phoneNumber)
+                .setTimeout(60L, TimeUnit.SECONDS)
+                .setActivity(activity)
+                .setCallbacks(callbacks)
+                .build()
+            PhoneAuthProvider.verifyPhoneNumber(options)
+        }
+    }
+
+    override suspend fun verifyOtp(otp: String): AuthResult<Unit> {
+        return suspendCoroutine { continuation ->
+            val credential = PhoneAuthProvider.getCredential(storedVerificationId, otp)
+            firebaseAuth.signInWithCredential(credential).addOnSuccessListener {
+                continuation.resume(AuthResult.OtpVerified())
+            }
+        }
     }
 
     override suspend fun authenticate(): AuthResult<Unit> {

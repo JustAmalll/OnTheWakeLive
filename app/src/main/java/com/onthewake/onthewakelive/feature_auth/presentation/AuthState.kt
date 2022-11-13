@@ -13,5 +13,7 @@ data class AuthState(
     val signInPhoneNumber: String = "",
     val signInPhoneNumberError: String? = null,
     val signInPassword: String = "",
-    val signInPasswordError: String? = null
+    val signInPasswordError: String? = null,
+    val otp: String = "",
+    val otpError: String? = null,
 )

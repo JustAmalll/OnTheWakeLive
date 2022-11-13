@@ -39,7 +39,6 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.firebase.storage.FirebaseStorage
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.StandardImageView
 import com.onthewake.onthewakelive.dataStore
@@ -50,8 +49,6 @@ import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.util.Constants.FIRST_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.UserProfileSerializer
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
@@ -154,7 +151,7 @@ fun QueueScreen(
                         textAlign = TextAlign.Center,
                     )
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = surfaceColor,
                     titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -221,7 +218,6 @@ fun QueueScreen(
                                 Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
                             )
                         },
-                        firebaseStorage = viewModel.firebaseStorage,
                         onSwipeToDelete = { viewModel.deleteQueueItem(it) },
                         imageLoader = imageLoader
                     )
@@ -233,7 +229,6 @@ fun QueueScreen(
                                 Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
                             )
                         },
-                        firebaseStorage = viewModel.firebaseStorage,
                         onSwipeToDelete = { viewModel.deleteQueueItem(it) },
                         imageLoader = imageLoader
                     )
@@ -304,7 +299,6 @@ fun QueueLeftContent(
     state: QueueState,
     userId: String?,
     imageLoader: ImageLoader,
-    firebaseStorage: FirebaseStorage,
     onDetailsClicked: (String) -> Unit,
     onSwipeToDelete: (String) -> Unit
 ) {
@@ -322,7 +316,6 @@ fun QueueLeftContent(
                         queueItem = item,
                         imageLoader = imageLoader,
                         userId = userId,
-                        firebaseStorage = firebaseStorage,
                         onDetailsClicked = onDetailsClicked,
                         onSwipeToDelete = onSwipeToDelete
                     )
@@ -338,7 +331,6 @@ fun QueueRightContent(
     state: QueueState,
     userId: String?,
     imageLoader: ImageLoader,
-    firebaseStorage: FirebaseStorage,
     onDetailsClicked: (String) -> Unit,
     onSwipeToDelete: (String) -> Unit
 ) {
@@ -357,7 +349,6 @@ fun QueueRightContent(
                         queueItem = item,
                         imageLoader = imageLoader,
                         userId = userId,
-                        firebaseStorage = firebaseStorage,
                         onDetailsClicked = onDetailsClicked,
                         onSwipeToDelete = onSwipeToDelete
                     )
@@ -373,7 +364,6 @@ fun QueueItem(
     queueItem: Queue,
     userId: String?,
     imageLoader: ImageLoader,
-    firebaseStorage: FirebaseStorage,
     onDetailsClicked: (String) -> Unit,
     onSwipeToDelete: (String) -> Unit
 ) {
@@ -428,10 +418,10 @@ fun QueueItem(
                     if (queueItem.userId != FIRST_ADMIN_USER_ID &&
                         queueItem.userId != SECOND_ADMIN_USER_ID
                     ) {
-//                        StandardImageView(
-//                            imageLoader = imageLoader,
-//                            model = downloadUrl.toString()
-//                        )
+                        StandardImageView(
+                            imageLoader = imageLoader,
+                            model = queueItem.profilePictureFileName
+                        )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
@@ -483,10 +473,10 @@ fun QueueItem(
                     if (queueItem.userId != FIRST_ADMIN_USER_ID &&
                         queueItem.userId != SECOND_ADMIN_USER_ID
                     ) {
-//                        StandardImageView(
-//                            imageLoader = imageLoader,
-//                            model = downloadUrl.toString()
-//                        )
+                        StandardImageView(
+                            imageLoader = imageLoader,
+                            model = queueItem.profilePictureFileName
+                        )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(

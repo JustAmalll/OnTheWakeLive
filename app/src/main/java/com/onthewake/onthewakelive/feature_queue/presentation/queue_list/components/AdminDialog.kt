@@ -33,17 +33,13 @@ fun AdminDialog(
 
     val leftQueueButtonState = remember { mutableStateOf(false) }
     val rightQueueButtonState = remember { mutableStateOf(true) }
-
     val firstNameFieldState = remember { mutableStateOf("") }
-
     val errorMessage = remember { mutableStateOf("") }
 
     val context = LocalContext.current
 
     Dialog(onDismissRequest = { showDialog(false) }) {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-        ) {
+        Surface(shape = RoundedCornerShape(16.dp)) {
             Box(
                 modifier = Modifier
                     .padding(14.dp)
@@ -119,11 +115,9 @@ fun AdminDialog(
                                     firstName = firstNameFieldState.value,
                                     queue = queue
                                 )
-
                             if (addToQueueResult.errorMessage != null) {
                                 errorMessage.value = addToQueueResult.errorMessage
                             }
-
                             if (addToQueueResult.successful) {
                                 onAddClicked(leftQueueButtonState.value, firstNameFieldState.value)
                                 showDialog(false)

@@ -67,14 +67,14 @@ fun ProfileScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         text = stringResource(id = R.string.profile),
                         fontSize = 32.sp
                     )
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = surfaceColor,
                     titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -108,9 +108,7 @@ fun ProfileScreen(
                                     .padding(end = 4.dp, top = 2.dp),
                                 onClick = {
                                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    navController.navigate(
-                                        Screen.EditProfileScreen.route
-                                    )
+                                    navController.navigate(Screen.EditProfileScreen.route)
                                 }
                             ) {
                                 Icon(

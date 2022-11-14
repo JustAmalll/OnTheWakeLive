@@ -49,6 +49,7 @@ class QueueViewModel @Inject constructor(
     val firstName = prefs.getString(PREFS_FIRST_NAME, null)
     val userId = prefs.getString(PREFS_USER_ID, null)
 
+
     fun connectToQueue() {
         getQueue()
 

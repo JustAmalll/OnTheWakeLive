@@ -99,7 +99,7 @@ fun EditProfileScreen(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { if (it != null) cropActivityLauncher.launch(it) }
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -122,10 +122,14 @@ fun EditProfileScreen(
                 scrollBehavior = scrollBehavior
             )
         }
-    ) { _ ->
-        LazyColumn {
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier.padding(
+                top = paddingValues.calculateTopPadding(),
+                bottom = paddingValues.calculateBottomPadding()
+            )
+        ) {
             item {
-                Spacer(modifier = Modifier.height(18.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -136,7 +140,6 @@ fun EditProfileScreen(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(16.dp))
                         Card(
                             modifier = Modifier
                                 .padding(top = 30.dp)
@@ -299,7 +302,6 @@ fun EditProfileScreen(
                         ) {
                             Text(text = stringResource(id = R.string.edit))
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }

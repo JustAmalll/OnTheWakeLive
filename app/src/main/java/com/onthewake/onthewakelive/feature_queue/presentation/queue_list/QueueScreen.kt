@@ -80,10 +80,7 @@ fun QueueScreen(
     }.collectAsState(initial = UserProfileSerializer.defaultValue)
 
     SideEffect {
-        systemUiController.setStatusBarColor(
-            color = surfaceColor, darkIcons = !darkTheme
-        )
-        systemUiController.setNavigationBarColor(
+        systemUiController.setSystemBarsColor(
             color = surfaceColor, darkIcons = !darkTheme
         )
     }

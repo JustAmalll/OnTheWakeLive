@@ -6,8 +6,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.net.toFile
-import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.onthewake.onthewakelive.dataStore
@@ -16,8 +14,10 @@ import com.onthewake.onthewakelive.feature_profile.domain.module.UpdateProfileDa
 import com.onthewake.onthewakelive.feature_profile.domain.repository.ProfileRepository
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ class EditProfileViewModel @Inject constructor(
     val lastName = mutableStateOf("")
     val phoneNumber = mutableStateOf("")
     val telegram = mutableStateOf("")
-    val userProfilePictureUri = mutableStateOf("")
+    val profilePictureUri = mutableStateOf("")
     val instagram = mutableStateOf("")
     val dateOfBirth = mutableStateOf("")
 
@@ -44,8 +44,12 @@ class EditProfileViewModel @Inject constructor(
     private val _navigateUp = MutableSharedFlow<Boolean>()
     val navigateUp = _navigateUp.asSharedFlow()
 
-    private val _profilePictureUri = mutableStateOf<Uri?>(null)
-    val profilePictureUri: State<Uri?> = _profilePictureUri
+    private val _selectedProfilePictureUri = mutableStateOf<Uri?>(null)
+    val selectedProfilePictureUri: State<Uri?> = _selectedProfilePictureUri
+
+    init {
+        updateDataFromDataStore()
+    }
 
     fun onEvent(event: EditProfileUiEvent) {
         when (event) {
@@ -68,10 +72,25 @@ class EditProfileViewModel @Inject constructor(
                 dateOfBirth.value = event.value
             }
             is EditProfileUiEvent.CropImage -> {
-                _profilePictureUri.value = event.uri
+                _selectedProfilePictureUri.value = event.uri
+                profilePictureUri.value = event.uri.toString()
             }
             is EditProfileUiEvent.EditProfile -> {
                 editProfile()
+            }
+        }
+    }
+
+    private fun updateDataFromDataStore() {
+        viewModelScope.launch {
+            context.dataStore.data.collectLatest { profile ->
+                firstName.value = profile.firstName
+                lastName.value = profile.lastName
+                phoneNumber.value = profile.phoneNumber
+                instagram.value = profile.instagram
+                telegram.value = profile.telegram
+                dateOfBirth.value = profile.dateOfBirth
+                profilePictureUri.value = profile.profilePictureUri
             }
         }
     }
@@ -106,39 +125,25 @@ class EditProfileViewModel @Inject constructor(
             )
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             state = state.copy(isLoading = true)
-
-            val profilePictureFileName = profilePictureUri.value?.toFile()?.name
-                ?: userProfilePictureUri.value.toUri().toFile().name
-            val profilePictureUri = profilePictureUri.value ?: userProfilePictureUri.value
-
-            println(profilePictureFileName)
 
             val result = profileRepository.updateProfile(
                 updateProfileData = UpdateProfileData(
-                    firstName = firstName.value,
-                    lastName = lastName.value,
-                    phoneNumber = phoneNumber.value,
-                    instagram = instagram.value,
-                    telegram = telegram.value,
-                    dateOfBirth = dateOfBirth.value,
-                    profilePictureFileName = profilePictureFileName
+                    firstName = firstName.value.trim(),
+                    lastName = lastName.value.trim(),
+                    phoneNumber = phoneNumber.value.trim(),
+                    instagram = instagram.value.trim(),
+                    telegram = telegram.value.trim(),
+                    dateOfBirth = dateOfBirth.value.trim(),
+                    profilePictureUri = profilePictureUri.value
                 ),
-                profilePictureUri = profilePictureUri.toString()
+                selectedProfilePictureUri = selectedProfilePictureUri.value
             )
-            context.dataStore.updateData {
-                it.copy(
-                    firstName = firstName.value,
-                    lastName = lastName.value,
-                    phoneNumber = phoneNumber.value,
-                    instagram = instagram.value,
-                    telegram = telegram.value,
-                    dateOfBirth = dateOfBirth.value,
-                    profilePictureUri = profilePictureUri.toString()
-                )
-            }
+
+            _selectedProfilePictureUri.value = null
             state = state.copy(isLoading = false)
+
             when (result) {
                 is Resource.Success -> {
                     _snackBarEvent.emit("Successfully updated profile")

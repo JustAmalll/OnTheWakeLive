@@ -3,10 +3,7 @@ package com.onthewake.onthewakelive.feature_auth.data.remote
 import com.onthewake.onthewakelive.feature_auth.data.remote.request.AuthRequest
 import com.onthewake.onthewakelive.feature_auth.data.remote.request.CreateAccountRequest
 import com.onthewake.onthewakelive.feature_auth.data.remote.response.AuthResponse
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface AuthApi {
 
@@ -23,5 +20,10 @@ interface AuthApi {
     @GET("/authenticate")
     suspend fun authenticate(
         @Header("Authorization") token: String
+    )
+
+    @GET("/checkIfUserAlreadyExists")
+    suspend fun checkIfUserAlreadyExists(
+        @Query("phoneNumber") phoneNumber: String
     )
 }

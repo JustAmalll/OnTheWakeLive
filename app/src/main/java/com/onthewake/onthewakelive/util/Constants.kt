@@ -1,7 +1,7 @@
 package com.onthewake.onthewakelive.util
 
 object Constants {
-//    const val BASE_URL = "http://192.168.1.3:8080"
+    //    const val BASE_URL = "http://192.168.1.3:8080"
 //    const val WS_BASE_URL = "ws://192.168.1.3:8080"
     const val BASE_URL = "https://on-the-wake-live.herokuapp.com"
     const val WS_BASE_URL = "ws://on-the-wake-live.herokuapp.com"
@@ -17,5 +17,6 @@ object Constants {
 
     const val ONESIGNAL_APP_ID = "8890bfbd-a1d0-426a-98ae-88aa5b954b68"
 
-    const val DETAILS_ARGUMENT_KEY = "queueItemId"
+    const val DETAILS_ARGUMENT_KEY = "queue_te_id"
+    const val REGISTER_DATA_ARGUMENT_KEY = "register_data_argument_key"
 }

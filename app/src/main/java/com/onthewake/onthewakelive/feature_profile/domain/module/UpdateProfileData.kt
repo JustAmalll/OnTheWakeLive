@@ -7,5 +7,5 @@ data class UpdateProfileData(
     val instagram: String,
     val telegram: String,
     val dateOfBirth: String,
-    val profilePictureFileName: String
+    val profilePictureUri: String
 )

@@ -35,10 +35,10 @@ class ProfileViewModel @Inject constructor(
                                 firstName = it.firstName,
                                 lastName = it.lastName,
                                 phoneNumber = it.phoneNumber,
-                                profilePictureUri = it.profilePictureUri,
                                 instagram = it.instagram,
                                 telegram = it.telegram,
-                                dateOfBirth = it.dateOfBirth
+                                dateOfBirth = it.dateOfBirth,
+                                profilePictureUri = it.profilePictureUri
                             )
                         }
                     }

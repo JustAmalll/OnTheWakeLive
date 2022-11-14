@@ -3,6 +3,7 @@ package com.onthewake.onthewakelive.feature_queue.presentation.queue_details
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.ImageLoader
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.FormattedDateOfBirth
 import com.onthewake.onthewakelive.core.presentation.StandardImageView
@@ -40,7 +43,17 @@ fun QueueDetailsScreen(
     val state = viewModel.state.value
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
+
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+    val bgColor = MaterialTheme.colorScheme.background
+    val systemUiController = rememberSystemUiController()
+    val darkTheme = isSystemInDarkTheme()
+
+    SideEffect {
+        systemUiController.setNavigationBarColor(
+            color = bgColor, darkIcons = !darkTheme
+        )
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.snackBarEvent.collectLatest { message ->
@@ -53,7 +66,7 @@ fun QueueDetailsScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(text = stringResource(id = R.string.details), fontSize = 32.sp) },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = surfaceColor,
                     titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 ),

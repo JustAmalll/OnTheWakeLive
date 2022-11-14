@@ -15,11 +15,11 @@ object UserProfileSerializer : Serializer<Profile> {
             userId = "",
             firstName = "",
             lastName = "",
-            profilePictureUri = "",
             phoneNumber = "",
             instagram = "",
             telegram = "",
-            dateOfBirth = ""
+            dateOfBirth = "",
+            profilePictureUri = ""
         )
 
     override suspend fun readFrom(

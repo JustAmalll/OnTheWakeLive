@@ -57,6 +57,10 @@ fun RegisterScreen(
                     message = "OtpInvalidCredentials",
                     duration = SnackbarDuration.Short
                 )
+                is AuthResult.UserAlreadyExist -> snackBarHostState.showSnackbar(
+                    message = "User with this phone number already exists",
+                    duration = SnackbarDuration.Short
+                )
                 else -> snackBarHostState.showSnackbar(
                     message = context.getString(R.string.unknown_error),
                     duration = SnackbarDuration.Short
@@ -66,14 +70,14 @@ fun RegisterScreen(
     }
 
     LaunchedEffect(key1 = true) {
-        viewModel.navigateUpEvent.collectLatest {
+        viewModel.navigateUpEvent.collectLatest { registerData ->
             navController.navigate(
                 Screen.OtpScreen.passRegisterData(
                     RegisterData(
-                        firstName = state.signUpFirsName,
-                        lastName = state.signUpLastName,
-                        phoneNumber = state.signUpPhoneNumber,
-                        password = state.signUpPassword
+                        firstName = registerData.firstName,
+                        lastName = registerData.lastName,
+                        phoneNumber = registerData.phoneNumber,
+                        password = registerData.password
                     ).toJson()
                 )
             )
@@ -82,7 +86,7 @@ fun RegisterScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
-    ) { padding ->
+    ) { _ ->
         Box(
             modifier = Modifier
                 .fillMaxSize()

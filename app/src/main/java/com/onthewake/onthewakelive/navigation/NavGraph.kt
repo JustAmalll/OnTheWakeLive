@@ -17,6 +17,7 @@ import com.onthewake.onthewakelive.feature_profile.presentation.profile.ProfileS
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_details.QueueDetailsScreen
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.QueueScreen
 import com.onthewake.onthewakelive.feature_splash.SplashScreen
+import com.onthewake.onthewakelive.util.Constants
 import com.onthewake.onthewakelive.util.Constants.DETAILS_ARGUMENT_KEY
 
 @ExperimentalMaterial3Api
@@ -41,7 +42,9 @@ fun SetupNavGraph(
         }
         composable(
             route = Screen.OtpScreen.route,
-            arguments = listOf(navArgument("registerData") { type = NavType.StringType })
+            arguments = listOf(navArgument(Constants.REGISTER_DATA_ARGUMENT_KEY) {
+                type = NavType.StringType
+            })
         ) {
             OtpScreen(navController = navController)
         }

@@ -2,9 +2,11 @@ package com.onthewake.onthewakelive.feature_profile.data.repository
 
 import android.content.Context
 import android.net.Uri
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.google.firebase.storage.FirebaseStorage
 import com.onthewake.onthewakelive.R
+import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_profile.data.remote.ProfileApi
 import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
 import com.onthewake.onthewakelive.feature_profile.domain.module.UpdateProfileData
@@ -28,9 +30,8 @@ class ProfileRepositoryImpl(
             if (response.successful) {
                 Resource.Success(response.data?.toProfile())
             } else {
-                response.message?.let { msg ->
-                    Resource.Error(msg)
-                } ?: Resource.Error(context.getString(R.string.unknown_error))
+                response.message?.let { msg -> Resource.Error(msg) }
+                    ?: Resource.Error(context.getString(R.string.unknown_error))
             }
         } catch (e: IOException) {
             Resource.Error(context.getString(R.string.couldnt_reach_server))
@@ -41,14 +42,17 @@ class ProfileRepositoryImpl(
 
     override suspend fun updateProfile(
         updateProfileData: UpdateProfileData,
-        profilePictureUri: String
+        selectedProfilePictureUri: Uri?
     ): SimpleResource {
+
+        val profilePictureFileName = if (updateProfileData.profilePictureUri.isNotBlank())
+            updateProfileData.profilePictureUri.toUri().toFile().name else ""
 
         return try {
             val uri = uploadToFirebaseStorage(
-                storage,
-                updateProfileData.profilePictureFileName,
-                profilePictureUri
+                storage = storage,
+                profilePictureFileName = profilePictureFileName,
+                selectedProfilePictureUri = selectedProfilePictureUri
             )
 
             val response = profileApi.updateProfile(
@@ -59,16 +63,28 @@ class ProfileRepositoryImpl(
                     instagram = updateProfileData.instagram,
                     telegram = updateProfileData.telegram,
                     dateOfBirth = updateProfileData.dateOfBirth,
-                    profilePictureFileName = uri.toString()
+                    profilePictureUri = uri?.toString() ?: ""
                 )
             )
+            context.dataStore.updateData {
+                it.copy(
+                    firstName = updateProfileData.firstName.trim(),
+                    lastName = updateProfileData.lastName.trim(),
+                    phoneNumber = updateProfileData.phoneNumber.trim(),
+                    instagram = updateProfileData.instagram.trim(),
+                    telegram = updateProfileData.telegram.trim(),
+                    dateOfBirth = updateProfileData.dateOfBirth.trim(),
+                    profilePictureUri = updateProfileData.profilePictureUri
+                )
+            }
+
             if (response.successful) {
                 Resource.Success(Unit)
             } else {
-                response.message?.let { msg ->
-                    Resource.Error(msg)
-                } ?: Resource.Error(context.getString(R.string.unknown_error))
+                response.message?.let { msg -> Resource.Error(msg) }
+                    ?: Resource.Error(context.getString(R.string.unknown_error))
             }
+            return Resource.Success(Unit)
         } catch (e: IOException) {
             Resource.Error(context.getString(R.string.couldnt_reach_server))
         } catch (e: HttpException) {
@@ -79,14 +95,27 @@ class ProfileRepositoryImpl(
     private suspend fun uploadToFirebaseStorage(
         storage: FirebaseStorage,
         profilePictureFileName: String,
-        profilePictureUri: String
-    ): Uri {
+        selectedProfilePictureUri: Uri?
+    ): Uri? {
         return suspendCoroutine { continuation ->
-            val ref = storage.reference.child(profilePictureFileName)
 
-            ref.putFile(profilePictureUri.toUri()).addOnSuccessListener {
-                ref.downloadUrl.addOnSuccessListener { uri -> continuation.resume(uri) }
-            }
+            if (profilePictureFileName.isNotBlank()) {
+                val ref = storage.reference.child(profilePictureFileName)
+
+                if (selectedProfilePictureUri != null) {
+                    // Upload image to firebase storage and return url to save it on database
+                    ref.putFile(selectedProfilePictureUri).addOnSuccessListener {
+                        ref.downloadUrl.addOnSuccessListener { uri -> continuation.resume(uri) }
+                    }
+                } else {
+                    // If user didn't select new image, just return old picture url)
+                    storage.reference.child(profilePictureFileName).downloadUrl.addOnSuccessListener {
+                        ref.downloadUrl.addOnSuccessListener { uri -> continuation.resume(uri) }
+                    }
+                }
+                // If profile image is blank - return null (when user tries to change
+                // profile data without profile image)
+            } else continuation.resume(null)
         }
     }
 }

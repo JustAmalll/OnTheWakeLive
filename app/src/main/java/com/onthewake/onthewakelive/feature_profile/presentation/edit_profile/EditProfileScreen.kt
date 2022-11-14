@@ -1,6 +1,7 @@
 package com.onthewake.onthewakelive.feature_profile.presentation.edit_profile
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,8 +29,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toFile
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.ImageLoader
@@ -56,10 +55,11 @@ fun EditProfileScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val isImageLoading = remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
-    val profilePictureUri = viewModel.profilePictureUri.value
+    val profilePictureUri = viewModel.selectedProfilePictureUri.value
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
+
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
     val bgColor = MaterialTheme.colorScheme.background
 
@@ -91,23 +91,13 @@ fun EditProfileScreen(
         }
     }
 
-    LaunchedEffect(key1 = true) {
-        viewModel.firstName.value = dataStore.value.firstName
-        viewModel.lastName.value = dataStore.value.lastName
-        viewModel.phoneNumber.value = dataStore.value.phoneNumber
-        viewModel.userProfilePictureUri.value = dataStore.value.profilePictureUri
-        viewModel.instagram.value = dataStore.value.instagram
-        viewModel.telegram.value = dataStore.value.telegram
-        viewModel.dateOfBirth.value = dataStore.value.dateOfBirth
-    }
-
     val cropActivityLauncher = rememberLauncherForActivityResult(
         contract = CropActivityResultContract(16f, 16f)
     ) { viewModel.onEvent(EditProfileUiEvent.CropImage(it)) }
 
     val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { cropActivityLauncher.launch(it) }
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { if (it != null) cropActivityLauncher.launch(it) }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
@@ -132,7 +122,7 @@ fun EditProfileScreen(
                 scrollBehavior = scrollBehavior
             )
         }
-    ) { padding ->
+    ) { _ ->
         LazyColumn {
             item {
                 Spacer(modifier = Modifier.height(18.dp))
@@ -152,7 +142,13 @@ fun EditProfileScreen(
                                 .padding(top = 30.dp)
                                 .size(140.dp),
                             shape = RoundedCornerShape(40.dp),
-                            onClick = { galleryLauncher.launch("image/*") },
+                            onClick = {
+                                galleryLauncher.launch(
+                                    PickVisualMediaRequest(
+                                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                                    )
+                                )
+                            },
                             colors = CardDefaults.cardColors(
                                 contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -178,7 +174,7 @@ fun EditProfileScreen(
                                     modifier = Modifier.fillMaxSize(),
                                     painter = rememberAsyncImagePainter(
                                         model = profilePictureUri
-                                            ?: viewModel.userProfilePictureUri.value,
+                                            ?: viewModel.profilePictureUri.value,
                                         imageLoader = imageLoader,
                                         onLoading = { isImageLoading.value = true },
                                         onError = { isImageLoading.value = false },
@@ -284,7 +280,7 @@ fun EditProfileScreen(
                                 if (dataStore.value.firstName == viewModel.firstName.value &&
                                     dataStore.value.lastName == viewModel.lastName.value &&
                                     dataStore.value.phoneNumber == viewModel.phoneNumber.value &&
-                                    viewModel.profilePictureUri.value == null &&
+                                    viewModel.selectedProfilePictureUri.value == null &&
                                     dataStore.value.instagram == viewModel.instagram.value &&
                                     dataStore.value.telegram == viewModel.telegram.value &&
                                     dataStore.value.dateOfBirth == viewModel.dateOfBirth.value

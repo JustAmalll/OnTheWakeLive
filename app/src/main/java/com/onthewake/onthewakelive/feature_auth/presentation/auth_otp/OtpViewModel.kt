@@ -13,6 +13,7 @@ import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
 import com.onthewake.onthewakelive.feature_auth.presentation.AuthState
 import com.onthewake.onthewakelive.feature_auth.presentation.RegisterData
+import com.onthewake.onthewakelive.util.Constants
 import com.onthewake.onthewakelive.util.fromJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -39,7 +40,9 @@ class OtpViewModel @Inject constructor(
                 state = state.copy(otp = event.value)
             }
             is OtpUiEvent.VerifyOtpAndSignUp -> {
-                savedStateHandle.get<String>("registerData")?.let { registerData ->
+                savedStateHandle.get<String>(
+                    Constants.REGISTER_DATA_ARGUMENT_KEY
+                )?.let { registerData ->
                     verifyOtpAndSignUp(registerData.fromJson(RegisterData::class.java))
                 }
             }

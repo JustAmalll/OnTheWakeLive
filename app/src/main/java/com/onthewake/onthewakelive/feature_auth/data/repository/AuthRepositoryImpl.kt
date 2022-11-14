@@ -45,13 +45,13 @@ class AuthRepositoryImpl(
             )
         )
         signIn(phoneNumber, password)
-    } catch (e: HttpException) {
-        when (e.code()) {
+    } catch (exception: HttpException) {
+        when (exception.code()) {
             401 -> AuthResult.Unauthorized()
             409 -> AuthResult.UserAlreadyExist()
             else -> AuthResult.UnknownError()
         }
-    } catch (e: Exception) {
+    } catch (exception: Exception) {
         AuthResult.UnknownError()
     }
 
@@ -74,13 +74,13 @@ class AuthRepositoryImpl(
         OneSignal.setExternalUserId(response.userId)
 
         AuthResult.Authorized()
-    } catch (e: HttpException) {
-        when (e.code()) {
+    } catch (exception: HttpException) {
+        when (exception.code()) {
             401 -> AuthResult.Unauthorized()
             409 -> AuthResult.IncorrectData()
             else -> AuthResult.UnknownError()
         }
-    } catch (e: Exception) {
+    } catch (exception: Exception) {
         AuthResult.UnknownError()
     }
 
@@ -91,12 +91,22 @@ class AuthRepositoryImpl(
         return suspendCoroutine { continuation ->
             val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
-                override fun onVerificationCompleted(credential: PhoneAuthCredential) {}
+                override fun onCodeAutoRetrievalTimeOut(p0: String) {
+                    super.onCodeAutoRetrievalTimeOut(p0)
+
+                    println("time out $p0")
+                }
+
+                override fun onVerificationCompleted(credential: PhoneAuthCredential) {
+                    println("onVerificationCompleted")
+                }
 
                 override fun onVerificationFailed(exception: FirebaseException) {
                     if (exception is FirebaseAuthInvalidCredentialsException) {
                         continuation.resume(AuthResult.OtpInvalidCredentials())
+                        println(exception)
                     } else if (exception is FirebaseTooManyRequestsException) {
+                        println(exception)
                         continuation.resume(AuthResult.OtpTooManyRequests())
                     }
                 }
@@ -105,7 +115,9 @@ class AuthRepositoryImpl(
                     verificationId: String,
                     token: PhoneAuthProvider.ForceResendingToken
                 ) {
+                    println("onCodeSent")
                     storedVerificationId = verificationId
+                    continuation.resume(AuthResult.OnOtpSend())
                 }
             }
 
@@ -121,9 +133,15 @@ class AuthRepositoryImpl(
 
     override suspend fun verifyOtp(otp: String): AuthResult<Unit> {
         return suspendCoroutine { continuation ->
-            val credential = PhoneAuthProvider.getCredential(storedVerificationId, otp)
-            firebaseAuth.signInWithCredential(credential).addOnSuccessListener {
-                continuation.resume(AuthResult.OtpVerified())
+            if (!this::storedVerificationId.isInitialized) {
+                continuation.resume(AuthResult.IncorrectOtp())
+            } else {
+                val credential = PhoneAuthProvider.getCredential(storedVerificationId, otp)
+                firebaseAuth.signInWithCredential(credential).addOnSuccessListener {
+                    continuation.resume(AuthResult.OtpVerified())
+                }.addOnFailureListener {
+                    continuation.resume(AuthResult.IncorrectOtp())
+                }
             }
         }
     }
@@ -135,10 +153,19 @@ class AuthRepositoryImpl(
             ) ?: return AuthResult.Unauthorized()
             api.authenticate("Bearer $token")
             AuthResult.Authorized()
-        } catch (e: HttpException) {
-            if (e.code() == 401) AuthResult.Unauthorized() else AuthResult.UnknownError()
-        } catch (e: Exception) {
+        } catch (exception: HttpException) {
+            if (exception.code() == 401) AuthResult.Unauthorized() else AuthResult.UnknownError()
+        } catch (exception: Exception) {
             AuthResult.UnknownError()
+        }
+    }
+
+    override suspend fun checkIfUserAlreadyExists(phoneNumber: String): Boolean {
+        return try {
+            api.checkIfUserAlreadyExists(phoneNumber)
+            false
+        } catch (exception: HttpException) {
+            true
         }
     }
 }

@@ -27,4 +27,6 @@ interface AuthRepository {
     ): AuthResult<Unit>
 
     suspend fun authenticate(): AuthResult<Unit>
+
+    suspend fun checkIfUserAlreadyExists(phoneNumber: String): Boolean
 }

@@ -43,6 +43,7 @@ fun OtpScreen(
         viewModel.authResults.collect { result ->
             when (result) {
                 is AuthResult.Authorized -> {
+                    navController.navigate(Screen.QueueScreen.route)
                     snackBarHostState.showSnackbar(
                         message = "Registration complete",
                         duration = SnackbarDuration.Short
@@ -66,7 +67,7 @@ fun OtpScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
-    ) { padding ->
+    ) { _ ->
         Box(
             modifier = Modifier
                 .fillMaxSize()

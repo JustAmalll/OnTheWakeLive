@@ -29,7 +29,7 @@ class AuthViewModel @Inject constructor(
     private val resultChannel = Channel<AuthResult<Unit>>()
     val authResults = resultChannel.receiveAsFlow()
 
-    private val _navigateUpEvent = MutableSharedFlow<Boolean>()
+    private val _navigateUpEvent = MutableSharedFlow<RegisterData>()
     val navigateUpEvent = _navigateUpEvent.asSharedFlow()
 
     fun onEvent(event: AuthUiEvent) {
@@ -92,9 +92,22 @@ class AuthViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            _navigateUpEvent.emit(true)
-            val result = repository.sendOtp(state.signUpPhoneNumber, activity)
-            resultChannel.send(result)
+            state = state.copy(isLoading = true)
+            if (!repository.checkIfUserAlreadyExists(state.signUpPhoneNumber)) {
+                _navigateUpEvent.emit(
+                    RegisterData(
+                        firstName = state.signUpFirsName.trim(),
+                        lastName = state.signUpLastName.trim(),
+                        phoneNumber = state.signUpPhoneNumber.trim(),
+                        password = state.signUpPassword.trim()
+                    )
+                )
+                val result = repository.sendOtp(state.signUpPhoneNumber, activity)
+                resultChannel.send(result)
+            } else {
+                resultChannel.send(AuthResult.UserAlreadyExist())
+            }
+            state = state.copy(isLoading = false)
         }
     }
 
@@ -122,8 +135,8 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             state = state.copy(isLoading = true)
             val result = repository.signIn(
-                phoneNumber = state.signInPhoneNumber,
-                password = state.signInPassword
+                phoneNumber = state.signInPhoneNumber.trim(),
+                password = state.signInPassword.trim()
             )
             resultChannel.send(result)
             state = state.copy(isLoading = false)

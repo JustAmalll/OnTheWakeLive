@@ -8,7 +8,7 @@ data class Queue(
     val userId: String,
     val firstName: String,
     val lastName: String,
-    val profilePictureFileName: String,
-    val leftQueue: String,
+    val profilePictureUri: String,
+    val isLeftQueue: Boolean,
     val timestamp: Long
 )

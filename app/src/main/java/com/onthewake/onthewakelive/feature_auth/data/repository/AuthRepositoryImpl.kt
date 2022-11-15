@@ -72,6 +72,7 @@ class AuthRepositoryImpl(
         OneSignal.initWithContext(context)
         OneSignal.setAppId(Constants.ONESIGNAL_APP_ID)
         OneSignal.setExternalUserId(response.userId)
+        OneSignal.promptForPushNotifications()
 
         AuthResult.Authorized()
     } catch (exception: HttpException) {

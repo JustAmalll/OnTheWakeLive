@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
+import android.provider.Settings
 import com.google.gson.Gson
 
 fun <T> T.toJson(): String = Gson().toJson(this)
@@ -19,12 +20,15 @@ fun Context.findActivity(): Activity {
     throw IllegalStateException("no activity")
 }
 
-fun Context.openInstagramProfile(instagram: String) {
-    this.startActivity(
-        Intent(
-            Intent.ACTION_VIEW, Uri.parse(
-                "${Constants.INSTAGRAM_URL}/$instagram/"
-            )
-        )
+fun Context.openInstagramProfile(instagram: String) = this.startActivity(
+    Intent(
+        Intent.ACTION_VIEW, Uri.parse("${Constants.INSTAGRAM_URL}/$instagram/")
     )
+)
+
+
+fun Context.openNotificationSettings() = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    putExtra("android.provider.extra.APP_PACKAGE", this@openNotificationSettings.packageName)
+    this@openNotificationSettings.startActivity(this)
 }

@@ -23,11 +23,11 @@ class QueueServiceImpl(
             emptyList()
         }
 
-    override suspend fun getQueueDetails(queueItemId: String): Resource<Profile> {
+    override suspend fun getProfileDetails(queueItemId: String): Resource<Profile> {
         return try {
-            val response = queueApi.getQueueDetails(queueItemId = queueItemId)
+            val response = queueApi.getProfileDetails(queueItemId = queueItemId)
             if (response.successful) {
-                Resource.Success(response.data)
+                Resource.Success(response.data?.toProfile())
             } else {
                 response.message?.let { msg ->
                     Resource.Error(msg)
@@ -40,7 +40,7 @@ class QueueServiceImpl(
         }
     }
 
-    override suspend fun deleteQueueItem(queueItemId: String): QueueDto? {
+    override suspend fun deleteQueueItem(queueItemId: String): Queue? {
         return try {
             client.delete(
                 QueueService.Endpoints.DeleteQueueItem.url

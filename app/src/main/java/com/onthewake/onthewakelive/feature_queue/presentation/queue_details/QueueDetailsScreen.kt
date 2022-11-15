@@ -63,7 +63,7 @@ fun QueueDetailsScreen(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = stringResource(id = R.string.details), fontSize = 32.sp) },
+                title = { Text(text = stringResource(id = R.string.details), fontSize = 28.sp) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = surfaceColor,
                     titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer

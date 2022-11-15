@@ -9,8 +9,8 @@ data class QueueDto(
     val userId: String,
     val firstName: String,
     val lastName: String,
-    val profilePictureFileName: String,
-    val leftQueue: String,
+    val profilePictureUri: String,
+    val isLeftQueue: Boolean,
     val timestamp: Long
 ) {
     fun toQueue(): Queue = Queue(
@@ -18,8 +18,8 @@ data class QueueDto(
         userId = userId,
         firstName = firstName,
         lastName = lastName,
-        profilePictureFileName = profilePictureFileName,
-        leftQueue = leftQueue,
+        profilePictureUri = profilePictureUri,
+        isLeftQueue = isLeftQueue,
         timestamp = timestamp
     )
 }

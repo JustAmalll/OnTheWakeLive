@@ -9,7 +9,7 @@ interface QueueSocketService {
 
     suspend fun initSession (firstName: String): Resource<Unit>
     fun observeQueue(): Flow<QueueResponse>
-    suspend fun addToQueue(leftQueue: String, firstName: String, timestamp: Long)
+    suspend fun addToQueue(isLeftQueue: Boolean, firstName: String, timestamp: Long)
     suspend fun closeSession()
 
     sealed class Endpoints(val url: String) {

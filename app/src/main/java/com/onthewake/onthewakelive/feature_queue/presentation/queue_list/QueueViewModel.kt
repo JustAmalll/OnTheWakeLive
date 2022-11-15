@@ -86,14 +86,14 @@ class QueueViewModel @Inject constructor(
         }
     }
 
-    fun addToQueue(leftQueue: String, firstName: String, timestamp: Long) {
+    fun addToQueue(isLeftQueue: Boolean, firstName: String, timestamp: Long) {
         viewModelScope.launch {
             isAdding.value = true
 
             val allQueue = _state.value.queue.sortedWith(compareBy { it.timestamp })
 
-            val leftQueueItems = allQueue.filter { it.leftQueue == "true" }
-            val rightQueueItems = allQueue.filter { it.leftQueue == "false" }
+            val leftQueueItems = allQueue.filter { isLeftQueue }
+            val rightQueueItems = allQueue.filter { !isLeftQueue }
 
             val userItemInLeftQueue = leftQueueItems.find { it.userId == userId }
             val userItemInRightQueue = rightQueueItems.find { it.userId == userId }
@@ -104,29 +104,29 @@ class QueueViewModel @Inject constructor(
             val ifUserAlreadyInQueue = allQueue.find { it.userId == userId }
 
             if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID) {
-                queueSocketService.addToQueue(leftQueue, firstName, timestamp)
+                queueSocketService.addToQueue(isLeftQueue, firstName, timestamp)
             } else {
-                if (leftQueue == "true" && ifUserAlreadyInQueue == null ||
-                    leftQueue == "false" && ifUserAlreadyInQueue == null
+                if (isLeftQueue && ifUserAlreadyInQueue == null ||
+                    !isLeftQueue && ifUserAlreadyInQueue == null
                 ) {
-                    queueSocketService.addToQueue(leftQueue, firstName, timestamp)
-                } else if (leftQueue == "true" && userItemInLeftQueue != null) {
+                    queueSocketService.addToQueue(isLeftQueue, firstName, timestamp)
+                } else if (isLeftQueue && userItemInLeftQueue != null) {
                     _snackBarEvent.emit(context.getString(R.string.already_in_queue_error))
-                } else if (leftQueue == "false" && userItemInRightQueue != null) {
+                } else if (!isLeftQueue && userItemInRightQueue != null) {
                     _snackBarEvent.emit(context.getString(R.string.already_in_queue_error))
-                } else if (leftQueue == "true" && userItemInRightQueue != null) {
+                } else if (isLeftQueue && userItemInRightQueue != null) {
                     if (leftQueueItems.size - userPositionInRightQueue >= 3) {
-                        queueSocketService.addToQueue(leftQueue, firstName, timestamp)
+                        queueSocketService.addToQueue(isLeftQueue, firstName, timestamp)
                     } else if (userPositionInRightQueue - leftQueueItems.size >= 3) {
-                        queueSocketService.addToQueue(leftQueue, firstName, timestamp)
+                        queueSocketService.addToQueue(isLeftQueue, firstName, timestamp)
                     } else {
                         _snackBarEvent.emit(context.getString(R.string.interval_error))
                     }
-                } else if (leftQueue == "false" && userItemInLeftQueue != null) {
+                } else if (!isLeftQueue && userItemInLeftQueue != null) {
                     if (rightQueueItems.size - userPositionInLeftQueue >= 3) {
-                        queueSocketService.addToQueue(leftQueue, firstName, timestamp)
+                        queueSocketService.addToQueue(isLeftQueue, firstName, timestamp)
                     } else if (userPositionInLeftQueue - rightQueueItems.size >= 3) {
-                        queueSocketService.addToQueue(leftQueue, firstName, timestamp)
+                        queueSocketService.addToQueue(isLeftQueue, firstName, timestamp)
                     } else {
                         _snackBarEvent.emit(context.getString(R.string.interval_error))
                     }
@@ -150,8 +150,8 @@ class QueueViewModel @Inject constructor(
                         userId = it.userId,
                         firstName = it.firstName,
                         lastName = it.lastName,
-                        profilePictureFileName = it.profilePictureFileName,
-                        leftQueue = it.leftQueue,
+                        profilePictureUri = it.profilePictureUri,
+                        isLeftQueue = it.isLeftQueue,
                         timestamp = it.timestamp
                     )
                 )

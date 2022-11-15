@@ -1,19 +1,19 @@
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_list
 
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -36,7 +37,6 @@ import androidx.navigation.NavHostController
 import coil.ImageLoader
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
@@ -45,10 +45,12 @@ import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.AdminDialog
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.EmptyContent
+import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.TabLayout
 import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.util.Constants.FIRST_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
 import com.onthewake.onthewakelive.util.UserProfileSerializer
+import com.onthewake.onthewakelive.util.openNotificationSettings
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
@@ -64,16 +66,51 @@ fun QueueScreen(
 ) {
 
     val state = viewModel.state.value
-    val context = LocalContext.current
-    val pagerState = rememberPagerState(pageCount = 2)
-    val showDialog = viewModel.showDialog
-    val haptic = LocalHapticFeedback.current
-    val snackBarHostState = remember { SnackbarHostState() }
     val userId = viewModel.userId
+    val showDialog = viewModel.showDialog
+
+    val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
+
+    val pagerState = rememberPagerState(pageCount = 2)
+    val snackBarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val systemUiController = rememberSystemUiController()
     val darkTheme = isSystemInDarkTheme()
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+
+    var hasNotificationPermission by remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            mutableStateOf(
+                ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            )
+        } else mutableStateOf(true)
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+
+            hasNotificationPermission = isGranted
+
+            if (!isGranted) {
+                scope.launch {
+                    val result = snackBarHostState.showSnackbar(
+                        "Разрешите показ уведомений",
+                        actionLabel = "Settings"
+                    )
+
+                    if (result == SnackbarResult.ActionPerformed) {
+                        context.openNotificationSettings()
+                    }
+                }
+            }
+        }
+    )
 
     val dataStore = remember {
         context.dataStore.data
@@ -103,7 +140,7 @@ fun QueueScreen(
 
             if (result == SnackbarResult.ActionPerformed) {
                 viewModel.addToQueue(
-                    leftQueue = deletedItem.leftQueue,
+                    isLeftQueue = deletedItem.isLeftQueue,
                     firstName = deletedItem.firstName,
                     timestamp = deletedItem.timestamp
                 )
@@ -114,9 +151,9 @@ fun QueueScreen(
     if (showDialog.value) {
         AdminDialog(
             showDialog = { showDialog.value = it },
-            onAddClicked = { leftQueue, firstName ->
+            onAddClicked = { isLeftQueue, firstName ->
                 viewModel.addToQueue(
-                    leftQueue = leftQueue.toString(),
+                    isLeftQueue = isLeftQueue,
                     firstName = firstName,
                     timestamp = System.currentTimeMillis()
                 )
@@ -156,21 +193,28 @@ fun QueueScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                modifier = if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID)
-                    Modifier.padding(bottom = 0.dp) else Modifier.padding(bottom = 76.dp),
+                modifier = Modifier.padding(
+                    bottom = if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID)
+                        0.dp else 76.dp
+                ),
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    if (!viewModel.isAdding.value) {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    }
+
+                    if (!viewModel.isAdding.value && hasNotificationPermission) {
                         if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID) {
                             showDialog.value = true
                         } else {
                             if (pagerState.currentPage == 0) viewModel.addToQueue(
-                                leftQueue = "true",
+                                isLeftQueue = true,
                                 firstName = dataStore.value.firstName,
                                 timestamp = System.currentTimeMillis()
                             )
                             else viewModel.addToQueue(
-                                leftQueue = "false",
+                                isLeftQueue = false,
                                 firstName = dataStore.value.firstName,
                                 timestamp = System.currentTimeMillis()
                             )
@@ -200,9 +244,9 @@ fun QueueScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .padding(padding)
         ) {
-            Tabs(pagerState = pagerState)
+            TabLayout(pagerState = pagerState)
 
             // Content
             HorizontalPager(state = pagerState) { page ->
@@ -235,61 +279,6 @@ fun QueueScreen(
     }
 }
 
-
-@ExperimentalPagerApi
-@Composable
-fun Tabs(pagerState: PagerState) {
-
-    val haptic = LocalHapticFeedback.current
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-
-    val list = listOf(
-        context.getString(R.string.left_line) to Icons.Default.ArrowBack,
-        context.getString(R.string.right_line) to Icons.Default.ArrowForward
-    )
-
-    TabRow(
-        selectedTabIndex = pagerState.currentPage,
-        contentColor = Color.White,
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                height = 2.dp,
-                color = MaterialTheme.colorScheme.secondaryContainer
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-    ) {
-        list.forEachIndexed { index, _ ->
-            Tab(
-                icon = {
-                    Icon(
-                        imageVector = list[index].second,
-                        contentDescription = null,
-                        tint = if (pagerState.currentPage == index)
-                            MaterialTheme.colorScheme.onSecondaryContainer
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                text = {
-                    Text(
-                        list[index].first,
-                        color = if (pagerState.currentPage == index)
-                            MaterialTheme.colorScheme.onSurface
-                        else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                selected = pagerState.currentPage == index,
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    scope.launch { pagerState.animateScrollToPage(index) }
-                }
-            )
-        }
-    }
-}
-
 @ExperimentalMaterial3Api
 @Composable
 fun QueueLeftContent(
@@ -300,7 +289,7 @@ fun QueueLeftContent(
     onSwipeToDelete: (String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        if (state.queue.none { it.leftQueue == "true" } && !state.isQueueLoading) {
+        if (state.queue.none { it.isLeftQueue } && !state.isQueueLoading) {
             EmptyContent(modifier = Modifier.align(Alignment.Center))
         }
         LazyColumn(
@@ -308,7 +297,7 @@ fun QueueLeftContent(
             reverseLayout = true
         ) {
             items(state.queue) { item ->
-                if (item.leftQueue == "true") {
+                if (item.isLeftQueue) {
                     QueueItem(
                         queueItem = item,
                         imageLoader = imageLoader,
@@ -333,7 +322,7 @@ fun QueueRightContent(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         val queue = state.queue.sortedWith(compareByDescending { it.timestamp })
-        if (queue.none { it.leftQueue == "false" } && !state.isQueueLoading) {
+        if (queue.none { !it.isLeftQueue } && !state.isQueueLoading) {
             EmptyContent(modifier = Modifier.align(Alignment.Center))
         }
         LazyColumn(
@@ -341,7 +330,7 @@ fun QueueRightContent(
             reverseLayout = true
         ) {
             items(queue) { item ->
-                if (item.leftQueue == "false") {
+                if (!item.isLeftQueue) {
                     QueueItem(
                         queueItem = item,
                         imageLoader = imageLoader,
@@ -364,6 +353,40 @@ fun QueueItem(
     onDetailsClicked: (String) -> Unit,
     onSwipeToDelete: (String) -> Unit
 ) {
+    Spacer(modifier = Modifier.height(12.dp))
+
+    if (queueItem.userId == userId ||
+        userId == FIRST_ADMIN_USER_ID ||
+        userId == SECOND_ADMIN_USER_ID
+    ) {
+        OwnUserItem(
+            queueItem = queueItem,
+            imageLoader = imageLoader,
+            onDetailsClicked = onDetailsClicked,
+            onSwipeToDelete = onSwipeToDelete
+        )
+    } else {
+        if (queueItem.userId != FIRST_ADMIN_USER_ID &&
+            queueItem.userId != SECOND_ADMIN_USER_ID
+        ) {
+            DefaultUserItem(
+                queueItem = queueItem,
+                imageLoader = imageLoader,
+                onDetailsClicked = onDetailsClicked
+            )
+        } else {
+            UserAddedByAdminItem(queueItem.firstName)
+        }
+    }
+}
+
+@Composable
+fun OwnUserItem(
+    queueItem: Queue,
+    imageLoader: ImageLoader,
+    onDetailsClicked: (String) -> Unit,
+    onSwipeToDelete: (String) -> Unit
+) {
     val haptic = LocalHapticFeedback.current
 
     val swipeToDelete = SwipeAction(
@@ -382,129 +405,93 @@ fun QueueItem(
         }
     )
 
-    Surface(
-        shape = RoundedCornerShape(4.dp),
+    SwipeableActionsBox(
         modifier = Modifier
-            .padding(vertical = 6.dp)
-            .clip(shape = RoundedCornerShape(12.dp))
+            .fillMaxWidth()
+            .clip(shape = MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable { onDetailsClicked(queueItem.id) },
+        startActions = listOf(swipeToDelete)
     ) {
-        if (queueItem.userId == userId ||
-            userId == FIRST_ADMIN_USER_ID ||
-            userId == SECOND_ADMIN_USER_ID
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            SwipeableActionsBox(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clip(shape = MaterialTheme.shapes.medium)
-                    .clickable {
-                        if (queueItem.userId != FIRST_ADMIN_USER_ID &&
-                            queueItem.userId != SECOND_ADMIN_USER_ID
-                        ) onDetailsClicked(queueItem.id)
-                    },
-                startActions = listOf(swipeToDelete)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .clip(shape = MaterialTheme.shapes.medium),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (queueItem.userId != FIRST_ADMIN_USER_ID &&
-                        queueItem.userId != SECOND_ADMIN_USER_ID
-                    ) {
-                        StandardImageView(
-                            imageLoader = imageLoader,
-                            model = queueItem.profilePictureFileName
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(
-                                text = queueItem.firstName,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(1.dp))
-                            Text(
-                                text = queueItem.lastName,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    } else {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 1.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = queueItem.firstName,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-        } else {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.medium,
-                onClick = {
-                    if (queueItem.userId != FIRST_ADMIN_USER_ID &&
-                        queueItem.userId != SECOND_ADMIN_USER_ID
-                    ) onDetailsClicked(queueItem.id)
-                }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .clip(shape = MaterialTheme.shapes.medium),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (queueItem.userId != FIRST_ADMIN_USER_ID &&
-                        queueItem.userId != SECOND_ADMIN_USER_ID
-                    ) {
-                        StandardImageView(
-                            imageLoader = imageLoader,
-                            model = queueItem.profilePictureFileName
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(
-                                text = queueItem.firstName,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(1.dp))
-                            Text(
-                                text = queueItem.lastName,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    } else {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 1.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = queueItem.firstName,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
+            StandardImageView(
+                imageLoader = imageLoader,
+                model = queueItem.profilePictureUri
+            )
+            Column(modifier = Modifier.padding(start = 12.dp)) {
+                Text(
+                    text = queueItem.firstName,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+                Text(
+                    text = queueItem.lastName,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
+    }
+}
+
+@Composable
+fun DefaultUserItem(
+    queueItem: Queue,
+    imageLoader: ImageLoader,
+    onDetailsClicked: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onDetailsClicked(queueItem.id) }
+            .clip(shape = MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StandardImageView(
+            imageLoader = imageLoader,
+            model = queueItem.profilePictureUri
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(
+                text = queueItem.firstName,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(1.dp))
+            Text(
+                text = queueItem.lastName,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun UserAddedByAdminItem(firstName: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape = MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = firstName,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }

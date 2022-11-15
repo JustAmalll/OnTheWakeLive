@@ -33,7 +33,7 @@ class QueueDetailsViewModel @Inject constructor(
     private fun loadQueueItemDetails(queueItemId: String) {
         viewModelScope.launch {
             state.value = state.value.copy(isLoading = true)
-            when (val result = queueService.getQueueDetails(queueItemId)) {
+            when (val result = queueService.getProfileDetails(queueItemId)) {
                 is Resource.Success -> {
                     result.data?.let {
                         state.value = state.value.copy(

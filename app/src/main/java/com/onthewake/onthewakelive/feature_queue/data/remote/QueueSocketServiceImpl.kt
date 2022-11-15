@@ -49,10 +49,10 @@ class QueueSocketServiceImpl(
         }
 
     override suspend fun addToQueue(
-        leftQueue: String, firstName: String, timestamp: Long
+        isLeftQueue: Boolean, firstName: String, timestamp: Long
     ) {
         try {
-            socket?.send(Frame.Text("$leftQueue/$firstName/$timestamp"))
+            socket?.send(Frame.Text("$isLeftQueue/$firstName/$timestamp"))
         } catch (e: Exception) {
             e.printStackTrace()
         }

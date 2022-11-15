@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.onthewake.onthewakelive.dataStore
+import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
 import com.onthewake.onthewakelive.feature_profile.domain.repository.ProfileRepository
 import com.onthewake.onthewakelive.util.Constants
 import com.onthewake.onthewakelive.util.Resource
@@ -57,5 +58,19 @@ class ProfileViewModel @Inject constructor(
 
     fun logout() {
         prefs.edit().putString(Constants.PREFS_JWT_TOKEN, null).apply()
+        viewModelScope.launch {
+            context.dataStore.updateData {
+                Profile(
+                    userId = "",
+                    firstName = "",
+                    lastName = "",
+                    phoneNumber = "",
+                    instagram = "",
+                    telegram = "",
+                    dateOfBirth = "",
+                    profilePictureUri = ""
+                )
+            }
+        }
     }
 }

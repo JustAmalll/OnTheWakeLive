@@ -385,9 +385,7 @@ fun QueueItem(
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable {
-                    if (!adminQueueItem) onDetailsClicked(queueItem.id)
-                },
+                .clickable { if (!adminQueueItem) onDetailsClicked(queueItem.id) },
             startActions = listOf(swipeToDelete)
         ) {
             if (adminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)

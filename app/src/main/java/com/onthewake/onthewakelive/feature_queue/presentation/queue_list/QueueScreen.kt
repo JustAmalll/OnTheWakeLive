@@ -355,38 +355,6 @@ fun QueueItem(
 ) {
     Spacer(modifier = Modifier.height(12.dp))
 
-    if (queueItem.userId == userId ||
-        userId == FIRST_ADMIN_USER_ID ||
-        userId == SECOND_ADMIN_USER_ID
-    ) {
-        OwnUserItem(
-            queueItem = queueItem,
-            imageLoader = imageLoader,
-            onDetailsClicked = onDetailsClicked,
-            onSwipeToDelete = onSwipeToDelete
-        )
-    } else {
-        if (queueItem.userId != FIRST_ADMIN_USER_ID &&
-            queueItem.userId != SECOND_ADMIN_USER_ID
-        ) {
-            DefaultUserItem(
-                queueItem = queueItem,
-                imageLoader = imageLoader,
-                onDetailsClicked = onDetailsClicked
-            )
-        } else {
-            UserAddedByAdminItem(queueItem.firstName)
-        }
-    }
-}
-
-@Composable
-fun OwnUserItem(
-    queueItem: Queue,
-    imageLoader: ImageLoader,
-    onDetailsClicked: (String) -> Unit,
-    onSwipeToDelete: (String) -> Unit
-) {
     val haptic = LocalHapticFeedback.current
 
     val swipeToDelete = SwipeAction(
@@ -405,39 +373,37 @@ fun OwnUserItem(
         }
     )
 
-    SwipeableActionsBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape = MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable { onDetailsClicked(queueItem.id) },
-        startActions = listOf(swipeToDelete)
+    val adminQueueItem = queueItem.userId == FIRST_ADMIN_USER_ID ||
+            queueItem.userId == SECOND_ADMIN_USER_ID
+
+    if (queueItem.userId == userId ||
+        userId == FIRST_ADMIN_USER_ID ||
+        userId == SECOND_ADMIN_USER_ID
     ) {
-        Row(
+        SwipeableActionsBox(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(shape = MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .clickable {
+                    if (!adminQueueItem) onDetailsClicked(queueItem.id)
+                },
+            startActions = listOf(swipeToDelete)
         ) {
-            StandardImageView(
+            if (adminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
+            else DefaultUserItem(
+                queueItem = queueItem,
                 imageLoader = imageLoader,
-                model = queueItem.profilePictureUri
+                onDetailsClicked = onDetailsClicked
             )
-            Column(modifier = Modifier.padding(start = 12.dp)) {
-                Text(
-                    text = queueItem.firstName,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(1.dp))
-                Text(
-                    text = queueItem.lastName,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
+    } else {
+        if (adminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
+        else DefaultUserItem(
+            queueItem = queueItem,
+            imageLoader = imageLoader,
+            onDetailsClicked = onDetailsClicked
+        )
     }
 }
 

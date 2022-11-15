@@ -24,21 +24,23 @@ import com.onthewake.onthewakelive.R
 
 @Composable
 fun StandardImageView(
-    imageLoader: ImageLoader,
-    model: String
+    imageLoader: ImageLoader, model: String
 ) {
     val isImageLoading = remember { mutableStateOf(false) }
 
-    IconButton(onClick = {}, modifier = Modifier.size(46.dp)) {
+    IconButton(
+        onClick = {},
+        modifier = Modifier.size(46.dp),
+    ) {
         if (!isImageLoading.value) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = stringResource(id = R.string.person_icon)
             )
         }
-        if (isImageLoading.value) {
-            CircularProgressIndicator(modifier = Modifier.size(26.dp), strokeWidth = 2.dp)
-        }
+        if (isImageLoading.value) CircularProgressIndicator(
+            modifier = Modifier.size(26.dp), strokeWidth = 2.dp
+        )
         Image(
             modifier = Modifier
                 .fillMaxSize()

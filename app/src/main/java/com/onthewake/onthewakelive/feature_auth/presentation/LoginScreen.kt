@@ -56,7 +56,9 @@ fun LoginScreen(
         viewModel.authResults.collect { result ->
             when (result) {
                 is AuthResult.Authorized -> {
-                    navController.navigate(Screen.QueueScreen.route)
+                    navController.navigate(Screen.QueueScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                    }
                 }
                 is AuthResult.IncorrectData -> {
                     snackBarHostState.showSnackbar(

@@ -1,7 +1,5 @@
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_details
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -29,7 +27,7 @@ import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.FormattedDateOfBirth
 import com.onthewake.onthewakelive.core.presentation.StandardImageView
 import com.onthewake.onthewakelive.navigation.Screen
-import com.onthewake.onthewakelive.util.Constants.INSTAGRAM_URL
+import com.onthewake.onthewakelive.util.openInstagramProfile
 import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterial3Api
@@ -100,33 +98,29 @@ fun QueueDetailsScreen(
                             .padding(top = 20.dp, bottom = 40.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                StandardImageView(
-                                    imageLoader = imageLoader,
-                                    model = state.profilePictureUri
+                            StandardImageView(
+                                imageLoader = imageLoader,
+                                model = state.profilePictureUri
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    text = state.firstName,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column {
-                                    Text(
-                                        text = state.firstName,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Spacer(modifier = Modifier.height(1.dp))
-                                    Text(
-                                        text = state.lastName,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
+                                Spacer(modifier = Modifier.height(1.dp))
+                                Text(
+                                    text = state.lastName,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                         }
                     }
@@ -151,13 +145,7 @@ fun QueueDetailsScreen(
                         }
                         if (state.instagram.isNotEmpty()) {
                             IconButton(onClick = {
-                                context.startActivity(
-                                    Intent(
-                                        Intent.ACTION_VIEW, Uri.parse(
-                                            "$INSTAGRAM_URL/${state.instagram}/"
-                                        )
-                                    )
-                                )
+                                context.openInstagramProfile(state.instagram)
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowForward,

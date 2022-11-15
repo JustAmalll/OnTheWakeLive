@@ -190,7 +190,7 @@ fun QueueScreen(
 
         DisposableEffect(key1 = lifecycleOwner) {
             val observer = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_STOP) viewModel.disconnect()
+                if (event == Lifecycle.Event.ON_PAUSE) viewModel.disconnect()
                 else if (event == Lifecycle.Event.ON_CREATE) viewModel.connectToQueue()
             }
             lifecycleOwner.lifecycle.addObserver(observer)

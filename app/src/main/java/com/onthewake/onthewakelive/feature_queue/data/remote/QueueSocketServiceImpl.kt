@@ -58,7 +58,6 @@ class QueueSocketServiceImpl(
         }
     }
 
-
     override suspend fun closeSession() {
         socket?.close()
     }

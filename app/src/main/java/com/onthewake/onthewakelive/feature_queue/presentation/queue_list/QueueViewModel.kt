@@ -49,7 +49,6 @@ class QueueViewModel @Inject constructor(
     val firstName = prefs.getString(PREFS_FIRST_NAME, null)
     val userId = prefs.getString(PREFS_USER_ID, null)
 
-
     fun connectToQueue() {
         getQueue()
 
@@ -60,11 +59,11 @@ class QueueViewModel @Inject constructor(
                         .onEach { queueItem ->
                             val newList = state.value.queue
                                 .toMutableList().apply {
-                                    if (queueItem.isDeleteAction) removeIf { it.id == queueItem.queue.id }
-                                    else add(0, queueItem.queue)
+                                    if (queueItem.isDeleteAction) removeIf {
+                                        it.id == queueItem.queue.id
+                                    } else add(0, queueItem.queue)
                                 }
                                 .sortedWith(compareByDescending { it.timestamp })
-                            println(newList)
                             _state.value = state.value.copy(queue = newList)
                         }.launchIn(viewModelScope)
                 }

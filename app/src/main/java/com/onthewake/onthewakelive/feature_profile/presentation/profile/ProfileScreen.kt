@@ -1,7 +1,5 @@
 package com.onthewake.onthewakelive.feature_profile.presentation.profile
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -17,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,8 +29,8 @@ import com.onthewake.onthewakelive.core.presentation.FormattedDateOfBirth
 import com.onthewake.onthewakelive.core.presentation.StandardImageView
 import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.navigation.Screen
-import com.onthewake.onthewakelive.util.Constants.INSTAGRAM_URL
 import com.onthewake.onthewakelive.util.UserProfileSerializer.defaultValue
+import com.onthewake.onthewakelive.util.openInstagramProfile
 import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterial3Api
@@ -85,7 +84,20 @@ fun ProfileScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = surfaceColor,
                     titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                )
+                ),
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(Screen.LoginScreen.route) {
+                            popUpTo(Screen.QueueScreen.route) { inclusive = true }
+                            viewModel.logout()
+                        }
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_logout),
+                            contentDescription = stringResource(id = R.string.arrow_back_icon)
+                        )
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -174,13 +186,7 @@ fun ProfileScreen(
                         if (dataStore.value.instagram.isNotEmpty()) {
                             IconButton(onClick = {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                context.startActivity(
-                                    Intent(
-                                        Intent.ACTION_VIEW, Uri.parse(
-                                            "$INSTAGRAM_URL/${dataStore.value.instagram}/"
-                                        )
-                                    )
-                                )
+                                context.openInstagramProfile(dataStore.value.instagram)
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowForward,

@@ -1,11 +1,13 @@
 package com.onthewake.onthewakelive.feature_profile.presentation.profile
 
 import android.app.Application
+import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_profile.domain.repository.ProfileRepository
+import com.onthewake.onthewakelive.util.Constants
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
-    private val context: Application
+    private val context: Application,
+    private val prefs: SharedPreferences
 ) : AndroidViewModel(context) {
 
     private val _snackBarEvent = MutableSharedFlow<String>()
@@ -50,5 +53,9 @@ class ProfileViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun logout() {
+        prefs.edit().putString(Constants.PREFS_JWT_TOKEN, null).apply()
     }
 }

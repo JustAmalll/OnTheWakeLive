@@ -43,7 +43,9 @@ fun OtpScreen(
         viewModel.authResults.collect { result ->
             when (result) {
                 is AuthResult.Authorized -> {
-                    navController.navigate(Screen.QueueScreen.route)
+                    navController.navigate(Screen.QueueScreen.route) {
+                        popUpTo(Screen.OtpScreen.route) { inclusive = true }
+                    }
                     snackBarHostState.showSnackbar(
                         message = "Registration complete",
                         duration = SnackbarDuration.Short

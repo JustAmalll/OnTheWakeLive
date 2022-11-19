@@ -28,15 +28,7 @@ class EditProfileViewModel @Inject constructor(
     private val context: Application
 ) : AndroidViewModel(context) {
 
-    var state by mutableStateOf(ProfileStateErrors())
-
-    val firstName = mutableStateOf("")
-    val lastName = mutableStateOf("")
-    val phoneNumber = mutableStateOf("")
-    val telegram = mutableStateOf("")
-    val profilePictureUri = mutableStateOf("")
-    val instagram = mutableStateOf("")
-    val dateOfBirth = mutableStateOf("")
+    var state by mutableStateOf(EditProfileState())
 
     private val _snackBarEvent = MutableSharedFlow<String>()
     val snackBarEvent = _snackBarEvent.asSharedFlow()
@@ -54,26 +46,26 @@ class EditProfileViewModel @Inject constructor(
     fun onEvent(event: EditProfileUiEvent) {
         when (event) {
             is EditProfileUiEvent.EditProfileFirstNameChanged -> {
-                firstName.value = event.value
+                state = state.copy(firstName = event.value)
             }
             is EditProfileUiEvent.EditProfileLastNameChanged -> {
-                lastName.value = event.value
+                state = state.copy(lastName = event.value)
             }
             is EditProfileUiEvent.EditProfilePhoneNumberChanged -> {
-                phoneNumber.value = event.value
+                state = state.copy(phoneNumber = event.value)
             }
             is EditProfileUiEvent.EditProfileTelegramChanged -> {
-                telegram.value = event.value
+                state = state.copy(telegram = event.value)
             }
             is EditProfileUiEvent.EditProfileInstagramChanged -> {
-                instagram.value = event.value
+                state = state.copy(instagram = event.value)
             }
             is EditProfileUiEvent.EditProfileDateOfBirthChanged -> {
-                dateOfBirth.value = event.value
+                state = state.copy(dateOfBirth = event.value)
             }
             is EditProfileUiEvent.CropImage -> {
                 _selectedProfilePictureUri.value = event.uri
-                profilePictureUri.value = event.uri.toString()
+                state = state.copy(profilePictureUri = event.uri.toString())
             }
             is EditProfileUiEvent.EditProfile -> {
                 editProfile()
@@ -84,22 +76,24 @@ class EditProfileViewModel @Inject constructor(
     private fun updateDataFromDataStore() {
         viewModelScope.launch {
             context.dataStore.data.collectLatest { profile ->
-                firstName.value = profile.firstName
-                lastName.value = profile.lastName
-                phoneNumber.value = profile.phoneNumber
-                instagram.value = profile.instagram
-                telegram.value = profile.telegram
-                dateOfBirth.value = profile.dateOfBirth
-                profilePictureUri.value = profile.profilePictureUri
+                state = state.copy(
+                    firstName = profile.firstName,
+                    lastName = profile.lastName,
+                    phoneNumber = profile.phoneNumber,
+                    telegram = profile.telegram,
+                    instagram = profile.instagram,
+                    dateOfBirth = profile.dateOfBirth,
+                    profilePictureUri = profile.profilePictureUri
+                )
             }
         }
     }
 
     private fun editProfile() {
-        val firstNameResult = validationUseCase.validateFirstName(firstName.value)
-        val lastNameResult = validationUseCase.validateLastName(lastName.value)
-        val phoneNumberResult = validationUseCase.validatePhoneNumber(phoneNumber.value)
-        val dateOfBirthResult = validationUseCase.validateDateOfBirth(dateOfBirth.value)
+        val firstNameResult = validationUseCase.validateFirstName(state.firstName)
+        val lastNameResult = validationUseCase.validateLastName(state.lastName)
+        val phoneNumberResult = validationUseCase.validatePhoneNumber(state.phoneNumber)
+        val dateOfBirthResult = validationUseCase.validateDateOfBirth(state.dateOfBirth)
 
         val hasError = listOf(
             firstNameResult,
@@ -130,13 +124,13 @@ class EditProfileViewModel @Inject constructor(
 
             val result = profileRepository.updateProfile(
                 updateProfileData = UpdateProfileData(
-                    firstName = firstName.value.trim(),
-                    lastName = lastName.value.trim(),
-                    phoneNumber = phoneNumber.value.trim(),
-                    instagram = instagram.value.trim(),
-                    telegram = telegram.value.trim(),
-                    dateOfBirth = dateOfBirth.value.trim(),
-                    profilePictureUri = profilePictureUri.value
+                    firstName = state.firstName.trim(),
+                    lastName = state.lastName.trim(),
+                    phoneNumber = state.phoneNumber.trim(),
+                    instagram = state.instagram.trim(),
+                    telegram = state.telegram.trim(),
+                    dateOfBirth = state.dateOfBirth.trim(),
+                    profilePictureUri = state.profilePictureUri
                 ),
                 selectedProfilePictureUri = selectedProfilePictureUri.value
             )

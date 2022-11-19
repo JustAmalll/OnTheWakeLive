@@ -12,6 +12,7 @@ sealed class Screen(val route: String) {
     object QueueScreen : Screen("queue_screen")
     object ProfileScreen : Screen("profile_screen")
     object EditProfileScreen : Screen("edit_profile_screen")
+    object TrickListScreen : Screen("trick_list_screen")
     object QueueDetailsScreen : Screen(
         "queue_details_screen/{${Constants.DETAILS_ARGUMENT_KEY}}"
     ) {

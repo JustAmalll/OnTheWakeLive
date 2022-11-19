@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.ui.theme
+package com.onthewake.onthewakelive.core.presentation.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

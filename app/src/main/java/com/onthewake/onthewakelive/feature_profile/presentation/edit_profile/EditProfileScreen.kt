@@ -176,8 +176,7 @@ fun EditProfileScreen(
                                 Image(
                                     modifier = Modifier.fillMaxSize(),
                                     painter = rememberAsyncImagePainter(
-                                        model = profilePictureUri
-                                            ?: viewModel.profilePictureUri.value,
+                                        model = profilePictureUri ?: state.profilePictureUri,
                                         imageLoader = imageLoader,
                                         onLoading = { isImageLoading.value = true },
                                         onError = { isImageLoading.value = false },
@@ -189,7 +188,7 @@ fun EditProfileScreen(
                         }
                         Spacer(modifier = Modifier.height(30.dp))
                         StandardTextField(
-                            value = viewModel.firstName.value,
+                            value = state.firstName,
                             onValueChange = {
                                 viewModel.onEvent(EditProfileUiEvent.EditProfileFirstNameChanged(it))
                             },
@@ -203,7 +202,7 @@ fun EditProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         StandardTextField(
-                            value = viewModel.lastName.value,
+                            value = state.lastName,
                             onValueChange = {
                                 viewModel.onEvent(EditProfileUiEvent.EditProfileLastNameChanged(it))
                             },
@@ -217,7 +216,7 @@ fun EditProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         StandardTextField(
-                            value = viewModel.phoneNumber.value,
+                            value = state.phoneNumber,
                             onValueChange = {
                                 viewModel.onEvent(
                                     EditProfileUiEvent.EditProfilePhoneNumberChanged(it)
@@ -233,7 +232,7 @@ fun EditProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         StandardTextField(
-                            value = viewModel.telegram.value,
+                            value = state.telegram,
                             onValueChange = {
                                 viewModel.onEvent(EditProfileUiEvent.EditProfileTelegramChanged(it))
                             },
@@ -241,7 +240,7 @@ fun EditProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         StandardTextField(
-                            value = viewModel.instagram.value,
+                            value = state.instagram,
                             onValueChange = {
                                 viewModel.onEvent(EditProfileUiEvent.EditProfileInstagramChanged(it))
                             },
@@ -250,7 +249,7 @@ fun EditProfileScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         TextField(
                             modifier = Modifier.fillMaxWidth(),
-                            value = viewModel.dateOfBirth.value,
+                            value = state.dateOfBirth,
                             onValueChange = {
                                 if (it.length <= 8) {
                                     viewModel.onEvent(
@@ -280,13 +279,13 @@ fun EditProfileScreen(
                         Button(
                             onClick = {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                if (dataStore.value.firstName == viewModel.firstName.value &&
-                                    dataStore.value.lastName == viewModel.lastName.value &&
-                                    dataStore.value.phoneNumber == viewModel.phoneNumber.value &&
+                                if (dataStore.value.firstName == state.firstName &&
+                                    dataStore.value.lastName == state.lastName &&
+                                    dataStore.value.phoneNumber == state.phoneNumber &&
                                     viewModel.selectedProfilePictureUri.value == null &&
-                                    dataStore.value.instagram == viewModel.instagram.value &&
-                                    dataStore.value.telegram == viewModel.telegram.value &&
-                                    dataStore.value.dateOfBirth == viewModel.dateOfBirth.value
+                                    dataStore.value.instagram == state.instagram &&
+                                    dataStore.value.telegram == state.telegram &&
+                                    dataStore.value.dateOfBirth == state.dateOfBirth
                                 ) {
                                     scope.launch {
                                         snackBarHostState.showSnackbar(

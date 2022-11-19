@@ -1,5 +1,6 @@
 package com.onthewake.onthewakelive.navigation
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -17,9 +18,11 @@ import com.onthewake.onthewakelive.feature_profile.presentation.profile.ProfileS
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_details.QueueDetailsScreen
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.QueueScreen
 import com.onthewake.onthewakelive.feature_splash.SplashScreen
+import com.onthewake.onthewakelive.feature_trick_list.presentation.TrickListScreen
 import com.onthewake.onthewakelive.util.Constants
 import com.onthewake.onthewakelive.util.Constants.DETAILS_ARGUMENT_KEY
 
+@ExperimentalMaterialApi
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @Composable
@@ -29,7 +32,7 @@ fun SetupNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.SplashScreen.route
+        startDestination = Screen.TrickListScreen.route
     ) {
         composable(route = Screen.SplashScreen.route) {
             SplashScreen(navController = navController)
@@ -64,6 +67,9 @@ fun SetupNavGraph(
         }
         composable(route = Screen.EditProfileScreen.route) {
             EditProfileScreen(imageLoader = imageLoader, navController = navController)
+        }
+        composable(route = Screen.TrickListScreen.route) {
+            TrickListScreen(navController = navController)
         }
     }
 }

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.onthewake.onthewakelive
 
 import android.content.Context
@@ -5,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -15,7 +18,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.core.presentation.StandardScaffold
 import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.navigation.SetupNavGraph
-import com.onthewake.onthewakelive.ui.theme.OnTheWakeLiveTheme
+import com.onthewake.onthewakelive.core.presentation.ui.theme.OnTheWakeLiveTheme
 import com.onthewake.onthewakelive.util.UserProfileSerializer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

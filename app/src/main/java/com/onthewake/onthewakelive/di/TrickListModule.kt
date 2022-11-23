@@ -1,6 +1,7 @@
 package com.onthewake.onthewakelive.di
 
 import android.content.Context
+import com.onthewake.onthewakelive.feature_trick_list.data.local.TrickListDatabase
 import com.onthewake.onthewakelive.feature_trick_list.data.remote.TrickListApi
 import com.onthewake.onthewakelive.feature_trick_list.data.repository.TrickListRepositoryImpl
 import com.onthewake.onthewakelive.feature_trick_list.domain.repository.TrickListRepository
@@ -34,7 +35,8 @@ object TrickListModule {
     @Singleton
     fun provideTrickListRepository(
         profileApi: TrickListApi,
+        db: TrickListDatabase,
         @ApplicationContext context: Context
-    ): TrickListRepository = TrickListRepositoryImpl(profileApi, context)
+    ): TrickListRepository = TrickListRepositoryImpl(profileApi, context, db.dao)
 
 }

@@ -26,7 +26,6 @@ fun Context.openInstagramProfile(instagram: String) = this.startActivity(
     )
 )
 
-
 fun Context.openNotificationSettings() = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     putExtra("android.provider.extra.APP_PACKAGE", this@openNotificationSettings.packageName)

@@ -3,11 +3,15 @@ package com.onthewake.onthewakelive.di
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import androidx.room.Room
 import coil.ImageLoader
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.google.gson.Gson
+import com.onthewake.onthewakelive.feature_trick_list.data.local.Converters
+import com.onthewake.onthewakelive.feature_trick_list.data.local.TrickListDatabase
 import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
+import com.onthewake.onthewakelive.util.GsonParser
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,6 +42,14 @@ object AppModule {
             }
         )
         .build()
+
+    @Provides
+    @Singleton
+    fun provideTrickListDatabase(app: Application): TrickListDatabase {
+        return Room.databaseBuilder(
+            app, TrickListDatabase::class.java, "trick_list.db"
+        ).addTypeConverter(Converters(GsonParser(Gson()))).build()
+    }
 
     @Provides
     @Singleton

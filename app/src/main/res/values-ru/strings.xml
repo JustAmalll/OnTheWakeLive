@@ -64,4 +64,5 @@
     <string name="verify_phone_number">Подтвердите номер телефона</string>
     <string name="validate_otp_error">Поле OTP не может быть пустым</string>
     <string name="validate_otp_length_error">ОТП должен содержать 6 цифр</string>
+    <string name="empty_users_trick_list">Упс! Список трюков пользователя пуст</string>
 </resources>

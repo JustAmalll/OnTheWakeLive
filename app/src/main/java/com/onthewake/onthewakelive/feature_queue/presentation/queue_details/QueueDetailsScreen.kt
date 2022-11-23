@@ -14,7 +14,9 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,7 @@ fun QueueDetailsScreen(
 
     val state = viewModel.state.value
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     val snackBarHostState = remember { SnackbarHostState() }
 
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
@@ -50,6 +53,9 @@ fun QueueDetailsScreen(
     SideEffect {
         systemUiController.setNavigationBarColor(
             color = bgColor, darkIcons = !darkTheme
+        )
+        systemUiController.setStatusBarColor(
+            color = surfaceColor, darkIcons = !darkTheme
         )
     }
 
@@ -127,6 +133,29 @@ fun QueueDetailsScreen(
                 }
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Trick List",
+                            fontSize = 22.sp,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        IconButton(onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            navController.navigate(
+                                Screen.TrickListScreen.passUserId(userId = state.userId)
+                            )
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = stringResource(id = R.string.right_arrow)
+                            )
+                        }
+                    }
+                    Divider(modifier = Modifier.padding(vertical = 20.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,

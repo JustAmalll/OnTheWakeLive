@@ -1,6 +1,6 @@
 package com.onthewake.onthewakelive.feature_trick_list.presentation
 
-import com.onthewake.onthewakelive.feature_trick_list.data.remote.response.TrickItemResponse
+import com.onthewake.onthewakelive.feature_trick_list.data.remote.dto.TrickItemDto
 
 data class TrickItemState (
     val name: String,
@@ -8,6 +8,6 @@ data class TrickItemState (
     val isSelected: Boolean = false
 )
 
-fun TrickItemState.toTrickItemResponse(): TrickItemResponse = TrickItemResponse(
+fun TrickItemState.toTrickItemDto(): TrickItemDto = TrickItemDto(
     name = name, description = description
 )

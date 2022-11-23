@@ -65,7 +65,6 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
     implementation 'androidx.activity:activity-compose:1.6.1'
-    implementation 'com.google.android.material:material:1.7.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
@@ -129,8 +128,13 @@ dependencies {
 
     // Material 3
     implementation "androidx.compose.material3:material3:1.1.0-alpha02"
-    implementation "androidx.compose.material3:material3-window-size-class:1.1.0-alpha02"
-    implementation "com.google.accompanist:accompanist-flowlayout:0.24.8-beta"
+
+    // Room
+    implementation "androidx.room:room-runtime:2.4.3"
+    kapt "androidx.room:room-compiler:2.4.3"
+
+    // Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:2.4.3"
 
     // Datastore
     implementation "androidx.datastore:datastore:1.0.0"

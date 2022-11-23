@@ -37,14 +37,14 @@ class QueueDetailsViewModel @Inject constructor(
                 is Resource.Success -> {
                     result.data?.let {
                         state.value = state.value.copy(
+                            userId = it.userId,
                             firstName = it.firstName,
                             lastName = it.lastName,
                             phoneNumber = it.phoneNumber,
                             profilePictureUri = it.profilePictureUri,
                             instagram = it.instagram,
                             telegram = it.telegram,
-                            dateOfBirth = it.dateOfBirth,
-                            isLoading = false
+                            dateOfBirth = it.dateOfBirth
                         )
                     }
                     state.value = state.value.copy(isLoading = false)

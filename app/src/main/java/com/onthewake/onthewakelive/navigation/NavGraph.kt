@@ -18,9 +18,11 @@ import com.onthewake.onthewakelive.feature_profile.presentation.profile.ProfileS
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_details.QueueDetailsScreen
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.QueueScreen
 import com.onthewake.onthewakelive.feature_splash.SplashScreen
-import com.onthewake.onthewakelive.feature_trick_list.presentation.TrickListScreen
+import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.AddTricksScreen
+import com.onthewake.onthewakelive.feature_trick_list.presentation.trick_list.TrickListScreen
 import com.onthewake.onthewakelive.util.Constants
 import com.onthewake.onthewakelive.util.Constants.DETAILS_ARGUMENT_KEY
+import com.onthewake.onthewakelive.util.Constants.USER_ID_ARGUMENT_KEY
 
 @ExperimentalMaterialApi
 @ExperimentalMaterial3Api
@@ -32,7 +34,7 @@ fun SetupNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.TrickListScreen.route
+        startDestination = Screen.SplashScreen.route
     ) {
         composable(route = Screen.SplashScreen.route) {
             SplashScreen(navController = navController)
@@ -68,7 +70,15 @@ fun SetupNavGraph(
         composable(route = Screen.EditProfileScreen.route) {
             EditProfileScreen(imageLoader = imageLoader, navController = navController)
         }
-        composable(route = Screen.TrickListScreen.route) {
+        composable(route = Screen.AddTricksScreen.route) {
+            AddTricksScreen(navController = navController)
+        }
+        composable(
+            route = Screen.TrickListScreen.route,
+            arguments = listOf(navArgument(USER_ID_ARGUMENT_KEY) {
+                type = NavType.StringType
+            })
+        ) {
             TrickListScreen(navController = navController)
         }
     }

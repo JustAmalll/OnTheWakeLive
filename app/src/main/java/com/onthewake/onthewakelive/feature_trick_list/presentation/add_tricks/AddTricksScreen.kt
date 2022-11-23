@@ -1,16 +1,15 @@
-package com.onthewake.onthewakelive.feature_trick_list.presentation
+package com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,50 +22,39 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.feature_trick_list.data.remote.response.TrickListResponse
-import com.onthewake.onthewakelive.feature_trick_list.domain.model.toTrickItemState
+import com.onthewake.onthewakelive.feature_trick_list.data.remote.dto.TrickListDto
+import com.onthewake.onthewakelive.feature_trick_list.presentation.TrickItemState
+import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.features.DefaultFilterChip
+import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.features.SelectableItem
+import com.onthewake.onthewakelive.feature_trick_list.presentation.toTrickItemDto
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @ExperimentalMaterialApi
 @ExperimentalMaterial3Api
 @Composable
-fun TrickListScreen(
+fun AddTricksScreen(
     navController: NavHostController,
-    viewModel: TrickListViewModel = hiltViewModel()
+    viewModel: AddTricksViewModel = hiltViewModel()
 ) {
 
-    val trickListState = viewModel.state.trickList
+    val trickList = viewModel.state.allTrickList
+    val userTrickList = viewModel.state.userTrickList
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackBarHostState = remember { SnackbarHostState() }
     val systemUiController = rememberSystemUiController()
     val darkTheme = isSystemInDarkTheme()
     val surfaceColor = MaterialTheme.colorScheme.surface
-
-    SideEffect {
-        systemUiController.setSystemBarsColor(
-            color = surfaceColor, darkIcons = !darkTheme
-        )
-    }
-
-    LaunchedEffect(key1 = true) {
-        viewModel.snackBarEvent.collectLatest { message ->
-            snackBarHostState.showSnackbar(message = message, duration = SnackbarDuration.Short)
-        }
-    }
 
     val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
@@ -82,75 +70,124 @@ fun TrickListScreen(
     var grabsSelected by remember { mutableStateOf(true) }
     var railsSelected by remember { mutableStateOf(true) }
 
-    trickListState?.let { trickList ->
+    val listState = rememberLazyListState()
+
+    val expandedFab by remember {
+        derivedStateOf { !listState.isScrollInProgress }
+    }
+
+    SideEffect {
+        systemUiController.setSystemBarsColor(
+            color = surfaceColor, darkIcons = !darkTheme
+        )
+    }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.snackBarEvent.collectLatest { message ->
+            snackBarHostState.showSnackbar(message = message, duration = SnackbarDuration.Short)
+        }
+    }
+
+    BackHandler {
+        if (sheetState.isCollapsed) navController.popBackStack()
+        else scope.launch { sheetState.collapse() }
+    }
+
+    if (trickList != null && userTrickList != null) {
+
         var spinItems by remember {
-            mutableStateOf(trickList.spins.map { it.toTrickItemState() })
+            mutableStateOf(trickList.spins.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.spins.contains(it)
+                )
+            })
         }
         var raileyTrickItems by remember {
-            mutableStateOf(trickList.raileyTricks.map { it.toTrickItemState() })
+            mutableStateOf(trickList.raileyTricks.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.raileyTricks.contains(it)
+                )
+            })
         }
         var backRollTrickItems by remember {
-            mutableStateOf(trickList.backRollTricks.map { it.toTrickItemState() })
+            mutableStateOf(trickList.backRollTricks.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.backRollTricks.contains(it)
+                )
+            })
         }
         var frontFlipTrickItems by remember {
-            mutableStateOf(trickList.frontFlipTricks.map { it.toTrickItemState() })
+            mutableStateOf(trickList.frontFlipTricks.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.frontFlipTricks.contains(it)
+                )
+            })
         }
         var frontRollTrickItems by remember {
-            mutableStateOf(trickList.frontRollTricks.map { it.toTrickItemState() })
+            mutableStateOf(trickList.frontRollTricks.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.frontRollTricks.contains(it)
+                )
+            })
         }
         var tantrumTrickItems by remember {
-            mutableStateOf(trickList.tantrumTricks.map { it.toTrickItemState() })
+            mutableStateOf(trickList.tantrumTricks.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.tantrumTricks.contains(it)
+                )
+            })
         }
         var whipTrickItems by remember {
-            mutableStateOf(trickList.whipTricks.map { it.toTrickItemState() })
+            mutableStateOf(trickList.whipTricks.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.whipTricks.contains(it)
+                )
+            })
         }
         var grabItems by remember {
-            mutableStateOf(trickList.grabs.map { it.toTrickItemState() })
+            mutableStateOf(trickList.grabs.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.grabs.contains(it)
+                )
+            })
         }
         var railItems by remember {
-            mutableStateOf(trickList.rails.map { it.toTrickItemState() })
+            mutableStateOf(trickList.rails.map {
+                TrickItemState(
+                    name = it.name,
+                    description = it.description,
+                    isSelected = userTrickList.rails.contains(it)
+                )
+            })
         }
 
         BottomSheetScaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
             scaffoldState = scaffoldState,
-            sheetPeekHeight = 0.dp,
             backgroundColor = MaterialTheme.colorScheme.background,
             topBar = {
                 TopAppBar(
                     scrollBehavior = scrollBehavior,
                     title = { Text(text = "Trick List") },
                     navigationIcon = {
-                        IconButton(onClick = {
-//                        navController.popBackStack()
-
-                            val selectedSpins = spinItems.filter { it.isSelected }
-                            val selectedRaileyTricks = raileyTrickItems.filter { it.isSelected }
-                            val selectedBackRollTricks = backRollTrickItems.filter { it.isSelected }
-                            val selectedFrontFlipTricks =
-                                frontFlipTrickItems.filter { it.isSelected }
-                            val selectedFrontRollTricks =
-                                frontRollTrickItems.filter { it.isSelected }
-                            val selectedTantrumTricks = tantrumTrickItems.filter { it.isSelected }
-                            val selectedWhipTricks = whipTrickItems.filter { it.isSelected }
-                            val selectedGrabs = grabItems.filter { it.isSelected }
-                            val selectedRails = railItems.filter { it.isSelected }
-
-                            viewModel.addTrickList(
-                                TrickListResponse(
-                                    spins = selectedSpins.map { it.toTrickItemResponse() },
-                                    raileyTricks = selectedRaileyTricks.map { it.toTrickItemResponse() },
-                                    backRollTricks = selectedBackRollTricks.map { it.toTrickItemResponse() },
-                                    frontFlipTricks = selectedFrontFlipTricks.map { it.toTrickItemResponse() },
-                                    frontRollTricks = selectedFrontRollTricks.map { it.toTrickItemResponse() },
-                                    tantrumTricks = selectedTantrumTricks.map { it.toTrickItemResponse() },
-                                    whipTricks = selectedWhipTricks.map { it.toTrickItemResponse() },
-                                    grabs = selectedGrabs.map { it.toTrickItemResponse() },
-                                    rails = selectedRails.map { it.toTrickItemResponse() },
-                                )
-                            )
-                        }) {
+                        IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Arrow Back"
@@ -172,6 +209,9 @@ fun TrickListScreen(
                     }
                 )
             },
+            sheetPeekHeight = 0.dp,
+            sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            sheetElevation = 1.dp,
             sheetBackgroundColor = MaterialTheme.colorScheme.surfaceVariant,
             sheetContent = {
                 Box(
@@ -254,11 +294,45 @@ fun TrickListScreen(
                     }
                 }
             },
-            sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            sheetElevation = 1.dp
+            floatingActionButton = {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        val selectedSpins = spinItems.filter { it.isSelected }
+                        val selectedRaileyTricks = raileyTrickItems.filter { it.isSelected }
+                        val selectedBackRollTricks = backRollTrickItems.filter { it.isSelected }
+                        val selectedFrontFlipTricks = frontFlipTrickItems.filter { it.isSelected }
+                        val selectedFrontRollTricks = frontRollTrickItems.filter { it.isSelected }
+                        val selectedTantrumTricks = tantrumTrickItems.filter { it.isSelected }
+                        val selectedWhipTricks = whipTrickItems.filter { it.isSelected }
+                        val selectedGrabs = grabItems.filter { it.isSelected }
+                        val selectedRails = railItems.filter { it.isSelected }
+
+                        val trickListDto = TrickListDto(
+                            spins = selectedSpins.map { it.toTrickItemDto() },
+                            raileyTricks = selectedRaileyTricks.map { it.toTrickItemDto() },
+                            backRollTricks = selectedBackRollTricks.map { it.toTrickItemDto() },
+                            frontFlipTricks = selectedFrontFlipTricks.map { it.toTrickItemDto() },
+                            frontRollTricks = selectedFrontRollTricks.map { it.toTrickItemDto() },
+                            tantrumTricks = selectedTantrumTricks.map { it.toTrickItemDto() },
+                            whipTricks = selectedWhipTricks.map { it.toTrickItemDto() },
+                            grabs = selectedGrabs.map { it.toTrickItemDto() },
+                            rails = selectedRails.map { it.toTrickItemDto() },
+                        )
+
+                        viewModel.addTrick(trickListDto)
+                    },
+                    modifier = Modifier.padding(
+                        bottom = BottomSheetScaffoldDefaults.SheetPeekHeight + 16.dp
+                    ),
+                    expanded = expandedFab,
+                    icon = { Icon(Icons.Filled.Done, "Done Icon") },
+                    text = { Text(text = "Finish setup") },
+                )
+            },
         ) { paddingValues ->
 
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = paddingValues.calculateTopPadding())
@@ -413,11 +487,12 @@ fun TrickListScreen(
                             subtitle = trickList.whipTricks[index].description,
                             selected = whipTrickItems[index].isSelected,
                             onClick = {
-                                whipTrickItems = whipTrickItems.mapIndexed { j, whipTrickItems ->
-                                    if (index == j) whipTrickItems.copy(
-                                        isSelected = !whipTrickItems.isSelected
-                                    ) else whipTrickItems
-                                }
+                                whipTrickItems =
+                                    whipTrickItems.mapIndexed { j, whipTrickItems ->
+                                        if (index == j) whipTrickItems.copy(
+                                            isSelected = !whipTrickItems.isSelected
+                                        ) else whipTrickItems
+                                    }
                             }
                         )
                     }
@@ -469,6 +544,9 @@ fun TrickListScreen(
             }
         }
     }
+
+    println("viewModel.state.isLoading ${viewModel.state.isLoading}")
+
     if (viewModel.state.isLoading) {
         Box(
             modifier = Modifier
@@ -479,90 +557,4 @@ fun TrickListScreen(
             CircularProgressIndicator()
         }
     }
-}
-
-@Composable
-fun SelectableItem(
-    title: String,
-    subtitle: String,
-    selected: Boolean = false,
-    onClick: () -> Unit = {}
-) {
-
-    val primary = MaterialTheme.colorScheme.primary
-    val onSurface = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 6.dp)
-                .border(
-                    width = 1.dp,
-                    color = if (selected) primary else onSurface,
-                    shape = RoundedCornerShape(size = 10.dp)
-                )
-                .clip(RoundedCornerShape(size = 10.dp))
-                .clickable { onClick() }
-        ) {
-            Text(
-                modifier = Modifier.padding(start = 12.dp, top = 10.dp),
-                text = title.replaceFirstChar { it.uppercaseChar() },
-                style = TextStyle(
-                    color = if (selected) primary else onSurface,
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                    fontWeight = FontWeight.Medium
-                ),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                modifier = Modifier.padding(start = 12.dp, bottom = 10.dp, end = 50.dp),
-                text = subtitle.replaceFirstChar { it.uppercaseChar() },
-                style = TextStyle(color = if (selected) primary else onSurface),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-        IconButton(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(4.dp),
-            onClick = { onClick() },
-        ) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Selectable Item Icon",
-                tint = if (selected) primary else onSurface
-            )
-        }
-    }
-}
-
-@ExperimentalMaterial3Api
-@Composable
-fun DefaultFilterChip(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-
-    FilterChip(
-        selected = selected,
-        onClick = onClick,
-        label = { Text(label) },
-        leadingIcon = if (selected) {
-            {
-                Icon(
-                    imageVector = Icons.Filled.Done,
-                    contentDescription = "Icon Done",
-                    modifier = Modifier.size(FilterChipDefaults.IconSize)
-                )
-            }
-        } else null,
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    )
 }

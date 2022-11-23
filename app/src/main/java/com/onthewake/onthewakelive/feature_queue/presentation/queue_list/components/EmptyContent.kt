@@ -43,5 +43,4 @@ fun EmptyContent(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(150.dp))
     }
-
 }

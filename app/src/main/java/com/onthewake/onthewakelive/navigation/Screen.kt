@@ -21,4 +21,5 @@ sealed class Screen(val route: String) {
     ) {
         fun passItemId(itemId: String): String = "queue_details_screen/$itemId"
     }
+    object GetPassScreen : Screen("get_pass_screen")
 }

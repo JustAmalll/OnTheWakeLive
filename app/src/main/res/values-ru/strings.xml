@@ -36,7 +36,7 @@
     <string name="left_line">Левая лебедка</string>
     <string name="right_line">Правая лебедка</string>
     <string name="delete_icon">Иконка удаления</string>
-    <string name="interval_error">Упс! Интервал для записи минимум 3 человека</string>
+    <string name="interval_error">Упс! Интервал для записи минимум 4 человека</string>
     <string name="already_in_queue_error">Упс! Вы уже в очереди</string>
     <string name="left_line_admin">Левая линия</string>
     <string name="right_line_admin">Правая линия</string>

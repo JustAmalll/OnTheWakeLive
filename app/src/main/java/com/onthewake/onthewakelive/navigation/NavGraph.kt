@@ -13,6 +13,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.feature_auth.presentation.LoginScreen
 import com.onthewake.onthewakelive.feature_auth.presentation.RegisterScreen
 import com.onthewake.onthewakelive.feature_auth.presentation.auth_otp.OtpScreen
+import com.onthewake.onthewakelive.feature_get_pass.presentation.GetPassScreen
 import com.onthewake.onthewakelive.feature_profile.presentation.edit_profile.EditProfileScreen
 import com.onthewake.onthewakelive.feature_profile.presentation.profile.ProfileScreen
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_details.QueueDetailsScreen
@@ -80,6 +81,9 @@ fun SetupNavGraph(
             })
         ) {
             TrickListScreen(navController = navController)
+        }
+        composable(route = Screen.GetPassScreen.route) {
+            GetPassScreen(navController = navController)
         }
     }
 }

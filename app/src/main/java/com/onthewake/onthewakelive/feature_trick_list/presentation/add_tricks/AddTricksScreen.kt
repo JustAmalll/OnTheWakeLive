@@ -545,8 +545,6 @@ fun AddTricksScreen(
         }
     }
 
-    println("viewModel.state.isLoading ${viewModel.state.isLoading}")
-
     if (viewModel.state.isLoading) {
         Box(
             modifier = Modifier

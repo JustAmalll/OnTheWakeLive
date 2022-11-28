@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.onthewake.onthewakelive
 
 import android.content.Context
@@ -16,9 +14,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.core.presentation.StandardScaffold
+import com.onthewake.onthewakelive.core.presentation.ui.theme.OnTheWakeLiveTheme
 import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.navigation.SetupNavGraph
-import com.onthewake.onthewakelive.core.presentation.ui.theme.OnTheWakeLiveTheme
 import com.onthewake.onthewakelive.util.UserProfileSerializer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -30,6 +28,7 @@ val Context.dataStore by dataStore(
 
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
+@ExperimentalMaterialApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -40,7 +39,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             OnTheWakeLiveTheme {
-
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
 

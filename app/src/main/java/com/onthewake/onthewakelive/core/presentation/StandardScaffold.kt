@@ -15,6 +15,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.core.domain.modules.BottomNavItem
 import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.util.Constants
+import com.onthewake.onthewakelive.util.Constants.ADMIN_IDS
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
@@ -48,9 +49,7 @@ fun StandardScaffold(
         topBar = { topBar() },
         bottomBar = {
             if (showBottomBar) {
-                if (userId != Constants.FIRST_ADMIN_USER_ID &&
-                    userId != Constants.SECOND_ADMIN_USER_ID
-                ) NavigationBar {
+                if (userId !in ADMIN_IDS) NavigationBar {
                     bottomNavItems.forEachIndexed { _, item ->
                         NavigationBarItem(
                             icon = {

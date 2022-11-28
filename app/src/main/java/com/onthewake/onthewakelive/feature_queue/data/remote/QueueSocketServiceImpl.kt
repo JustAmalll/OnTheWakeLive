@@ -3,6 +3,7 @@ package com.onthewake.onthewakelive.feature_queue.data.remote
 import android.content.Context
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_queue.domain.module.QueueResponse
+import com.onthewake.onthewakelive.util.Constants.WS_BASE_URL
 import com.onthewake.onthewakelive.util.Resource
 import io.ktor.client.*
 import io.ktor.client.features.websocket.*
@@ -24,41 +25,39 @@ class QueueSocketServiceImpl(
         firstName: String
     ): Resource<Unit> = try {
         socket = client.webSocketSession {
-            url("${QueueSocketService.Endpoints.QueueSocket.url}?firstName=$firstName")
+            url(urlString = "$WS_BASE_URL?firstName=$firstName")
         }
         if (socket?.isActive == true) Resource.Success(Unit)
         else Resource.Error(context.getString(R.string.couldnt_establish_a_connection))
     } catch (e: Exception) {
-        e.printStackTrace()
         Resource.Error(e.localizedMessage ?: context.getString(R.string.unknown_error))
     }
 
-    override fun observeQueue(): Flow<QueueResponse> =
-        try {
-            socket?.incoming
-                ?.receiveAsFlow()
-                ?.filter { it is Frame.Text }
-                ?.map {
-                    val json = (it as? Frame.Text)?.readText() ?: ""
-                    val queueDto = Json.decodeFromString<QueueResponse>(json)
-                    QueueResponse(isDeleteAction = queueDto.isDeleteAction, queue = queueDto.queue)
-                } ?: flow { }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            flow { }
-        }
+    override fun observeQueue(): Flow<QueueResponse> = flow {
+
+        val queueState = socket!!
+            .incoming
+            .consumeAsFlow()
+            .filterIsInstance<Frame.Text>()
+            .mapNotNull {
+                val queueDto = Json.decodeFromString<QueueResponse>(it.readText())
+                QueueResponse(isDeleteAction = queueDto.isDeleteAction, queue = queueDto.queue)
+            }
+
+        emitAll(queueState)
+    }
 
     override suspend fun addToQueue(
-        isLeftQueue: Boolean, firstName: String, timestamp: Long
+        isLeftQueue: Boolean,
+        firstName: String,
+        timestamp: Long
     ) {
-        try {
-            socket?.send(Frame.Text("$isLeftQueue/$firstName/$timestamp"))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        socket?.outgoing?.send(Frame.Text("$isLeftQueue/$firstName/$timestamp"))
+        println("Successfully added to queue!")
     }
 
     override suspend fun closeSession() {
         socket?.close()
+        socket = null
     }
 }

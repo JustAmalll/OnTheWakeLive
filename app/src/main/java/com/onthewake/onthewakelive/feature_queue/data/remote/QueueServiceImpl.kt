@@ -3,6 +3,7 @@ package com.onthewake.onthewakelive.feature_queue.data.remote
 import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
 import com.onthewake.onthewakelive.feature_queue.data.remote.dto.QueueDto
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
+import com.onthewake.onthewakelive.util.Constants.BASE_URL
 import com.onthewake.onthewakelive.util.Resource
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -17,7 +18,7 @@ class QueueServiceImpl(
     override suspend fun getQueue(): List<Queue> =
         try {
             client.get<List<QueueDto>>(
-                QueueService.Endpoints.GetQueue.url
+                urlString = "$BASE_URL/queue"
             ).map { it.toQueue() }
         } catch (e: Exception) {
             emptyList()
@@ -42,9 +43,7 @@ class QueueServiceImpl(
 
     override suspend fun deleteQueueItem(queueItemId: String): Queue? {
         return try {
-            client.delete(
-                QueueService.Endpoints.DeleteQueueItem.url
-            ) {
+            client.delete(urlString = "$BASE_URL/queue/item/delete") {
                 parameter("queueItemId", queueItemId)
             }
         } catch (e: Exception) {

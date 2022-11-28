@@ -63,8 +63,8 @@ fun AdminDialog(
                     ) {
                         Button(
                             onClick = {
-                                leftQueueButtonState.value = true
-                                rightQueueButtonState.value = false
+                                leftQueueButtonState.value = !leftQueueButtonState.value
+                                rightQueueButtonState.value = !rightQueueButtonState.value
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (rightQueueButtonState.value)
@@ -80,8 +80,8 @@ fun AdminDialog(
                         Spacer(modifier = Modifier.width(20.dp))
                         Button(
                             onClick = {
-                                leftQueueButtonState.value = false
-                                rightQueueButtonState.value = true
+                                leftQueueButtonState.value = !leftQueueButtonState.value
+                                rightQueueButtonState.value = !rightQueueButtonState.value
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (leftQueueButtonState.value)

@@ -1,7 +1,6 @@
 package com.onthewake.onthewakelive.feature_auth.presentation.auth_otp
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -115,26 +114,6 @@ fun OtpScreen(
                 ) {
                     Text(text = "Verify")
                 }
-            }
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(vertical = 12.dp)
-                    .clickable {
-                        navController.navigate(Screen.RegisterScreen.route)
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = stringResource(id = R.string.dont_have_an_account_yet),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "${stringResource(id = R.string.sign_up)}!",
-                    color = MaterialTheme.colorScheme.primary
-                )
             }
         }
     }

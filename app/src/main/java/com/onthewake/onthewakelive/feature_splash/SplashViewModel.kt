@@ -2,9 +2,9 @@ package com.onthewake.onthewakelive.feature_splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -28,5 +28,4 @@ class SplashViewModel @Inject constructor(
             resultChannel.send(result)
         }
     }
-
 }

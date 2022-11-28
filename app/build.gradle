@@ -27,8 +27,8 @@ android {
         applicationId "dev.amal.onthewakelive"
         minSdk 26
         targetSdk 33
-        versionCode 3
-        versionName "3"
+        versionCode 7
+        versionName "7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary true }
@@ -144,4 +144,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:31.0.2')
     implementation "com.google.firebase:firebase-storage-ktx"
     implementation 'com.google.firebase:firebase-auth-ktx'
+
+    // In-App purchase
+    implementation 'io.qonversion.android.sdk:sdk:3.2.3'
 }

@@ -26,7 +26,6 @@ import com.onthewake.onthewakelive.core.presentation.ui.theme.Neutral10
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.navigation.Screen
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -51,16 +50,13 @@ fun SplashScreen(
                 targetValue = 0.5f,
                 animationSpec = tween(
                     durationMillis = 500,
-                    easing = {
-                        overshootInterpolator.getInterpolation(it)
-                    }
+                    easing = { overshootInterpolator.getInterpolation(it) }
                 )
             )
         }
     }
     LaunchedEffect(key1 = true) {
         viewModel.authResults.collect { result ->
-            delay(1400)
             when (result) {
                 is AuthResult.Authorized -> {
                     navController.navigate(Screen.QueueScreen.route) {

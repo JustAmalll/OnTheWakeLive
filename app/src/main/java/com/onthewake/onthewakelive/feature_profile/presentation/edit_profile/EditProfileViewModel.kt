@@ -1,6 +1,7 @@
 package com.onthewake.onthewakelive.feature_profile.presentation.edit_profile
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -12,6 +13,7 @@ import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
 import com.onthewake.onthewakelive.feature_profile.domain.module.UpdateProfileData
 import com.onthewake.onthewakelive.feature_profile.domain.repository.ProfileRepository
+import com.onthewake.onthewakelive.util.Constants.PREFS_FIRST_NAME
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +27,8 @@ import javax.inject.Inject
 class EditProfileViewModel @Inject constructor(
     private val validationUseCase: ValidationUseCase,
     private val profileRepository: ProfileRepository,
-    private val context: Application
+    private val context: Application,
+    private val prefs: SharedPreferences
 ) : AndroidViewModel(context) {
 
     var state by mutableStateOf(EditProfileState())
@@ -136,6 +139,8 @@ class EditProfileViewModel @Inject constructor(
             )
 
             _selectedProfilePictureUri.value = null
+            prefs.edit().putString(PREFS_FIRST_NAME, state.firstName.trim()).apply()
+
             state = state.copy(isLoading = false)
 
             when (result) {

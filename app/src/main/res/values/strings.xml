@@ -64,7 +64,7 @@
     <string name="delete_icon">Delete Icon</string>
 
     <string name="already_in_queue_error">Oops! You are already in queue!</string>
-    <string name="interval_error">Oops! You need at least 3 people in front of you!</string>
+    <string name="interval_error">Oops! You need at least 4 people in front of you!</string>
 
     <string name="logo" translatable="false">OnTheWakeLogo</string>
 

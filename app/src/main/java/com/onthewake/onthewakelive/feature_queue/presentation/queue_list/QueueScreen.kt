@@ -1,9 +1,14 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_list
 
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -28,7 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -40,6 +44,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
+import com.onthewake.onthewakelive.core.presentation.AnimatedShimmer
 import com.onthewake.onthewakelive.core.presentation.StandardImageView
 import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
@@ -47,8 +52,7 @@ import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.compone
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.EmptyContent
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.TabLayout
 import com.onthewake.onthewakelive.navigation.Screen
-import com.onthewake.onthewakelive.util.Constants.FIRST_ADMIN_USER_ID
-import com.onthewake.onthewakelive.util.Constants.SECOND_ADMIN_USER_ID
+import com.onthewake.onthewakelive.util.Constants.ADMIN_IDS
 import com.onthewake.onthewakelive.util.UserProfileSerializer
 import com.onthewake.onthewakelive.util.openNotificationSettings
 import kotlinx.coroutines.flow.collectLatest
@@ -56,7 +60,6 @@ import kotlinx.coroutines.launch
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 
-@ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @Composable
 fun QueueScreen(
@@ -72,7 +75,7 @@ fun QueueScreen(
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
 
-    val pagerState = rememberPagerState(pageCount = 2)
+    val pagerState = rememberPagerState(pageCount = 2, initialPage = 1)
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -103,14 +106,18 @@ fun QueueScreen(
                         "Разрешите показ уведомений",
                         actionLabel = "Settings"
                     )
-
-                    if (result == SnackbarResult.ActionPerformed) {
+                    if (result == SnackbarResult.ActionPerformed)
                         context.openNotificationSettings()
-                    }
                 }
             }
         }
     )
+
+    LaunchedEffect(key1 = true) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     val dataStore = remember {
         context.dataStore.data
@@ -131,8 +138,7 @@ fun QueueScreen(
     LaunchedEffect(key1 = true) {
         viewModel.snackBarWithActionEvent.collectLatest { deletedItem ->
             val result = snackBarHostState.showSnackbar(
-                message = if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID)
-                    context.getString(R.string.admin_delete_message)
+                message = if (userId in ADMIN_IDS) context.getString(R.string.admin_delete_message)
                 else context.getString(R.string.delete_message),
                 actionLabel = context.getString(R.string.undo),
                 duration = SnackbarDuration.Short
@@ -148,30 +154,17 @@ fun QueueScreen(
         }
     }
 
-    if (showDialog.value) {
-        AdminDialog(
-            showDialog = { showDialog.value = it },
-            onAddClicked = { isLeftQueue, firstName ->
-                viewModel.addToQueue(
-                    isLeftQueue = isLeftQueue,
-                    firstName = firstName,
-                    timestamp = System.currentTimeMillis()
-                )
-            },
-            queue = state.queue
-        )
-    }
-
-    if (state.isQueueLoading) {
-        Dialog(onDismissRequest = {}) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.padding(40.dp)
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-    }
+    if (showDialog.value) AdminDialog(
+        showDialog = { showDialog.value = it },
+        onAddClicked = { isLeftQueue, firstName ->
+            viewModel.addToQueue(
+                isLeftQueue = isLeftQueue,
+                firstName = firstName,
+                timestamp = System.currentTimeMillis()
+            )
+        },
+        queue = state.queue
+    )
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -192,33 +185,18 @@ fun QueueScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.padding(
-                    bottom = if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID)
-                        0.dp else 76.dp
-                ),
+            if (!state.isQueueLoading) FloatingActionButton(
+                modifier = Modifier.padding(bottom = if (userId in ADMIN_IDS) 0.dp else 76.dp),
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-                    }
-
                     if (!viewModel.isAdding.value && hasNotificationPermission) {
-                        if (userId == FIRST_ADMIN_USER_ID || userId == SECOND_ADMIN_USER_ID) {
-                            showDialog.value = true
-                        } else {
-                            if (pagerState.currentPage == 0) viewModel.addToQueue(
-                                isLeftQueue = true,
-                                firstName = dataStore.value.firstName,
-                                timestamp = System.currentTimeMillis()
-                            )
-                            else viewModel.addToQueue(
-                                isLeftQueue = false,
-                                firstName = dataStore.value.firstName,
-                                timestamp = System.currentTimeMillis()
-                            )
-                        }
+                        if (userId in ADMIN_IDS) showDialog.value = true
+                        else viewModel.addToQueue(
+                            isLeftQueue = pagerState.currentPage == 0,
+                            firstName = dataStore.value.firstName,
+                            timestamp = System.currentTimeMillis()
+                        )
                     }
                 }
             ) {
@@ -248,38 +226,47 @@ fun QueueScreen(
         ) {
             TabLayout(pagerState = pagerState)
 
-            // Content
-            HorizontalPager(state = pagerState) { page ->
-                when (page) {
-                    0 -> QueueLeftContent(
-                        state = state,
-                        userId = userId,
-                        onDetailsClicked = { queueItemId ->
-                            navController.navigate(
-                                Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
-                            )
-                        },
-                        onSwipeToDelete = { viewModel.deleteQueueItem(it) },
-                        imageLoader = imageLoader
-                    )
-                    1 -> QueueRightContent(
-                        state = state,
-                        userId = userId,
-                        onDetailsClicked = { queueItemId ->
-                            navController.navigate(
-                                Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
-                            )
-                        },
-                        onSwipeToDelete = { viewModel.deleteQueueItem(it) },
-                        imageLoader = imageLoader
-                    )
+            if (state.isQueueLoading) {
+                repeat(5) {
+                    AnimatedShimmer()
+                }
+            } else {
+
+                // Content
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.padding(bottom = if (userId in ADMIN_IDS) 0.dp else 76.dp)
+                ) { page ->
+                    when (page) {
+                        0 -> QueueLeftContent(
+                            state = state,
+                            userId = userId,
+                            onDetailsClicked = { queueItemId ->
+                                navController.navigate(
+                                    Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
+                                )
+                            },
+                            onSwipeToDelete = { viewModel.deleteQueueItem(it) },
+                            imageLoader = imageLoader
+                        )
+                        1 -> QueueRightContent(
+                            state = state,
+                            userId = userId,
+                            onDetailsClicked = { queueItemId ->
+                                navController.navigate(
+                                    Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
+                                )
+                            },
+                            onSwipeToDelete = { viewModel.deleteQueueItem(it) },
+                            imageLoader = imageLoader
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-@ExperimentalMaterial3Api
 @Composable
 fun QueueLeftContent(
     state: QueueState,
@@ -289,29 +276,26 @@ fun QueueLeftContent(
     onSwipeToDelete: (String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        if (state.queue.none { it.isLeftQueue } && !state.isQueueLoading) {
-            EmptyContent(modifier = Modifier.align(Alignment.Center))
-        }
+        val leftQueue = state.queue.filter { it.isLeftQueue }
+        if (leftQueue.isEmpty()) EmptyContent(modifier = Modifier.align(Alignment.Center))
+
         LazyColumn(
             contentPadding = PaddingValues(10.dp),
             reverseLayout = true
         ) {
-            items(state.queue) { item ->
-                if (item.isLeftQueue) {
-                    QueueItem(
-                        queueItem = item,
-                        imageLoader = imageLoader,
-                        userId = userId,
-                        onDetailsClicked = onDetailsClicked,
-                        onSwipeToDelete = onSwipeToDelete
-                    )
-                }
+            items(leftQueue) { item ->
+                QueueItem(
+                    queueItem = item,
+                    imageLoader = imageLoader,
+                    userId = userId,
+                    onDetailsClicked = onDetailsClicked,
+                    onSwipeToDelete = onSwipeToDelete
+                )
             }
         }
     }
 }
 
-@ExperimentalMaterial3Api
 @Composable
 fun QueueRightContent(
     state: QueueState,
@@ -321,16 +305,18 @@ fun QueueRightContent(
     onSwipeToDelete: (String) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        val queue = state.queue.sortedWith(compareByDescending { it.timestamp })
-        if (queue.none { !it.isLeftQueue } && !state.isQueueLoading) {
-            EmptyContent(modifier = Modifier.align(Alignment.Center))
-        }
-        LazyColumn(
-            contentPadding = PaddingValues(10.dp),
-            reverseLayout = true
+        val rightQueue = state.queue.filter { !it.isLeftQueue }
+        if (rightQueue.isEmpty()) EmptyContent(modifier = Modifier.align(Alignment.Center))
+
+        AnimatedVisibility(
+            visible = !state.isQueueLoading,
+            enter = fadeIn() + expandVertically()
         ) {
-            items(queue) { item ->
-                if (!item.isLeftQueue) {
+            LazyColumn(
+                contentPadding = PaddingValues(10.dp),
+                reverseLayout = true
+            ) {
+                items(rightQueue) { item ->
                     QueueItem(
                         queueItem = item,
                         imageLoader = imageLoader,
@@ -344,7 +330,6 @@ fun QueueRightContent(
     }
 }
 
-@ExperimentalMaterial3Api
 @Composable
 fun QueueItem(
     queueItem: Queue,
@@ -353,9 +338,8 @@ fun QueueItem(
     onDetailsClicked: (String) -> Unit,
     onSwipeToDelete: (String) -> Unit
 ) {
-    Spacer(modifier = Modifier.height(12.dp))
-
     val haptic = LocalHapticFeedback.current
+    val isAdminQueueItem = queueItem.userId in ADMIN_IDS
 
     val swipeToDelete = SwipeAction(
         icon = {
@@ -373,22 +357,19 @@ fun QueueItem(
         }
     )
 
-    val adminQueueItem = queueItem.userId == FIRST_ADMIN_USER_ID ||
-            queueItem.userId == SECOND_ADMIN_USER_ID
+    Spacer(modifier = Modifier.height(12.dp))
 
-    if (queueItem.userId == userId ||
-        userId == FIRST_ADMIN_USER_ID ||
-        userId == SECOND_ADMIN_USER_ID
-    ) {
+    if (queueItem.userId == userId || userId in ADMIN_IDS) {
         SwipeableActionsBox(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = MaterialTheme.shapes.medium)
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable { if (!adminQueueItem) onDetailsClicked(queueItem.id) },
-            startActions = listOf(swipeToDelete)
+                .clickable { if (!isAdminQueueItem) onDetailsClicked(queueItem.id) },
+            startActions = listOf(swipeToDelete),
+            swipeThreshold = 120.dp
         ) {
-            if (adminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
+            if (isAdminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
             else DefaultUserItem(
                 queueItem = queueItem,
                 imageLoader = imageLoader,
@@ -396,7 +377,7 @@ fun QueueItem(
             )
         }
     } else {
-        if (adminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
+        if (isAdminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
         else DefaultUserItem(
             queueItem = queueItem,
             imageLoader = imageLoader,

@@ -192,6 +192,27 @@ fun ProfileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    Text(
+                        text = "Get Pass",
+                        fontSize = 22.sp,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    IconButton(onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        navController.navigate(Screen.GetPassScreen.route)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = stringResource(id = R.string.right_arrow)
+                        )
+                    }
+                }
+                Divider(modifier = Modifier.padding(vertical = 20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Column {
                         Text(
                             text = stringResource(id = R.string.instagram),

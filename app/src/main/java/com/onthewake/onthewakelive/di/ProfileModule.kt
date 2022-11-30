@@ -1,8 +1,8 @@
 package com.onthewake.onthewakelive.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.google.firebase.storage.FirebaseStorage
-import com.google.gson.Gson
 import com.onthewake.onthewakelive.feature_profile.data.remote.ProfileApi
 import com.onthewake.onthewakelive.feature_profile.data.repository.ProfileRepositoryImpl
 import com.onthewake.onthewakelive.feature_profile.domain.repository.ProfileRepository
@@ -37,7 +37,8 @@ object ProfileModule {
     fun provideProfileRepository(
         profileApi: ProfileApi,
         @ApplicationContext context: Context,
-        storage: FirebaseStorage
-    ): ProfileRepository = ProfileRepositoryImpl(profileApi, storage, context)
+        storage: FirebaseStorage,
+        prefs: SharedPreferences
+    ): ProfileRepository = ProfileRepositoryImpl(profileApi, storage, context, prefs)
 
 }

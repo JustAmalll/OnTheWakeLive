@@ -7,8 +7,6 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -213,7 +211,7 @@ fun QueueScreen(
         DisposableEffect(key1 = lifecycleOwner) {
             val observer = LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_PAUSE) viewModel.disconnect()
-                else if (event == Lifecycle.Event.ON_CREATE) viewModel.connectToQueue()
+                else if (event == Lifecycle.Event.ON_START) viewModel.connectToQueue()
             }
             lifecycleOwner.lifecycle.addObserver(observer)
             onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -230,9 +228,9 @@ fun QueueScreen(
                 repeat(5) {
                     AnimatedShimmer()
                 }
-            } else {
+            }
 
-                // Content
+            AnimatedVisibility(visible = !state.isQueueLoading) {
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.padding(bottom = if (userId in ADMIN_IDS) 0.dp else 76.dp)
@@ -275,22 +273,25 @@ fun QueueLeftContent(
     onDetailsClicked: (String) -> Unit,
     onSwipeToDelete: (String) -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        val leftQueue = state.queue.filter { it.isLeftQueue }
-        if (leftQueue.isEmpty()) EmptyContent(modifier = Modifier.align(Alignment.Center))
+    val leftQueue = state.queue.filter { it.isLeftQueue }
 
-        LazyColumn(
-            contentPadding = PaddingValues(10.dp),
-            reverseLayout = true
-        ) {
-            items(leftQueue) { item ->
-                QueueItem(
-                    queueItem = item,
-                    imageLoader = imageLoader,
-                    userId = userId,
-                    onDetailsClicked = onDetailsClicked,
-                    onSwipeToDelete = onSwipeToDelete
-                )
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (leftQueue.isEmpty()) {
+            EmptyContent(modifier = Modifier.align(Alignment.Center))
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(10.dp),
+                reverseLayout = true
+            ) {
+                items(leftQueue) { item ->
+                    QueueItem(
+                        queueItem = item,
+                        imageLoader = imageLoader,
+                        userId = userId,
+                        onDetailsClicked = onDetailsClicked,
+                        onSwipeToDelete = onSwipeToDelete
+                    )
+                }
             }
         }
     }
@@ -304,14 +305,12 @@ fun QueueRightContent(
     onDetailsClicked: (String) -> Unit,
     onSwipeToDelete: (String) -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        val rightQueue = state.queue.filter { !it.isLeftQueue }
-        if (rightQueue.isEmpty()) EmptyContent(modifier = Modifier.align(Alignment.Center))
+    val rightQueue = state.queue.filter { !it.isLeftQueue }
 
-        AnimatedVisibility(
-            visible = !state.isQueueLoading,
-            enter = fadeIn() + expandVertically()
-        ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (rightQueue.isEmpty()) {
+            EmptyContent(modifier = Modifier.align(Alignment.Center))
+        } else {
             LazyColumn(
                 contentPadding = PaddingValues(10.dp),
                 reverseLayout = true
@@ -367,7 +366,7 @@ fun QueueItem(
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .clickable { if (!isAdminQueueItem) onDetailsClicked(queueItem.id) },
             startActions = listOf(swipeToDelete),
-            swipeThreshold = 120.dp
+            swipeThreshold = 100.dp
         ) {
             if (isAdminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
             else DefaultUserItem(

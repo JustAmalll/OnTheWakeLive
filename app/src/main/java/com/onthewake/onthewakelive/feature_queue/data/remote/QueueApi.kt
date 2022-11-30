@@ -11,5 +11,4 @@ interface QueueApi {
     suspend fun getProfileDetails(
         @Query("queueItemId") queueItemId: String
     ): BasicApiResponse<ProfileResponse>
-
 }

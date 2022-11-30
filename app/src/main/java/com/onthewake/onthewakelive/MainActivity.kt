@@ -17,6 +17,8 @@ import com.onthewake.onthewakelive.core.presentation.StandardScaffold
 import com.onthewake.onthewakelive.core.presentation.ui.theme.OnTheWakeLiveTheme
 import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.navigation.SetupNavGraph
+import com.onthewake.onthewakelive.util.Constants
+import com.onthewake.onthewakelive.util.Constants.ADMIN_IDS
 import com.onthewake.onthewakelive.util.UserProfileSerializer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -42,14 +44,16 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
 
+                val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+                val isAdmin = prefs.getString(Constants.PREFS_USER_ID, null) in ADMIN_IDS
+
                 StandardScaffold(
                     modifier = Modifier.fillMaxSize(),
                     navController = navController,
                     showBottomBar = navBackStackEntry?.destination?.route in listOf(
                         Screen.QueueScreen.route,
                         Screen.ProfileScreen.route,
-                    ),
-                    prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+                    ) && !isAdmin
                 ) {
                     SetupNavGraph(
                         navController = navController,

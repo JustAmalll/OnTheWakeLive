@@ -16,10 +16,8 @@ import com.onthewake.onthewakelive.util.Constants.PREFS_FIRST_NAME
 import com.onthewake.onthewakelive.util.Constants.PREFS_USER_ID
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,7 +49,7 @@ class QueueViewModel @Inject constructor(
         getQueue()
 
         viewModelScope.launch {
-            when (val result = queueSocketService.initSession(firstName!!)) {
+            when (val result = queueSocketService.initSession(firstName ?: "Guest")) {
                 is Resource.Success -> {
                     queueSocketService.observeQueue()
                         .onEach { queueItem ->
@@ -63,6 +61,8 @@ class QueueViewModel @Inject constructor(
                                 }
                                 .sortedWith(compareByDescending { it.timestamp })
                             _state.value = state.value.copy(queue = newList)
+
+                            println("observed $newList")
                         }.launchIn(viewModelScope)
                 }
                 is Resource.Error -> {
@@ -75,7 +75,7 @@ class QueueViewModel @Inject constructor(
     }
 
     private fun getQueue() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _state.value = state.value.copy(isQueueLoading = true)
             val result = queueService.getQueue()
             _state.value = state.value.copy(queue = result, isQueueLoading = false)

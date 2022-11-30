@@ -5,9 +5,11 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -22,7 +24,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.core.presentation.ui.theme.Neutral10
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.navigation.Screen
 import kotlinx.coroutines.Dispatchers
@@ -37,10 +38,12 @@ fun SplashScreen(
     val overshootInterpolator = remember { OvershootInterpolator(2f) }
 
     val systemUiController = rememberSystemUiController()
+    val darkTheme = isSystemInDarkTheme()
+    val backgroundColor = MaterialTheme.colorScheme.background
 
     SideEffect {
         systemUiController.setSystemBarsColor(
-            color = Neutral10, darkIcons = false
+            color = backgroundColor, darkIcons = !darkTheme
         )
     }
 
@@ -75,14 +78,16 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Neutral10),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center,
     ) {
         Image(
             modifier = Modifier
                 .size(600.dp)
                 .scale(scale.value),
-            painter = painterResource(id = R.drawable.on_the_wake_logo),
+            painter = painterResource(
+                id = if (darkTheme) R.drawable.logo_white else R.drawable.logo_black
+            ),
             contentDescription = stringResource(id = R.string.logo)
         )
     }

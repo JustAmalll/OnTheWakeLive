@@ -1,11 +1,9 @@
 package com.onthewake.onthewakelive.feature_trick_list.presentation.trick_list
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -13,18 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.EmptyContent
+import com.onthewake.onthewakelive.feature_trick_list.presentation.components.CategoryTextView
+import com.onthewake.onthewakelive.feature_trick_list.presentation.trick_list.components.TrickItem
 import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterial3Api
@@ -73,19 +68,18 @@ fun TrickListScreen(
         }
     ) { paddingValues ->
 
-        if (trickListState != null) {
+        if (viewModel.state.isLoading) StandardLoadingView()
+
+        if (trickListState == null && !viewModel.state.isLoading) EmptyContent()
+
+        if (trickListState != null)
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = paddingValues.calculateTopPadding())
             ) {
                 if (trickListState.spins.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Spins",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Spins") }
                     items(trickListState.spins.size) { index ->
                         TrickItem(
                             title = trickListState.spins[index].name,
@@ -94,12 +88,7 @@ fun TrickListScreen(
                     }
                 }
                 if (trickListState.raileyTricks.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Railey Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Railey Tricks") }
                     items(trickListState.raileyTricks.size) { index ->
                         TrickItem(
                             title = trickListState.raileyTricks[index].name,
@@ -108,12 +97,7 @@ fun TrickListScreen(
                     }
                 }
                 if (trickListState.backRollTricks.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Back Roll Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Back Roll Tricks") }
                     items(trickListState.backRollTricks.size) { index ->
                         TrickItem(
                             title = trickListState.backRollTricks[index].name,
@@ -122,12 +106,7 @@ fun TrickListScreen(
                     }
                 }
                 if (trickListState.frontFlipTricks.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Front Flip Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Front Flip Tricks") }
                     items(trickListState.frontFlipTricks.size) { index ->
                         TrickItem(
                             title = trickListState.frontFlipTricks[index].name,
@@ -136,12 +115,7 @@ fun TrickListScreen(
                     }
                 }
                 if (trickListState.frontRollTricks.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Front Roll Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Front Roll Tricks") }
                     items(trickListState.frontRollTricks.size) { index ->
                         TrickItem(
                             title = trickListState.frontRollTricks[index].name,
@@ -150,12 +124,7 @@ fun TrickListScreen(
                     }
                 }
                 if (trickListState.tantrumTricks.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Tantrum Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Tantrum Tricks") }
                     items(trickListState.tantrumTricks.size) { index ->
                         TrickItem(
                             title = trickListState.tantrumTricks[index].name,
@@ -164,12 +133,7 @@ fun TrickListScreen(
                     }
                 }
                 if (trickListState.whipTricks.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Whip Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Whip Tricks") }
                     items(trickListState.whipTricks.size) { index ->
                         TrickItem(
                             title = trickListState.whipTricks[index].name,
@@ -178,12 +142,7 @@ fun TrickListScreen(
                     }
                 }
                 if (trickListState.grabs.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Grabs",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Grabs") }
                     items(trickListState.grabs.size) { index ->
                         TrickItem(
                             title = trickListState.grabs[index].name,
@@ -192,12 +151,7 @@ fun TrickListScreen(
                     }
                 }
                 if (trickListState.rails.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Rails",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Rails") }
                     items(trickListState.rails.size) { index ->
                         TrickItem(
                             title = trickListState.rails[index].name,
@@ -206,61 +160,5 @@ fun TrickListScreen(
                     }
                 }
             }
-        } else {
-            EmptyContent()
-        }
-    }
-    if (viewModel.state.isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    }
-}
-
-@Composable
-fun TrickItem(
-    title: String,
-    subtitle: String
-) {
-
-    val onSurface = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-
-    Box(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 6.dp)
-                .border(
-                    width = 1.dp,
-                    color = onSurface,
-                    shape = RoundedCornerShape(size = 10.dp)
-                )
-                .clip(RoundedCornerShape(size = 10.dp))
-        ) {
-            Text(
-                modifier = Modifier.padding(start = 12.dp, top = 10.dp),
-                text = title.replaceFirstChar { it.uppercaseChar() },
-                style = TextStyle(
-                    color = onSurface,
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                    fontWeight = FontWeight.Medium
-                ),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                modifier = Modifier.padding(start = 12.dp, bottom = 10.dp, end = 50.dp),
-                text = subtitle.replaceFirstChar { it.uppercaseChar() },
-                style = TextStyle(color = onSurface),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
     }
 }

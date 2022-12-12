@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.onthewake.onthewakelive.dataStore
+import com.onthewake.onthewakelive.feature_auth.data.remote.request.CreateAccountRequest
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
@@ -64,10 +65,12 @@ class OtpViewModel @Inject constructor(
 
             if (otpResult is AuthResult.OtpVerified) {
                 val signUpResult = repository.signUp(
-                    firstName = registerData.firstName,
-                    lastName = registerData.lastName,
-                    phoneNumber = registerData.phoneNumber,
-                    password = registerData.password
+                    CreateAccountRequest(
+                        firstName = registerData.firstName,
+                        lastName = registerData.lastName,
+                        phoneNumber = registerData.phoneNumber,
+                        password = registerData.password
+                    )
                 )
                 context.dataStore.updateData { profile ->
                     profile.copy(

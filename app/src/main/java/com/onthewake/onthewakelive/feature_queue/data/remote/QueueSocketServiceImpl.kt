@@ -21,6 +21,8 @@ class QueueSocketServiceImpl(
 
     private var socket: WebSocketSession? = null
 
+    override fun isSocketActive(): Boolean = socket?.isActive == true && socket != null
+
     override suspend fun initSession(
         firstName: String
     ): Resource<Unit> = try {
@@ -34,7 +36,6 @@ class QueueSocketServiceImpl(
     }
 
     override fun observeQueue(): Flow<QueueResponse> = flow {
-
         val queueState = socket!!
             .incoming
             .consumeAsFlow()
@@ -52,7 +53,7 @@ class QueueSocketServiceImpl(
         firstName: String,
         timestamp: Long
     ) {
-        socket?.outgoing?.send(Frame.Text("$isLeftQueue/$firstName/$timestamp"))
+        socket?.send(Frame.Text("$isLeftQueue/$firstName/$timestamp"))
         println("Successfully added to queue!")
     }
 

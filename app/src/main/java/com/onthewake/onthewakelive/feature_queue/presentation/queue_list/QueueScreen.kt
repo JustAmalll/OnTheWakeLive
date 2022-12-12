@@ -2,11 +2,13 @@
 
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_list
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -65,10 +67,9 @@ fun QueueScreen(
     navController: NavHostController,
     imageLoader: ImageLoader
 ) {
-
     val state = viewModel.state.value
     val userId = viewModel.userId
-    val showDialog = viewModel.showDialog
+    var showDialog = viewModel.showDialog
 
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
@@ -85,8 +86,7 @@ fun QueueScreen(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             mutableStateOf(
                 ContextCompat.checkSelfPermission(
-                    context,
-                    android.Manifest.permission.POST_NOTIFICATIONS
+                    context, Manifest.permission.POST_NOTIFICATIONS
                 ) == PackageManager.PERMISSION_GRANTED
             )
         } else mutableStateOf(true)
@@ -113,7 +113,7 @@ fun QueueScreen(
 
     LaunchedEffect(key1 = true) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
@@ -152,16 +152,16 @@ fun QueueScreen(
         }
     }
 
-    if (showDialog.value) AdminDialog(
-        showDialog = { showDialog.value = it },
+    if (showDialog) AdminDialog(
+        showDialog = { showDialog = it },
+        queue = state.queue,
         onAddClicked = { isLeftQueue, firstName ->
             viewModel.addToQueue(
                 isLeftQueue = isLeftQueue,
                 firstName = firstName,
                 timestamp = System.currentTimeMillis()
             )
-        },
-        queue = state.queue
+        }
     )
 
     Scaffold(
@@ -188,8 +188,8 @@ fun QueueScreen(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
-                    if (!viewModel.isAdding.value && hasNotificationPermission) {
-                        if (userId in ADMIN_IDS) showDialog.value = true
+                    if (hasNotificationPermission) {
+                        if (userId in ADMIN_IDS) showDialog = true
                         else viewModel.addToQueue(
                             isLeftQueue = pagerState.currentPage == 0,
                             firstName = dataStore.value.firstName,
@@ -210,8 +210,8 @@ fun QueueScreen(
 
         DisposableEffect(key1 = lifecycleOwner) {
             val observer = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_PAUSE) viewModel.disconnect()
-                else if (event == Lifecycle.Event.ON_START) viewModel.connectToQueue()
+                if (event == Lifecycle.Event.ON_START) viewModel.connectToQueue()
+                else if (event == Lifecycle.Event.ON_PAUSE) viewModel.disconnect()
             }
             lifecycleOwner.lifecycle.addObserver(observer)
             onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -225,12 +225,13 @@ fun QueueScreen(
             TabLayout(pagerState = pagerState)
 
             if (state.isQueueLoading) {
-                repeat(5) {
-                    AnimatedShimmer()
-                }
+                repeat(5) { AnimatedShimmer() }
             }
 
-            AnimatedVisibility(visible = !state.isQueueLoading) {
+            AnimatedVisibility(
+                visible = !state.isQueueLoading,
+                exit = fadeOut(targetAlpha = 1f)
+            ) {
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.padding(bottom = if (userId in ADMIN_IDS) 0.dp else 76.dp)
@@ -239,24 +240,34 @@ fun QueueScreen(
                         0 -> QueueLeftContent(
                             state = state,
                             userId = userId,
+                            imageLoader = imageLoader,
                             onDetailsClicked = { queueItemId ->
                                 navController.navigate(
                                     Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
                                 )
                             },
                             onSwipeToDelete = { viewModel.deleteQueueItem(it) },
-                            imageLoader = imageLoader
+                            onUserAvatarClicked = { pictureUrl ->
+                                if (pictureUrl.isNotEmpty()) navController.navigate(
+                                    Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
+                                )
+                            }
                         )
                         1 -> QueueRightContent(
                             state = state,
                             userId = userId,
+                            imageLoader = imageLoader,
                             onDetailsClicked = { queueItemId ->
-                                navController.navigate(
+                                 navController.navigate(
                                     Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
                                 )
                             },
                             onSwipeToDelete = { viewModel.deleteQueueItem(it) },
-                            imageLoader = imageLoader
+                            onUserAvatarClicked = { pictureUrl ->
+                                if (pictureUrl.isNotEmpty()) navController.navigate(
+                                    Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
+                                )
+                            }
                         )
                     }
                 }
@@ -271,9 +282,12 @@ fun QueueLeftContent(
     userId: String?,
     imageLoader: ImageLoader,
     onDetailsClicked: (String) -> Unit,
-    onSwipeToDelete: (String) -> Unit
+    onSwipeToDelete: (String) -> Unit,
+    onUserAvatarClicked: (String) -> Unit
 ) {
-    val leftQueue = state.queue.filter { it.isLeftQueue }
+    val leftQueue = remember(state.queue) {
+        state.queue.filter { it.isLeftQueue }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (leftQueue.isEmpty()) {
@@ -289,7 +303,8 @@ fun QueueLeftContent(
                         imageLoader = imageLoader,
                         userId = userId,
                         onDetailsClicked = onDetailsClicked,
-                        onSwipeToDelete = onSwipeToDelete
+                        onSwipeToDelete = onSwipeToDelete,
+                        onUserAvatarClicked = onUserAvatarClicked
                     )
                 }
             }
@@ -303,9 +318,12 @@ fun QueueRightContent(
     userId: String?,
     imageLoader: ImageLoader,
     onDetailsClicked: (String) -> Unit,
-    onSwipeToDelete: (String) -> Unit
+    onSwipeToDelete: (String) -> Unit,
+    onUserAvatarClicked: (String) -> Unit
 ) {
-    val rightQueue = state.queue.filter { !it.isLeftQueue }
+    val rightQueue = remember(state.queue) {
+        state.queue.filter { !it.isLeftQueue }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (rightQueue.isEmpty()) {
@@ -321,7 +339,8 @@ fun QueueRightContent(
                         imageLoader = imageLoader,
                         userId = userId,
                         onDetailsClicked = onDetailsClicked,
-                        onSwipeToDelete = onSwipeToDelete
+                        onSwipeToDelete = onSwipeToDelete,
+                        onUserAvatarClicked = onUserAvatarClicked
                     )
                 }
             }
@@ -335,7 +354,8 @@ fun QueueItem(
     userId: String?,
     imageLoader: ImageLoader,
     onDetailsClicked: (String) -> Unit,
-    onSwipeToDelete: (String) -> Unit
+    onSwipeToDelete: (String) -> Unit,
+    onUserAvatarClicked: (String) -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
     val isAdminQueueItem = queueItem.userId in ADMIN_IDS
@@ -372,7 +392,8 @@ fun QueueItem(
             else DefaultUserItem(
                 queueItem = queueItem,
                 imageLoader = imageLoader,
-                onDetailsClicked = onDetailsClicked
+                onDetailsClicked = onDetailsClicked,
+                onUserAvatarClicked = onUserAvatarClicked
             )
         }
     } else {
@@ -380,7 +401,8 @@ fun QueueItem(
         else DefaultUserItem(
             queueItem = queueItem,
             imageLoader = imageLoader,
-            onDetailsClicked = onDetailsClicked
+            onDetailsClicked = onDetailsClicked,
+            onUserAvatarClicked = onUserAvatarClicked
         )
     }
 }
@@ -389,7 +411,8 @@ fun QueueItem(
 fun DefaultUserItem(
     queueItem: Queue,
     imageLoader: ImageLoader,
-    onDetailsClicked: (String) -> Unit
+    onDetailsClicked: (String) -> Unit,
+    onUserAvatarClicked: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -402,7 +425,8 @@ fun DefaultUserItem(
     ) {
         StandardImageView(
             imageLoader = imageLoader,
-            model = queueItem.profilePictureUri
+            model = queueItem.profilePictureUri,
+            onUserAvatarClicked = onUserAvatarClicked
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column {

@@ -31,20 +31,15 @@ class AuthRepositoryImpl(
     private lateinit var storedVerificationId: String
 
     override suspend fun signUp(
-        firstName: String,
-        lastName: String,
-        phoneNumber: String,
-        password: String
+        accountRequest: CreateAccountRequest
     ): AuthResult<Unit> = try {
-        api.signUp(
-            request = CreateAccountRequest(
-                firstName = firstName,
-                lastName = lastName,
-                phoneNumber = phoneNumber,
-                password = password
+        api.signUp(request = accountRequest)
+        signIn(
+            AuthRequest(
+                phoneNumber = accountRequest.phoneNumber,
+                password = accountRequest.password
             )
         )
-        signIn(phoneNumber, password)
     } catch (exception: HttpException) {
         when (exception.code()) {
             401 -> AuthResult.Unauthorized()
@@ -56,12 +51,10 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun signIn(
-        phoneNumber: String, password: String
+        authRequest: AuthRequest
     ): AuthResult<Unit> = try {
 
-        val response = api.signIn(
-            request = AuthRequest(phoneNumber = phoneNumber, password = password)
-        )
+        val response = api.signIn(request = authRequest)
 
         prefs.edit().apply {
             putString(PREFS_JWT_TOKEN, response.token).apply()
@@ -70,9 +63,9 @@ class AuthRepositoryImpl(
         }
 
         OneSignal.initWithContext(context)
+        OneSignal.promptForPushNotifications()
         OneSignal.setAppId(Constants.ONESIGNAL_APP_ID)
         OneSignal.setExternalUserId(response.userId)
-        OneSignal.promptForPushNotifications()
 
         AuthResult.Authorized()
     } catch (exception: HttpException) {
@@ -91,12 +84,6 @@ class AuthRepositoryImpl(
 
         return suspendCoroutine { continuation ->
             val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-
-                override fun onCodeAutoRetrievalTimeOut(p0: String) {
-                    super.onCodeAutoRetrievalTimeOut(p0)
-
-                    println("time out $p0")
-                }
 
                 override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                     println("onVerificationCompleted")

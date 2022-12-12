@@ -1,7 +1,6 @@
 package com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,10 +29,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
+import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
 import com.onthewake.onthewakelive.feature_trick_list.data.remote.dto.TrickListDto
 import com.onthewake.onthewakelive.feature_trick_list.presentation.TrickItemState
-import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.features.DefaultFilterChip
-import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.features.SelectableItem
+import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.components.DefaultFilterChip
+import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.components.SelectableItem
+import com.onthewake.onthewakelive.feature_trick_list.presentation.components.CategoryTextView
 import com.onthewake.onthewakelive.feature_trick_list.presentation.toTrickItemDto
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -93,7 +93,7 @@ fun AddTricksScreen(
         else scope.launch { sheetState.collapse() }
     }
 
-    if (trickList != null && userTrickList != null) {
+    if (trickList != null && userTrickList != null && !viewModel.state.isLoading) {
 
         var spinItems by remember {
             mutableStateOf(trickList.spins.map {
@@ -338,221 +338,117 @@ fun AddTricksScreen(
                     .padding(top = paddingValues.calculateTopPadding())
             ) {
                 if (spinsSelected) {
-                    item {
-                        Text(
-                            text = "Spins",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Spins") }
                     items(spinItems.size) { index ->
                         SelectableItem(
                             title = spinItems[index].name,
                             subtitle = spinItems[index].description,
                             selected = spinItems[index].isSelected,
-                            onClick = {
-                                spinItems = spinItems.mapIndexed { j, spinItems ->
-                                    if (index == j) spinItems.copy(
-                                        isSelected = !spinItems.isSelected
-                                    ) else spinItems
-                                }
-                            }
+                            onClick = { spinItems = onItemClick(spinItems, index) }
                         )
                     }
                 }
                 if (raileyTricksSelected) {
-                    item {
-                        Text(
-                            text = "Railey Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Railey Tricks") }
                     items(trickList.raileyTricks.size) { index ->
                         SelectableItem(
                             title = trickList.raileyTricks[index].name,
                             subtitle = trickList.raileyTricks[index].description,
                             selected = raileyTrickItems[index].isSelected,
-                            onClick = {
-                                raileyTrickItems =
-                                    raileyTrickItems.mapIndexed { j, raileyTrickItems ->
-                                        if (index == j) raileyTrickItems.copy(
-                                            isSelected = !raileyTrickItems.isSelected
-                                        ) else raileyTrickItems
-                                    }
-                            }
+                            onClick = { raileyTrickItems = onItemClick(raileyTrickItems, index) }
                         )
                     }
                 }
                 if (backRollTricksSelected) {
-                    item {
-                        Text(
-                            text = "Back Roll Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Back Roll Tricks") }
                     items(trickList.backRollTricks.size) { index ->
                         SelectableItem(
                             title = trickList.backRollTricks[index].name,
                             subtitle = trickList.backRollTricks[index].description,
                             selected = backRollTrickItems[index].isSelected,
                             onClick = {
-                                backRollTrickItems =
-                                    backRollTrickItems.mapIndexed { j, backRollTrickItems ->
-                                        if (index == j) backRollTrickItems.copy(
-                                            isSelected = !backRollTrickItems.isSelected
-                                        ) else backRollTrickItems
-                                    }
+                                backRollTrickItems = onItemClick(backRollTrickItems, index)
                             }
                         )
                     }
                 }
                 if (frontFlipTricksSelected) {
-                    item {
-                        Text(
-                            text = "Front Flip Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Front Flip Tricks") }
                     items(trickList.frontFlipTricks.size) { index ->
                         SelectableItem(
                             title = trickList.frontFlipTricks[index].name,
                             subtitle = trickList.frontFlipTricks[index].description,
                             selected = frontFlipTrickItems[index].isSelected,
                             onClick = {
-                                frontFlipTrickItems =
-                                    frontFlipTrickItems.mapIndexed { j, frontFlipTrickItems ->
-                                        if (index == j) frontFlipTrickItems.copy(
-                                            isSelected = !frontFlipTrickItems.isSelected
-                                        ) else frontFlipTrickItems
-                                    }
+                                frontFlipTrickItems = onItemClick(frontFlipTrickItems, index)
                             }
                         )
                     }
                 }
                 if (frontRollTricksSelected) {
-                    item {
-                        Text(
-                            text = "Front Roll Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Front Roll Tricks") }
                     items(trickList.frontRollTricks.size) { index ->
                         SelectableItem(
                             title = trickList.frontRollTricks[index].name,
                             subtitle = trickList.frontRollTricks[index].description,
                             selected = frontRollTrickItems[index].isSelected,
                             onClick = {
-                                frontRollTrickItems =
-                                    frontRollTrickItems.mapIndexed { j, frontRollTrickItems ->
-                                        if (index == j) frontRollTrickItems.copy(
-                                            isSelected = !frontRollTrickItems.isSelected
-                                        ) else frontRollTrickItems
-                                    }
+                                frontRollTrickItems = onItemClick(frontRollTrickItems, index)
                             }
                         )
                     }
                 }
                 if (tantrumTricksSelected) {
-                    item {
-                        Text(
-                            text = "Tantrum Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Tantrum Tricks") }
                     items(trickList.tantrumTricks.size) { index ->
                         SelectableItem(
                             title = trickList.tantrumTricks[index].name,
                             subtitle = trickList.tantrumTricks[index].description,
                             selected = tantrumTrickItems[index].isSelected,
-                            onClick = {
-                                tantrumTrickItems =
-                                    tantrumTrickItems.mapIndexed { j, tantrumTrickItems ->
-                                        if (index == j) tantrumTrickItems.copy(
-                                            isSelected = !tantrumTrickItems.isSelected
-                                        ) else tantrumTrickItems
-                                    }
-                            }
+                            onClick = { tantrumTrickItems = onItemClick(tantrumTrickItems, index) }
                         )
                     }
                 }
                 if (whipTricksSelected) {
-                    item {
-                        Text(
-                            text = "Whip Tricks",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Whip Tricks") }
                     items(trickList.whipTricks.size) { index ->
                         SelectableItem(
                             title = trickList.whipTricks[index].name,
                             subtitle = trickList.whipTricks[index].description,
                             selected = whipTrickItems[index].isSelected,
-                            onClick = {
-                                whipTrickItems =
-                                    whipTrickItems.mapIndexed { j, whipTrickItems ->
-                                        if (index == j) whipTrickItems.copy(
-                                            isSelected = !whipTrickItems.isSelected
-                                        ) else whipTrickItems
-                                    }
-                            }
+                            onClick = { whipTrickItems = onItemClick(whipTrickItems, index) }
                         )
                     }
                 }
                 if (grabsSelected) {
-                    item {
-                        Text(
-                            text = "Grabs",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Grabs") }
                     items(trickList.grabs.size) { index ->
                         SelectableItem(
                             title = trickList.grabs[index].name,
                             subtitle = trickList.grabs[index].description,
                             selected = grabItems[index].isSelected,
-                            onClick = {
-                                grabItems = grabItems.mapIndexed { j, grabItems ->
-                                    if (index == j) grabItems.copy(
-                                        isSelected = !grabItems.isSelected
-                                    ) else grabItems
-                                }
-                            }
+                            onClick = { grabItems = onItemClick(grabItems, index) }
                         )
                     }
                 }
                 if (railsSelected) {
-                    item {
-                        Text(
-                            text = "Rails",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
+                    item { CategoryTextView(text = "Rails") }
                     items(trickList.rails.size) { index ->
                         SelectableItem(
                             title = trickList.rails[index].name,
                             subtitle = trickList.rails[index].description,
                             selected = railItems[index].isSelected,
-                            onClick = {
-                                railItems = railItems.mapIndexed { j, railItems ->
-                                    if (index == j) railItems.copy(
-                                        isSelected = !railItems.isSelected
-                                    ) else railItems
-                                }
-                            }
+                            onClick = { railItems = onItemClick(railItems, index) }
                         )
                     }
                 }
             }
         }
-    }
+    } else StandardLoadingView()
+}
 
-    if (viewModel.state.isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
+fun onItemClick(itemList: List<TrickItemState>, index: Int): List<TrickItemState> {
+    return itemList.mapIndexed { j, items ->
+        if (index == j) items.copy(isSelected = !items.isSelected) else items
     }
 }

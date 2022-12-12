@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             OnTheWakeLiveTheme {
                 val navController = rememberNavController()
@@ -51,14 +52,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     navController = navController,
                     showBottomBar = navBackStackEntry?.destination?.route in listOf(
-                        Screen.QueueScreen.route,
-                        Screen.ProfileScreen.route,
+                        Screen.QueueScreen.route, Screen.ProfileScreen.route
                     ) && !isAdmin
                 ) {
-                    SetupNavGraph(
-                        navController = navController,
-                        imageLoader = imageLoader
-                    )
+                    SetupNavGraph(navController = navController, imageLoader = imageLoader)
                 }
             }
         }

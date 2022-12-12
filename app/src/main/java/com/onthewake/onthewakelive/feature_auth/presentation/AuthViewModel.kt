@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.onthewake.onthewakelive.feature_auth.data.remote.request.AuthRequest
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
@@ -135,8 +136,10 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             state = state.copy(isLoading = true)
             val result = repository.signIn(
-                phoneNumber = state.signInPhoneNumber.trim(),
-                password = state.signInPassword.trim()
+                AuthRequest(
+                    phoneNumber = state.signInPhoneNumber.trim(),
+                    password = state.signInPassword.trim()
+                )
             )
             resultChannel.send(result)
             state = state.copy(isLoading = false)

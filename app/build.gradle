@@ -27,8 +27,8 @@ android {
         applicationId "dev.amal.onthewakelive"
         minSdk 26
         targetSdk 33
-        versionCode 7
-        versionName "7"
+        versionCode 8
+        versionName "8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary true }
@@ -58,6 +58,7 @@ android {
     packagingOptions {
         resources { excludes += '/META-INF/{AL2.0,LGPL2.1}' }
     }
+    namespace 'com.onthewake.onthewakelive'
 }
 
 dependencies {
@@ -146,5 +147,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
 
     // In-App purchase
-    implementation 'io.qonversion.android.sdk:sdk:3.2.3'
+    implementation "com.android.billingclient:billing-ktx:5.1.0"
+    implementation 'com.google.guava:guava:27.0.1-android'
 }

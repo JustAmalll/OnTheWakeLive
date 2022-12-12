@@ -10,7 +10,7 @@ import com.onthewake.onthewakelive.feature_trick_list.data.remote.dto.TrickListD
 import com.onthewake.onthewakelive.feature_trick_list.domain.model.TrickList
 import com.onthewake.onthewakelive.feature_trick_list.domain.repository.TrickListRepository
 import com.onthewake.onthewakelive.feature_trick_list.presentation.TrickListState
-import com.onthewake.onthewakelive.util.Constants
+import com.onthewake.onthewakelive.util.Constants.PREFS_USER_ID
 import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,7 +29,7 @@ class AddTricksViewModel @Inject constructor(
     private val _snackBarEvent = MutableSharedFlow<String>()
     val snackBarEvent = _snackBarEvent.asSharedFlow()
 
-    val userId = prefs.getString(Constants.PREFS_USER_ID, null)
+    val userId = prefs.getString(PREFS_USER_ID, null)
 
     init {
         if (userId != null) getUsersTrickList(userId)
@@ -38,7 +38,6 @@ class AddTricksViewModel @Inject constructor(
 
     private fun getAllTrickList() {
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
             trickListRepository.getTrickList().collect { result ->
                 when (result) {
                     is Resource.Success -> {
@@ -54,7 +53,6 @@ class AddTricksViewModel @Inject constructor(
 
     private fun getUsersTrickList(userId: String) {
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
             val result = trickListRepository.getUsersTrickList(userId)
             state = when (result) {
                 is Resource.Success -> {
@@ -64,7 +62,6 @@ class AddTricksViewModel @Inject constructor(
                     state.copy(userTrickList = TrickList())
                 }
             }
-            state = state.copy(isLoading = false)
         }
     }
 

@@ -11,9 +11,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -24,21 +22,23 @@ import com.onthewake.onthewakelive.R
 
 @Composable
 fun StandardImageView(
-    imageLoader: ImageLoader, model: String
+    imageLoader: ImageLoader,
+    model: String,
+    onUserAvatarClicked: (String) -> Unit
 ) {
-    val isImageLoading = remember { mutableStateOf(false) }
+    var isImageLoading by remember { mutableStateOf(false) }
 
     IconButton(
-        onClick = {},
+        onClick = { onUserAvatarClicked(model) },
         modifier = Modifier.size(46.dp),
     ) {
-        if (!isImageLoading.value) {
+        if (!isImageLoading) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = stringResource(id = R.string.person_icon)
             )
         }
-        if (isImageLoading.value) CircularProgressIndicator(
+        if (isImageLoading) CircularProgressIndicator(
             modifier = Modifier.size(26.dp), strokeWidth = 2.dp
         )
         Image(
@@ -53,9 +53,9 @@ fun StandardImageView(
             painter = rememberAsyncImagePainter(
                 model = model,
                 imageLoader = imageLoader,
-                onLoading = { isImageLoading.value = true },
-                onError = { isImageLoading.value = false },
-                onSuccess = { isImageLoading.value = false }
+                onLoading = { isImageLoading = true },
+                onError = { isImageLoading = false },
+                onSuccess = { isImageLoading = false }
             ),
             contentDescription = stringResource(id = R.string.user_picture)
         )

@@ -27,6 +27,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.FormattedDateOfBirth
 import com.onthewake.onthewakelive.core.presentation.StandardImageView
+import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
 import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.util.UserProfileSerializer.defaultValue
@@ -101,6 +102,9 @@ fun ProfileScreen(
             )
         }
     ) { paddingValues ->
+
+        if (viewModel.isLoading.value) StandardLoadingView()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -144,7 +148,12 @@ fun ProfileScreen(
                         ) {
                             StandardImageView(
                                 imageLoader = imageLoader,
-                                model = dataStore.value.profilePictureUri
+                                model = dataStore.value.profilePictureUri,
+                                onUserAvatarClicked = { pictureUrl ->
+                                    if (pictureUrl.isNotEmpty()) navController.navigate(
+                                        Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
+                                    )
+                                }
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
@@ -165,7 +174,7 @@ fun ProfileScreen(
                 }
             }
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -186,28 +195,7 @@ fun ProfileScreen(
                         )
                     }
                 }
-                Divider(modifier = Modifier.padding(vertical = 20.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Get Pass",
-                        fontSize = 22.sp,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    IconButton(onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        navController.navigate(Screen.GetPassScreen.route)
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = stringResource(id = R.string.right_arrow)
-                        )
-                    }
-                }
-                Divider(modifier = Modifier.padding(vertical = 20.dp))
+                Divider(modifier = Modifier.padding(vertical = 18.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -236,7 +224,7 @@ fun ProfileScreen(
                         }
                     }
                 }
-                Divider(modifier = Modifier.padding(vertical = 20.dp))
+                Divider(modifier = Modifier.padding(vertical = 18.dp))
                 Column {
                     Text(
                         text = stringResource(id = R.string.telegram),
@@ -248,7 +236,7 @@ fun ProfileScreen(
                         stringResource(id = R.string.not_specified)
                     })
                 }
-                Divider(modifier = Modifier.padding(vertical = 20.dp))
+                Divider(modifier = Modifier.padding(vertical = 18.dp))
                 Column {
                     Text(
                         text = stringResource(id = R.string.phone_number),
@@ -258,19 +246,9 @@ fun ProfileScreen(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(text = dataStore.value.phoneNumber)
                 }
-                Divider(modifier = Modifier.padding(vertical = 20.dp))
+                Divider(modifier = Modifier.padding(vertical = 18.dp))
                 FormattedDateOfBirth(dataStore.value.dateOfBirth)
             }
-        }
-    }
-    if (viewModel.isLoading.value) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
         }
     }
 }

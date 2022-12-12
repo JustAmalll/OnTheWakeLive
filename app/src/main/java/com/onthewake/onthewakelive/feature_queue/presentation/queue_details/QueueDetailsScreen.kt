@@ -112,7 +112,12 @@ fun QueueDetailsScreen(
                         ) {
                             StandardImageView(
                                 imageLoader = imageLoader,
-                                model = state.profilePictureUri
+                                model = state.profilePictureUri,
+                                onUserAvatarClicked = { pictureUrl ->
+                                    if (pictureUrl.isNotEmpty()) navController.navigate(
+                                        Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
+                                    )
+                                }
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {

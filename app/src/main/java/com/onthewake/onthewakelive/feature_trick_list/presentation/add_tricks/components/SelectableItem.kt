@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.features
+package com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

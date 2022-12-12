@@ -1,6 +1,5 @@
 package com.onthewake.onthewakelive.feature_auth.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.onthewake.onthewakelive.R
+import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
 import com.onthewake.onthewakelive.core.presentation.StandardTextField
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.navigation.Screen
@@ -84,9 +84,7 @@ fun RegisterScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
-    ) { _ ->
+    Scaffold(snackbarHost = { SnackbarHost(hostState = snackBarHostState) }) { _ ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -184,9 +182,7 @@ fun RegisterScreen(
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .clickable {
-                        navController.navigate(Screen.LoginScreen.route)
-                    },
+                    .clickable { navController.navigate(Screen.LoginScreen.route) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -202,14 +198,5 @@ fun RegisterScreen(
             }
         }
     }
-    if (state.isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    }
+    if (state.isLoading) StandardLoadingView()
 }

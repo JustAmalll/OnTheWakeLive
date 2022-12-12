@@ -28,6 +28,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.FormattedDateOfBirth
 import com.onthewake.onthewakelive.core.presentation.StandardImageView
+import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
 import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.util.openInstagramProfile
 import kotlinx.coroutines.flow.collectLatest
@@ -85,6 +86,9 @@ fun QueueDetailsScreen(
             )
         }
     ) { paddingValues ->
+
+        if (state.isLoading) StandardLoadingView()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -214,16 +218,6 @@ fun QueueDetailsScreen(
                     FormattedDateOfBirth(state.dateOfBirth)
                 }
             }
-        }
-    }
-    if (state.isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
         }
     }
 }

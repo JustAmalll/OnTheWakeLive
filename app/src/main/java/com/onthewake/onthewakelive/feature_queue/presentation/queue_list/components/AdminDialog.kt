@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,10 +29,15 @@ fun AdminDialog(
     queue: List<Queue>
 ) {
 
-    val leftQueueButtonState = remember { mutableStateOf(false) }
-    val rightQueueButtonState = remember { mutableStateOf(true) }
-    val firstNameFieldState = remember { mutableStateOf("") }
-    val errorMessage = remember { mutableStateOf("") }
+    var leftButtonState by remember { mutableStateOf(false) }
+    var rightButtonState by remember { mutableStateOf(true) }
+    var firstNameFieldState by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+
+    val rightButtonColor = if (rightButtonState) MaterialTheme.colorScheme.onSurfaceVariant
+    else MaterialTheme.colorScheme.onPrimary
+    val leftButtonColor = if (leftButtonState) MaterialTheme.colorScheme.onSurfaceVariant
+    else MaterialTheme.colorScheme.onPrimary
 
     val context = LocalContext.current
 
@@ -63,16 +66,11 @@ fun AdminDialog(
                     ) {
                         Button(
                             onClick = {
-                                leftQueueButtonState.value = !leftQueueButtonState.value
-                                rightQueueButtonState.value = !rightQueueButtonState.value
+                                leftButtonState = !leftButtonState
+                                rightButtonState = !rightButtonState
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (rightQueueButtonState.value)
-                                    MaterialTheme.colorScheme.surfaceVariant
-                                else MaterialTheme.colorScheme.primary,
-                                contentColor = if (rightQueueButtonState.value)
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                else MaterialTheme.colorScheme.onPrimary
+                                containerColor = rightButtonColor, contentColor = rightButtonColor
                             )
                         ) {
                             Text(text = stringResource(id = R.string.left_line_admin))
@@ -80,16 +78,11 @@ fun AdminDialog(
                         Spacer(modifier = Modifier.width(20.dp))
                         Button(
                             onClick = {
-                                leftQueueButtonState.value = !leftQueueButtonState.value
-                                rightQueueButtonState.value = !rightQueueButtonState.value
+                                leftButtonState = !leftButtonState
+                                rightButtonState = !rightButtonState
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (leftQueueButtonState.value)
-                                    MaterialTheme.colorScheme.surfaceVariant
-                                else MaterialTheme.colorScheme.primary,
-                                contentColor = if (leftQueueButtonState.value)
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                else MaterialTheme.colorScheme.onPrimary
+                                containerColor = leftButtonColor, contentColor = leftButtonColor
                             )
                         ) {
                             Text(text = stringResource(id = R.string.right_line_admin))
@@ -97,14 +90,14 @@ fun AdminDialog(
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     StandardTextField(
-                        value = firstNameFieldState.value,
-                        onValueChange = { firstNameFieldState.value = it },
+                        value = firstNameFieldState,
+                        onValueChange = { firstNameFieldState = it },
                         label = stringResource(id = R.string.first_name),
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Sentences
                         ),
-                        isError = errorMessage.value.isNotEmpty(),
-                        errorText = errorMessage.value
+                        isError = errorMessage.isNotEmpty(),
+                        errorText = errorMessage
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
@@ -112,14 +105,13 @@ fun AdminDialog(
                         onClick = {
                             val addToQueueResult = ValidationUseCase(context = context)
                                 .validateAdminAddToQueue(
-                                    firstName = firstNameFieldState.value,
-                                    queue = queue
+                                    firstName = firstNameFieldState, queue = queue
                                 )
                             if (addToQueueResult.errorMessage != null) {
-                                errorMessage.value = addToQueueResult.errorMessage
+                                errorMessage = addToQueueResult.errorMessage
                             }
                             if (addToQueueResult.successful) {
-                                onAddClicked(leftQueueButtonState.value, firstNameFieldState.value)
+                                onAddClicked(leftButtonState, firstNameFieldState)
                                 showDialog(false)
                             }
                         }

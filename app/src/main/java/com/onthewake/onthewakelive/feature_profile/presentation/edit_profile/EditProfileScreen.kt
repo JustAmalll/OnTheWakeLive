@@ -35,6 +35,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
+import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
 import com.onthewake.onthewakelive.core.presentation.StandardTextField
 import com.onthewake.onthewakelive.dataStore
 import com.onthewake.onthewakelive.util.CropActivityResultContract
@@ -170,9 +171,9 @@ fun EditProfileScreen(
                                         )
                                     )
                                 }
-                                if (isImageLoading.value) {
-                                    CircularProgressIndicator(modifier = Modifier.size(42.dp))
-                                }
+                                if (isImageLoading.value) CircularProgressIndicator(
+                                    modifier = Modifier.size(42.dp)
+                                )
                                 Image(
                                     modifier = Modifier.fillMaxSize(),
                                     painter = rememberAsyncImagePainter(
@@ -306,21 +307,5 @@ fun EditProfileScreen(
             }
         }
     }
-    if (state.isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    }
+    if (state.isLoading) StandardLoadingView()
 }
-
-
-
-
-
-
-

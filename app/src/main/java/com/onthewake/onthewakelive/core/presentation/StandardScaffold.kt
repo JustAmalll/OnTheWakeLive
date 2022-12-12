@@ -5,7 +5,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.navigation.NavHostController
@@ -16,9 +15,13 @@ import com.onthewake.onthewakelive.navigation.Screen
 @Composable
 fun StandardScaffold(
     navController: NavHostController,
-    modifier: Modifier = Modifier,
     showBottomBar: Boolean = true,
-    bottomNavItems: List<BottomNavItem> = listOf(
+    content: @Composable () -> Unit
+) {
+
+    val haptic = LocalHapticFeedback.current
+
+    val bottomNavItems: List<BottomNavItem> = listOf(
         BottomNavItem(
             route = Screen.QueueScreen.route,
             icon = Icons.Default.Home,
@@ -29,15 +32,9 @@ fun StandardScaffold(
             icon = Icons.Default.Person,
             contentDescription = "Profile"
         )
-    ),
-    topBar: @Composable () -> Unit = {},
-    content: @Composable () -> Unit
-) {
-
-    val haptic = LocalHapticFeedback.current
+    )
 
     Scaffold(
-        topBar = { topBar() },
         bottomBar = {
             if (showBottomBar) NavigationBar {
                 bottomNavItems.forEachIndexed { _, item ->
@@ -63,8 +60,7 @@ fun StandardScaffold(
                     )
                 }
             }
-        },
-        modifier = modifier
+        }
     ) {
         content()
     }

@@ -4,11 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.datastore.dataStore
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -49,7 +47,6 @@ class MainActivity : ComponentActivity() {
                 val isAdmin = prefs.getString(Constants.PREFS_USER_ID, null) in ADMIN_IDS
 
                 StandardScaffold(
-                    modifier = Modifier.fillMaxSize(),
                     navController = navController,
                     showBottomBar = navBackStackEntry?.destination?.route in listOf(
                         Screen.QueueScreen.route, Screen.ProfileScreen.route

@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.feature_auth.presentation
+package com.onthewake.onthewakelive.feature_auth.presentation.auth_register
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -37,9 +37,8 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun RegisterScreen(
     navController: NavHostController,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: RegisterViewModel = hiltViewModel()
 ) {
-
     val state = viewModel.state
     val snackBarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
@@ -47,23 +46,19 @@ fun RegisterScreen(
     val context = LocalContext.current
 
     LaunchedEffect(viewModel, context) {
-        viewModel.authResults.collect { result ->
+        viewModel.registerResults.collect { result ->
             when (result) {
                 is AuthResult.OtpTooManyRequests -> snackBarHostState.showSnackbar(
-                    message = "OtpTooManyRequests",
-                    duration = SnackbarDuration.Short
+                    message = "OtpTooManyRequests"
                 )
                 is AuthResult.OtpInvalidCredentials -> snackBarHostState.showSnackbar(
-                    message = "OtpInvalidCredentials",
-                    duration = SnackbarDuration.Short
+                    message = "Invalid phone number format"
                 )
                 is AuthResult.UserAlreadyExist -> snackBarHostState.showSnackbar(
-                    message = "User with this phone number already exists",
-                    duration = SnackbarDuration.Short
+                    message = "User with this phone number already exists"
                 )
                 else -> snackBarHostState.showSnackbar(
-                    message = context.getString(R.string.unknown_error),
-                    duration = SnackbarDuration.Short
+                    message = context.getString(R.string.unknown_error)
                 )
             }
         }
@@ -105,23 +100,23 @@ fun RegisterScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 StandardTextField(
-                    value = state.signUpFirsName,
+                    value = state.signUpFirstName,
                     onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignUpFirstNameChanged(it))
+                        viewModel.onEvent(RegisterUiEvent.SignUpFirstNameChanged(it))
                     },
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         imeAction = ImeAction.Next
                     ),
                     label = stringResource(id = R.string.first_name),
-                    isError = state.signUpFirsNameError != null,
-                    errorText = state.signUpFirsNameError
+                    isError = state.signUpFirstNameError != null,
+                    errorText = state.signUpFirstNameError
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 StandardTextField(
                     value = state.signUpLastName,
                     onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignUpLastNameChanged(it))
+                        viewModel.onEvent(RegisterUiEvent.SignUpLastNameChanged(it))
                     },
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
@@ -135,7 +130,7 @@ fun RegisterScreen(
                 StandardTextField(
                     value = state.signUpPhoneNumber,
                     onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignUpPhoneNumberChanged(it))
+                        viewModel.onEvent(RegisterUiEvent.SignUpPhoneNumberChanged(it))
                     },
                     label = stringResource(id = R.string.phone_number),
                     keyboardOptions = KeyboardOptions(
@@ -149,7 +144,7 @@ fun RegisterScreen(
                 StandardTextField(
                     value = state.signUpPassword,
                     onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignUpPasswordChanged(it))
+                        viewModel.onEvent(RegisterUiEvent.SignUpPasswordChanged(it))
                     },
                     label = stringResource(id = R.string.password),
                     keyboardOptions = KeyboardOptions(
@@ -158,7 +153,7 @@ fun RegisterScreen(
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            viewModel.onEvent(AuthUiEvent.SignIn)
+                            viewModel.onEvent(RegisterUiEvent.SendOtp(context))
                             focusManager.clearFocus()
                         }
                     ),
@@ -169,7 +164,7 @@ fun RegisterScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        viewModel.onEvent(AuthUiEvent.SendOtp(context))
+                        viewModel.onEvent(RegisterUiEvent.SendOtp(context))
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         focusManager.clearFocus()
                     },

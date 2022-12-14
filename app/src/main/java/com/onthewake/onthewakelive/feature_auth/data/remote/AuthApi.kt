@@ -22,8 +22,8 @@ interface AuthApi {
         @Header("Authorization") token: String
     )
 
-    @GET("/checkIfUserAlreadyExists")
-    suspend fun checkIfUserAlreadyExists(
+    @GET("/isUserAlreadyExists")
+    suspend fun isUserAlreadyExists(
         @Query("phoneNumber") phoneNumber: String
-    )
+    ): Boolean
 }

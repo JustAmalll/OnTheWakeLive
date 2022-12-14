@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.feature_auth.presentation
+package com.onthewake.onthewakelive.feature_auth.presentation.auth_login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,7 +36,7 @@ import com.onthewake.onthewakelive.navigation.Screen
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val state = viewModel.state
     val snackBarHostState = remember { SnackbarHostState() }
@@ -54,28 +54,17 @@ fun LoginScreen(
     }
 
     LaunchedEffect(viewModel, context) {
-        viewModel.authResults.collect { result ->
+        viewModel.loginResults.collect { result ->
             when (result) {
-                is AuthResult.Authorized -> {
-                    navController.navigate(Screen.QueueScreen.route) {
-                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
-                    }
+                is AuthResult.Authorized -> navController.navigate(Screen.QueueScreen.route) {
+                    popUpTo(Screen.LoginScreen.route) { inclusive = true }
                 }
-                is AuthResult.IncorrectData -> {
-                    snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.incorrect_data)
-                    )
-                }
-                is AuthResult.UnknownError -> {
-                    snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.unknown_error)
-                    )
-                }
-                else -> {
-                    snackBarHostState.showSnackbar(
-                        message = context.getString(R.string.unknown_error)
-                    )
-                }
+                is AuthResult.IncorrectData -> snackBarHostState.showSnackbar(
+                    message = context.getString(R.string.incorrect_data)
+                )
+                else -> snackBarHostState.showSnackbar(
+                    message = context.getString(R.string.unknown_error)
+                )
             }
         }
     }
@@ -103,7 +92,7 @@ fun LoginScreen(
                 StandardTextField(
                     value = state.signInPhoneNumber,
                     onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignInPhoneNumberChanged(it))
+                        viewModel.onEvent(LoginUiEvent.SignInPhoneNumberChanged(it))
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Phone,
@@ -117,7 +106,7 @@ fun LoginScreen(
                 StandardTextField(
                     value = state.signInPassword,
                     onValueChange = {
-                        viewModel.onEvent(AuthUiEvent.SignInPasswordChanged(it))
+                        viewModel.onEvent(LoginUiEvent.SignInPasswordChanged(it))
                     },
                     label = stringResource(id = R.string.password),
                     keyboardOptions = KeyboardOptions(
@@ -126,7 +115,7 @@ fun LoginScreen(
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
-                            viewModel.onEvent(AuthUiEvent.SignIn)
+                            viewModel.onEvent(LoginUiEvent.SignIn)
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             focusManager.clearFocus()
                         }
@@ -138,7 +127,7 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        viewModel.onEvent(AuthUiEvent.SignIn)
+                        viewModel.onEvent(LoginUiEvent.SignIn)
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         focusManager.clearFocus()
                     },

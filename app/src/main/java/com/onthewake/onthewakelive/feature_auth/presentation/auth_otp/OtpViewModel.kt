@@ -1,6 +1,7 @@
 package com.onthewake.onthewakelive.feature_auth.presentation.auth_otp
 
 import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,9 +13,10 @@ import com.onthewake.onthewakelive.feature_auth.data.remote.request.CreateAccoun
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
-import com.onthewake.onthewakelive.feature_auth.presentation.AuthState
-import com.onthewake.onthewakelive.feature_auth.presentation.RegisterData
-import com.onthewake.onthewakelive.util.Constants
+import com.onthewake.onthewakelive.feature_auth.presentation.auth_register.RegisterData
+import com.onthewake.onthewakelive.feature_auth.presentation.auth_register.RegisterState
+import com.onthewake.onthewakelive.util.Constants.REGISTER_DATA_ARGUMENT_KEY
+import com.onthewake.onthewakelive.util.findActivity
 import com.onthewake.onthewakelive.util.fromJson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -27,32 +29,38 @@ class OtpViewModel @Inject constructor(
     private val repository: AuthRepository,
     private val context: Application,
     private val validationUseCase: ValidationUseCase,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ) : AndroidViewModel(context) {
 
-    var state by mutableStateOf(AuthState())
+    var state by mutableStateOf(RegisterState())
+        private set
 
     private val resultChannel = Channel<AuthResult<Unit>>()
-    val authResults = resultChannel.receiveAsFlow()
+    val otpResults = resultChannel.receiveAsFlow()
 
-    fun onEvent(event: OtpUiEvent) {
-        when (event) {
-            is OtpUiEvent.OtpCodeChanged -> {
-                state = state.copy(otp = event.value)
-            }
-            is OtpUiEvent.VerifyOtpAndSignUp -> {
-                savedStateHandle.get<String>(
-                    Constants.REGISTER_DATA_ARGUMENT_KEY
-                )?.let { registerData ->
-                    verifyOtpAndSignUp(registerData.fromJson(RegisterData::class.java))
-                }
-            }
+    init {
+        savedStateHandle.get<String>(REGISTER_DATA_ARGUMENT_KEY)?.let { registerDataJson ->
+            val registerData = registerDataJson.fromJson(RegisterData::class.java)
+            state = state.copy(
+                signUpFirstName = registerData.firstName,
+                signUpLastName = registerData.lastName,
+                signUpPhoneNumber = registerData.phoneNumber,
+                signUpPassword = registerData.password
+            )
         }
     }
 
-    private fun verifyOtpAndSignUp(registerData: RegisterData) {
+    fun onEvent(event: OtpUiEvent) {
+        when (event) {
+            is OtpUiEvent.OtpCodeChanged -> state = state.copy(otp = event.value)
+            is OtpUiEvent.VerifyOtpAndSignUp -> verifyOtpAndSignUp()
+        }
+    }
+
+    private fun verifyOtpAndSignUp() {
 
         val otpValidationResult = validationUseCase.validateOtp(state.otp)
+
         if (!otpValidationResult.successful) {
             state = state.copy(otpError = otpValidationResult.errorMessage)
             return
@@ -66,17 +74,17 @@ class OtpViewModel @Inject constructor(
             if (otpResult is AuthResult.OtpVerified) {
                 val signUpResult = repository.signUp(
                     CreateAccountRequest(
-                        firstName = registerData.firstName,
-                        lastName = registerData.lastName,
-                        phoneNumber = registerData.phoneNumber,
-                        password = registerData.password
+                        firstName = state.signUpFirstName,
+                        lastName = state.signUpLastName,
+                        phoneNumber = state.signUpPhoneNumber,
+                        password = state.signUpPassword
                     )
                 )
                 context.dataStore.updateData { profile ->
                     profile.copy(
-                        firstName = registerData.firstName,
-                        lastName = registerData.lastName,
-                        phoneNumber = registerData.phoneNumber
+                        firstName = state.signUpFirstName,
+                        lastName = state.signUpLastName,
+                        phoneNumber = state.signUpPhoneNumber
                     )
                 }
                 resultChannel.send(signUpResult)
@@ -84,6 +92,17 @@ class OtpViewModel @Inject constructor(
                 resultChannel.send(AuthResult.IncorrectOtp())
             }
             state = state.copy(isLoading = false)
+        }
+    }
+
+    fun resendCode(context: Context) {
+        viewModelScope.launch {
+            val resendResult = repository.sendOtp(
+                phoneNumber = state.signUpPhoneNumber,
+                activity = context.findActivity(),
+                isResendAction = true
+            )
+            resultChannel.send(resendResult)
         }
     }
 }

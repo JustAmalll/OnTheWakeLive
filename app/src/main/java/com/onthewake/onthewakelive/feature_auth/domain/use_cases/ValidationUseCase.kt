@@ -2,12 +2,11 @@ package com.onthewake.onthewakelive.feature_auth.domain.use_cases
 
 import android.content.Context
 import com.onthewake.onthewakelive.R
+import com.onthewake.onthewakelive.feature_auth.domain.models.ValidationResult
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
 import java.util.*
 
-class ValidationUseCase(
-    private val context: Context
-) {
+class ValidationUseCase(private val context: Context) {
 
     fun validateFirstName(firstName: String): ValidationResult {
         if (firstName.isBlank()) {
@@ -52,12 +51,6 @@ class ValidationUseCase(
                 errorMessage = context.getString(R.string.validate_phone_number_error)
             )
         }
-//        if (!Patterns.PHONE.matcher(phoneNumber).matches()) {
-//            return ValidationResult(
-//                successful = false,
-//                errorMessage = context.getString(R.string.validate_invalid_phone_number_error)
-//            )
-//        }
         return ValidationResult(successful = true)
     }
 

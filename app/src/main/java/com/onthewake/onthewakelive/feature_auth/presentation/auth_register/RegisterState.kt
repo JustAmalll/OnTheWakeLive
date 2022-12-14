@@ -1,19 +1,15 @@
-package com.onthewake.onthewakelive.feature_auth.presentation
+package com.onthewake.onthewakelive.feature_auth.presentation.auth_register
 
-data class AuthState(
+data class RegisterState(
     val isLoading: Boolean = false,
-    val signUpFirsName: String = "",
-    val signUpFirsNameError: String? = null,
+    val signUpFirstName: String = "",
+    val signUpFirstNameError: String? = null,
     val signUpLastName: String = "",
     val signUpLastNameError: String? = null,
     val signUpPhoneNumber: String = "",
     val signUpPhoneNumberError: String? = null,
     val signUpPassword: String = "",
     val signUpPasswordError: String? = null,
-    val signInPhoneNumber: String = "",
-    val signInPhoneNumberError: String? = null,
-    val signInPassword: String = "",
-    val signInPasswordError: String? = null,
     val otp: String = "",
     val otpError: String? = null,
 )

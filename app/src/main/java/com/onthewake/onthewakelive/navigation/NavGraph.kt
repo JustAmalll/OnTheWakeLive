@@ -10,8 +10,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import coil.ImageLoader
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.onthewake.onthewakelive.feature_auth.presentation.LoginScreen
-import com.onthewake.onthewakelive.feature_auth.presentation.RegisterScreen
+import com.onthewake.onthewakelive.feature_auth.presentation.auth_login.LoginScreen
+import com.onthewake.onthewakelive.feature_auth.presentation.auth_register.RegisterScreen
 import com.onthewake.onthewakelive.feature_auth.presentation.auth_otp.OtpScreen
 import com.onthewake.onthewakelive.feature_full_size_avatar.presentation.FullSizeAvatarScreen
 import com.onthewake.onthewakelive.feature_profile.presentation.edit_profile.EditProfileScreen

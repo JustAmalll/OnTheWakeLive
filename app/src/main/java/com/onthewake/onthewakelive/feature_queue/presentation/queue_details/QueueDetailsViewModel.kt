@@ -47,13 +47,12 @@ class QueueDetailsViewModel @Inject constructor(
                             dateOfBirth = it.dateOfBirth
                         )
                     }
-                    state.value = state.value.copy(isLoading = false)
                 }
                 is Resource.Error -> {
-                    state.value = state.value.copy(isLoading = false)
                     _snackBarEvent.emit(result.message ?: "Unknown Error")
                 }
             }
+            state.value = state.value.copy(isLoading = false)
         }
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.datastore.dataStore
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.core.presentation.StandardScaffold
 import com.onthewake.onthewakelive.core.presentation.ui.theme.OnTheWakeLiveTheme
@@ -33,7 +34,7 @@ val Context.dataStore by dataStore(
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var imageLoader: coil.ImageLoader
+    lateinit var imageLoader: ImageLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

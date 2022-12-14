@@ -6,6 +6,7 @@ import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +26,7 @@ class SplashViewModel @Inject constructor(
     private fun authenticate() {
         viewModelScope.launch {
             val result = repository.authenticate()
+            delay(1200)
             resultChannel.send(result)
         }
     }

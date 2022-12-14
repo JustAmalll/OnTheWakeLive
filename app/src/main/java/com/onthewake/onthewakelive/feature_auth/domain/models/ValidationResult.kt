@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.feature_auth.domain.use_cases
+package com.onthewake.onthewakelive.feature_auth.domain.models
 
 data class ValidationResult(
     val successful: Boolean,

@@ -10,4 +10,5 @@ sealed class AuthResult<T>(val data: T? = null) {
     class IncorrectOtp<T>(): AuthResult<T>()
     class OtpInvalidCredentials<T>: AuthResult<T>()
     class OtpTooManyRequests<T>: AuthResult<T>()
+    class OtpSentSuccess<T>: AuthResult<T>()
 }

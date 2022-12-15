@@ -81,47 +81,51 @@ class AuthRepositoryImpl(
         phoneNumber: String,
         activity: Activity,
         isResendAction: Boolean
-    ): AuthResult<Unit> = suspendCoroutine { continuation ->
-        val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+    ): AuthResult<Unit> {
+        return suspendCoroutine { continuation ->
+            val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
-            override fun onVerificationCompleted(credential: PhoneAuthCredential) {}
+                override fun onVerificationCompleted(credential: PhoneAuthCredential) {}
 
-            override fun onVerificationFailed(exception: FirebaseException) {
-                println(exception)
-                if (exception is FirebaseAuthInvalidCredentialsException) {
-                    continuation.resume(AuthResult.OtpInvalidCredentials())
-                } else if (exception is FirebaseTooManyRequestsException) {
-                    continuation.resume(AuthResult.OtpTooManyRequests())
+                override fun onVerificationFailed(exception: FirebaseException) {
+                    println(exception)
+                    if (exception is FirebaseAuthInvalidCredentialsException) {
+                        continuation.resume(AuthResult.OtpInvalidCredentials())
+                    } else if (exception is FirebaseTooManyRequestsException) {
+                        continuation.resume(AuthResult.OtpTooManyRequests())
+                    }
+                }
+
+                override fun onCodeSent(
+                    verificationId: String, token: PhoneAuthProvider.ForceResendingToken
+                ) {
+                    super.onCodeSent(verificationId, token)
+                    println("onCodeSent")
+                    storedVerificationId = verificationId
+                    resendToken = token
                 }
             }
 
-            override fun onCodeSent(
-                verificationId: String, token: PhoneAuthProvider.ForceResendingToken
-            ) {
-                super.onCodeSent(verificationId, token)
-                println("onCodeSent")
-                storedVerificationId = verificationId
-                resendToken = token
+            if (isResendAction) {
+                val options = PhoneAuthOptions.newBuilder(firebaseAuth)
+                    .setPhoneNumber(phoneNumber)
+                    .setTimeout(55L, TimeUnit.SECONDS)
+                    .setActivity(activity)
+                    .setCallbacks(callbacks)
+                    .setForceResendingToken(resendToken)
+                    .build()
+                PhoneAuthProvider.verifyPhoneNumber(options)
+            } else {
+                val options = PhoneAuthOptions.newBuilder(firebaseAuth)
+                    .setPhoneNumber(phoneNumber)
+                    .setTimeout(55L, TimeUnit.SECONDS)
+                    .setActivity(activity)
+                    .setCallbacks(callbacks)
+                    .build()
+                PhoneAuthProvider.verifyPhoneNumber(options)
             }
-        }
 
-        if (isResendAction) {
-            val options = PhoneAuthOptions.newBuilder(firebaseAuth)
-                .setPhoneNumber(phoneNumber)
-                .setTimeout(55L, TimeUnit.SECONDS)
-                .setActivity(activity)
-                .setCallbacks(callbacks)
-                .setForceResendingToken(resendToken)
-                .build()
-            PhoneAuthProvider.verifyPhoneNumber(options)
-        } else {
-            val options = PhoneAuthOptions.newBuilder(firebaseAuth)
-                .setPhoneNumber(phoneNumber)
-                .setTimeout(55L, TimeUnit.SECONDS)
-                .setActivity(activity)
-                .setCallbacks(callbacks)
-                .build()
-            PhoneAuthProvider.verifyPhoneNumber(options)
+            continuation.resume(AuthResult.OtpSentSuccess())
         }
     }
 

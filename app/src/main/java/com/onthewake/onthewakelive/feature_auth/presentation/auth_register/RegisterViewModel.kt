@@ -94,7 +94,7 @@ class RegisterViewModel @Inject constructor(
                     activity = activity,
                     isResendAction = false
                 )
-                if (result !is AuthResult.OtpInvalidCredentials)
+                if (result is AuthResult.OtpSentSuccess)
                     _navigateUpEvent.emit(
                         RegisterData(
                             firstName = state.signUpFirstName.trim(),

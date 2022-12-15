@@ -44,7 +44,7 @@ fun OtpScreen(
                     popUpTo(Screen.LoginScreen.route) { inclusive = true }
                 }
                 is AuthResult.IncorrectOtp -> snackBarHostState.showSnackbar(
-                    message = "IncorrectOtp"
+                    message = "Incorrect OTP"
                 )
                 else -> snackBarHostState.showSnackbar(
                     message = context.getString(R.string.unknown_error)
@@ -131,7 +131,7 @@ fun Timer(onResendClicked: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Didn't receive code?, retry after ",
+            text = "Didn't receive code? Resend after ",
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onBackground
         )

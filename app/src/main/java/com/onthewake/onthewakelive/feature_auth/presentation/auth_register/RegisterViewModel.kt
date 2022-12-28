@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
-import com.onthewake.onthewakelive.util.findActivity
+import com.onthewake.onthewakelive.core.util.findActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow

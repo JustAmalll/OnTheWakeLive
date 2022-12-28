@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.util
+package com.onthewake.onthewakelive.core.util
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping

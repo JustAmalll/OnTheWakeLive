@@ -5,8 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueService
-import com.onthewake.onthewakelive.util.Constants.DETAILS_ARGUMENT_KEY
-import com.onthewake.onthewakelive.util.Resource
+import com.onthewake.onthewakelive.core.util.Constants.DETAILS_ARGUMENT_KEY
+import com.onthewake.onthewakelive.core.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

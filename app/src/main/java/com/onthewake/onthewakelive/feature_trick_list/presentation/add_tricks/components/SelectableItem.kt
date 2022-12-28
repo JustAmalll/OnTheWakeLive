@@ -24,7 +24,7 @@ fun SelectableItem(
     title: String,
     subtitle: String,
     selected: Boolean = false,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit
 ) {
 
     val primary = MaterialTheme.colorScheme.primary
@@ -41,7 +41,7 @@ fun SelectableItem(
                     shape = RoundedCornerShape(size = 10.dp)
                 )
                 .clip(RoundedCornerShape(size = 10.dp))
-                .clickable { onClick() }
+                .clickable(onClick = onClick)
         ) {
             Text(
                 modifier = Modifier.padding(start = 12.dp, top = 10.dp),
@@ -67,7 +67,7 @@ fun SelectableItem(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(4.dp),
-            onClick = { onClick() },
+            onClick = onClick,
         ) {
             Icon(
                 imageVector = Icons.Default.CheckCircle,

@@ -5,7 +5,7 @@ import com.onthewake.onthewakelive.feature_trick_list.data.local.TrickListDataba
 import com.onthewake.onthewakelive.feature_trick_list.data.remote.TrickListApi
 import com.onthewake.onthewakelive.feature_trick_list.data.repository.TrickListRepositoryImpl
 import com.onthewake.onthewakelive.feature_trick_list.domain.repository.TrickListRepository
-import com.onthewake.onthewakelive.util.Constants.BASE_URL
+import com.onthewake.onthewakelive.core.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

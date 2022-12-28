@@ -1,6 +1,6 @@
 package com.onthewake.onthewakelive.navigation
 
-import com.onthewake.onthewakelive.util.Constants
+import com.onthewake.onthewakelive.core.util.Constants
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 

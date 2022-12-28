@@ -5,11 +5,11 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.onthewake.onthewakelive.dataStore
+import com.onthewake.onthewakelive.core.presentation.dataStore
 import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
 import com.onthewake.onthewakelive.feature_profile.domain.repository.ProfileRepository
-import com.onthewake.onthewakelive.util.Constants
-import com.onthewake.onthewakelive.util.Resource
+import com.onthewake.onthewakelive.core.util.Constants
+import com.onthewake.onthewakelive.core.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

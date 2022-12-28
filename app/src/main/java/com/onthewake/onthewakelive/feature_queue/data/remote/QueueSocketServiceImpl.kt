@@ -3,8 +3,8 @@ package com.onthewake.onthewakelive.feature_queue.data.remote
 import android.content.Context
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_queue.domain.module.QueueResponse
-import com.onthewake.onthewakelive.util.Constants.WS_BASE_URL
-import com.onthewake.onthewakelive.util.Resource
+import com.onthewake.onthewakelive.core.util.Constants.WS_BASE_URL
+import com.onthewake.onthewakelive.core.util.Resource
 import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*

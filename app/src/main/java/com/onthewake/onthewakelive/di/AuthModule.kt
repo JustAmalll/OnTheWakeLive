@@ -11,7 +11,7 @@ import com.onthewake.onthewakelive.feature_auth.data.remote.AuthApi
 import com.onthewake.onthewakelive.feature_auth.data.repository.AuthRepositoryImpl
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
-import com.onthewake.onthewakelive.util.Constants.BASE_URL
+import com.onthewake.onthewakelive.core.util.Constants.BASE_URL
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

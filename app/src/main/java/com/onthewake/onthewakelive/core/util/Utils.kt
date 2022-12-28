@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.util
+package com.onthewake.onthewakelive.core.util
 
 import android.app.Activity
 import android.content.Context
@@ -21,9 +21,7 @@ fun Context.findActivity(): Activity {
 }
 
 fun Context.openInstagramProfile(instagram: String) = this.startActivity(
-    Intent(
-        Intent.ACTION_VIEW, Uri.parse("${Constants.INSTAGRAM_URL}/$instagram/")
-    )
+    Intent(Intent.ACTION_VIEW, Uri.parse("${Constants.INSTAGRAM_URL}/$instagram/"))
 )
 
 fun Context.openNotificationSettings() = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {

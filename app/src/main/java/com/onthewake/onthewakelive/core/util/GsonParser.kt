@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.util
+package com.onthewake.onthewakelive.core.util
 
 import com.google.gson.Gson
 import java.lang.reflect.Type

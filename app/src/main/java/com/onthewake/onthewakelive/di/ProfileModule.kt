@@ -6,7 +6,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.onthewake.onthewakelive.feature_profile.data.remote.ProfileApi
 import com.onthewake.onthewakelive.feature_profile.data.repository.ProfileRepositoryImpl
 import com.onthewake.onthewakelive.feature_profile.domain.repository.ProfileRepository
-import com.onthewake.onthewakelive.util.Constants.BASE_URL
+import com.onthewake.onthewakelive.core.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

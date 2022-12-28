@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.util
+package com.onthewake.onthewakelive.core.util
 
 import android.content.Context
 import android.content.Intent

@@ -9,12 +9,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.onthewake.onthewakelive.dataStore
+import com.onthewake.onthewakelive.core.presentation.dataStore
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
 import com.onthewake.onthewakelive.feature_profile.domain.module.UpdateProfileData
 import com.onthewake.onthewakelive.feature_profile.domain.repository.ProfileRepository
-import com.onthewake.onthewakelive.util.Constants.PREFS_FIRST_NAME
-import com.onthewake.onthewakelive.util.Resource
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_FIRST_NAME
+import com.onthewake.onthewakelive.core.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow

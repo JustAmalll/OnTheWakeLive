@@ -3,8 +3,8 @@ package com.onthewake.onthewakelive.feature_queue.data.remote
 import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
 import com.onthewake.onthewakelive.feature_queue.data.remote.dto.QueueDto
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
-import com.onthewake.onthewakelive.util.Constants.BASE_URL
-import com.onthewake.onthewakelive.util.Resource
+import com.onthewake.onthewakelive.core.util.Constants.BASE_URL
+import com.onthewake.onthewakelive.core.util.Resource
 import io.ktor.client.*
 import io.ktor.client.request.*
 import retrofit2.HttpException

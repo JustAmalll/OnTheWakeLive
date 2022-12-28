@@ -11,9 +11,9 @@ interface TrickListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTrickList(trickList: TrickListEntity)
 
-    @Query("DELETE FROM tricklistentity")
-    suspend fun deleteTrickList()
-
     @Query("SELECT * FROM tricklistentity")
     suspend fun getTrickList(): TrickListEntity?
+
+    @Query("DELETE FROM tricklistentity")
+    suspend fun deleteTrickList()
 }

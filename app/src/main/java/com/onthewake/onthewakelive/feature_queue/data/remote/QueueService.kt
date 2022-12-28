@@ -2,7 +2,7 @@ package com.onthewake.onthewakelive.feature_queue.data.remote
 
 import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
-import com.onthewake.onthewakelive.util.Resource
+import com.onthewake.onthewakelive.core.util.Resource
 
 interface QueueService {
     suspend fun getQueue(): List<Queue>

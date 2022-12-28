@@ -1,9 +1,10 @@
-package com.onthewake.onthewakelive
+package com.onthewake.onthewakelive.core.presentation
 
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
@@ -12,13 +13,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.onthewake.onthewakelive.core.presentation.StandardScaffold
 import com.onthewake.onthewakelive.core.presentation.ui.theme.OnTheWakeLiveTheme
 import com.onthewake.onthewakelive.navigation.Screen
 import com.onthewake.onthewakelive.navigation.SetupNavGraph
-import com.onthewake.onthewakelive.util.Constants
-import com.onthewake.onthewakelive.util.Constants.ADMIN_IDS
-import com.onthewake.onthewakelive.util.UserProfileSerializer
+import com.onthewake.onthewakelive.core.util.Constants
+import com.onthewake.onthewakelive.core.util.Constants.ADMIN_IDS
+import com.onthewake.onthewakelive.core.util.UserProfileSerializer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -27,6 +27,7 @@ val Context.dataStore by dataStore(
     serializer = UserProfileSerializer
 )
 
+@ExperimentalAnimationApi
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi
 @ExperimentalMaterialApi

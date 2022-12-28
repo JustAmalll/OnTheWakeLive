@@ -7,9 +7,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onthewake.onthewakelive.feature_trick_list.domain.repository.TrickListRepository
-import com.onthewake.onthewakelive.feature_trick_list.presentation.TrickListState
-import com.onthewake.onthewakelive.util.Constants
-import com.onthewake.onthewakelive.util.Resource
+import com.onthewake.onthewakelive.core.util.Constants
+import com.onthewake.onthewakelive.core.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -38,9 +37,11 @@ class TrickListViewModel @Inject constructor(
             state = state.copy(isLoading = true)
             when (val result = trickListRepository.getUsersTrickList(userId)) {
                 is Resource.Success -> {
-                    state = state.copy(allTrickList = result.data)
+                    state = state.copy(userTrickList = result.data)
                 }
-                is Resource.Error -> {}
+                is Resource.Error -> {
+                    _snackBarEvent.emit(result.message ?: "Unknown Error")
+                }
             }
             state = state.copy(isLoading = false)
         }

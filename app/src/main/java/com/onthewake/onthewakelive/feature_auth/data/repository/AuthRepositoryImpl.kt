@@ -12,10 +12,10 @@ import com.onthewake.onthewakelive.feature_auth.data.remote.request.AuthRequest
 import com.onthewake.onthewakelive.feature_auth.data.remote.request.CreateAccountRequest
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.feature_auth.domain.repository.AuthRepository
-import com.onthewake.onthewakelive.util.Constants
-import com.onthewake.onthewakelive.util.Constants.PREFS_FIRST_NAME
-import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
-import com.onthewake.onthewakelive.util.Constants.PREFS_USER_ID
+import com.onthewake.onthewakelive.core.util.Constants
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_FIRST_NAME
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_JWT_TOKEN
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_USER_ID
 import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume

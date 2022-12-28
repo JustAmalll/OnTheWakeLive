@@ -24,7 +24,6 @@
     <string name="unknown_error">An unknown error occurred</string>
     <string name="couldnt_reach_server">Oops! Couldn\'t reach server. Check your internet connection.</string>
     <string name="something_went_wrong">Oops! Something went wrong. Please try again.</string>
-    <string name="empty_users_trick_list">Oops! User trick list is empty</string>
     <string name="incorrect_data">Incorrect phone number or password</string>
 
     <string name="login">Login</string>
@@ -84,5 +83,27 @@
     <string name="edit_profile_date_of_birth">Date of Birth (dd/mm/yyyy)</string>
     <string name="nothing_to_update">Nothing to update</string>
     <string name="edit">Edit</string>
+
+    // Tricks category
+    <string name="spins" translatable="false">Spins</string>
+    <string name="railey" translatable="false">Railey</string>
+    <string name="railey_tricks" translatable="false">Railey Tricks</string>
+    <string name="back_roll" translatable="false">Back Roll</string>
+    <string name="back_roll_tricks" translatable="false">Back Roll Tricks</string>
+    <string name="front_flip" translatable="false">Front Flip</string>
+    <string name="front_flip_tricks" translatable="false">Front Flip Tricks</string>
+    <string name="front_roll" translatable="false">Front Roll</string>
+    <string name="front_roll_tricks" translatable="false">Front Roll Tricks</string>
+    <string name="tantrum" translatable="false">Tantrum</string>
+    <string name="tantrum_tricks" translatable="false">Tantrum Tricks</string>
+    <string name="whip" translatable="false">Whip</string>
+    <string name="whip_tricks" translatable="false">Whip Tricks</string>
+    <string name="grabs" translatable="false">Grabs</string>
+    <string name="rails" translatable="false">Rails</string>
+
+    <string name="icon_done">Done Icon</string>
+    <string name="finish_setup">Finish setup</string>
+    <string name="filter_icon">Filter Icon</string>
+    <string name="trick_list">Trick List</string>
 
 </resources>

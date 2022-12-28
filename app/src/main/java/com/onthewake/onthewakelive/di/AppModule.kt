@@ -10,8 +10,8 @@ import com.google.firebase.storage.ktx.storage
 import com.google.gson.Gson
 import com.onthewake.onthewakelive.feature_trick_list.data.local.Converters
 import com.onthewake.onthewakelive.feature_trick_list.data.local.TrickListDatabase
-import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
-import com.onthewake.onthewakelive.util.GsonParser
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_JWT_TOKEN
+import com.onthewake.onthewakelive.core.util.GsonParser
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

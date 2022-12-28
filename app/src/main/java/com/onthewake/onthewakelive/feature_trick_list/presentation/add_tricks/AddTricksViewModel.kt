@@ -6,12 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.onthewake.onthewakelive.feature_trick_list.data.remote.dto.TrickListDto
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_USER_ID
+import com.onthewake.onthewakelive.core.util.Resource
 import com.onthewake.onthewakelive.feature_trick_list.domain.model.TrickList
 import com.onthewake.onthewakelive.feature_trick_list.domain.repository.TrickListRepository
-import com.onthewake.onthewakelive.feature_trick_list.presentation.TrickListState
-import com.onthewake.onthewakelive.util.Constants.PREFS_USER_ID
-import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,7 +22,7 @@ class AddTricksViewModel @Inject constructor(
     prefs: SharedPreferences
 ) : ViewModel() {
 
-    var state by mutableStateOf(TrickListState())
+    var state by mutableStateOf(AddTrickListState())
 
     private val _snackBarEvent = MutableSharedFlow<String>()
     val snackBarEvent = _snackBarEvent.asSharedFlow()
@@ -53,22 +51,21 @@ class AddTricksViewModel @Inject constructor(
 
     private fun getUsersTrickList(userId: String) {
         viewModelScope.launch {
-            val result = trickListRepository.getUsersTrickList(userId)
-            state = when (result) {
+            when (val result = trickListRepository.getUsersTrickList(userId)) {
                 is Resource.Success -> {
-                    state.copy(userTrickList = result.data ?: TrickList())
+                    state = state.copy(userTrickList = result.data ?: TrickList())
                 }
                 is Resource.Error -> {
-                    state.copy(userTrickList = TrickList())
+                    _snackBarEvent.emit(result.message ?: "Unknown Error")
                 }
             }
         }
     }
 
-    fun addTrick(trickListDto: TrickListDto) {
+    fun addTrick(trickList: TrickList) {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
-            when (val result = trickListRepository.addTrickList(trickListDto)) {
+            when (val result = trickListRepository.addTrickList(trickList)) {
                 is Resource.Success -> {
                     _snackBarEvent.emit("Success!")
                 }

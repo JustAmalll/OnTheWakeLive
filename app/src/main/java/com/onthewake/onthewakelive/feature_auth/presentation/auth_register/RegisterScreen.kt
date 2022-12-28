@@ -29,7 +29,7 @@ import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.StandardTextField
 import com.onthewake.onthewakelive.feature_auth.domain.models.AuthResult
 import com.onthewake.onthewakelive.navigation.Screen
-import com.onthewake.onthewakelive.util.toJson
+import com.onthewake.onthewakelive.core.util.toJson
 import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterial3Api

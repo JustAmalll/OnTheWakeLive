@@ -7,22 +7,18 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -45,21 +41,16 @@ import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.AnimatedShimmer
-import com.onthewake.onthewakelive.core.presentation.StandardImageView
-import com.onthewake.onthewakelive.dataStore
-import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
-import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.AdminDialog
-import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.EmptyContent
-import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.TabLayout
+import com.onthewake.onthewakelive.core.presentation.dataStore
+import com.onthewake.onthewakelive.core.util.Constants.ADMIN_IDS
+import com.onthewake.onthewakelive.core.util.UserProfileSerializer
+import com.onthewake.onthewakelive.core.util.openNotificationSettings
+import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.*
 import com.onthewake.onthewakelive.navigation.Screen
-import com.onthewake.onthewakelive.util.Constants.ADMIN_IDS
-import com.onthewake.onthewakelive.util.UserProfileSerializer
-import com.onthewake.onthewakelive.util.openNotificationSettings
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import me.saket.swipe.SwipeAction
-import me.saket.swipe.SwipeableActionsBox
 
+@ExperimentalAnimationApi
 @ExperimentalPagerApi
 @Composable
 fun QueueScreen(
@@ -224,51 +215,50 @@ fun QueueScreen(
         ) {
             TabLayout(pagerState = pagerState)
 
-            if (state.isQueueLoading) {
-                repeat(5) { AnimatedShimmer() }
-            }
-
-            AnimatedVisibility(
-                visible = !state.isQueueLoading,
-                exit = fadeOut(targetAlpha = 1f)
-            ) {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.padding(bottom = if (userId in ADMIN_IDS) 0.dp else 76.dp)
-                ) { page ->
-                    when (page) {
-                        0 -> QueueLeftContent(
-                            state = state,
-                            userId = userId,
-                            imageLoader = imageLoader,
-                            onDetailsClicked = { queueItemId ->
-                                navController.navigate(
-                                    Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
-                                )
-                            },
-                            onSwipeToDelete = { viewModel.deleteQueueItem(it) },
-                            onUserAvatarClicked = { pictureUrl ->
-                                if (pictureUrl.isNotEmpty()) navController.navigate(
-                                    Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
-                                )
-                            }
-                        )
-                        1 -> QueueRightContent(
-                            state = state,
-                            userId = userId,
-                            imageLoader = imageLoader,
-                            onDetailsClicked = { queueItemId ->
-                                 navController.navigate(
-                                    Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
-                                )
-                            },
-                            onSwipeToDelete = { viewModel.deleteQueueItem(it) },
-                            onUserAvatarClicked = { pictureUrl ->
-                                if (pictureUrl.isNotEmpty()) navController.navigate(
-                                    Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
-                                )
-                            }
-                        )
+            AnimatedContent(targetState = state.isQueueLoading) { isLoading ->
+                if (isLoading) {
+                    Column {
+                        repeat(5) { AnimatedShimmer() }
+                    }
+                } else {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.padding(bottom = if (userId in ADMIN_IDS) 0.dp else 76.dp)
+                    ) { page ->
+                        when (page) {
+                            0 -> QueueLeftContent(
+                                state = state,
+                                userId = userId,
+                                imageLoader = imageLoader,
+                                onDetailsClicked = { queueItemId ->
+                                    navController.navigate(
+                                        Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
+                                    )
+                                },
+                                onSwipeToDelete = { viewModel.deleteQueueItem(it) },
+                                onUserAvatarClicked = { pictureUrl ->
+                                    if (pictureUrl.isNotEmpty()) navController.navigate(
+                                        Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
+                                    )
+                                }
+                            )
+                            1 -> QueueRightContent(
+                                state = state,
+                                userId = userId,
+                                imageLoader = imageLoader,
+                                onDetailsClicked = { queueItemId ->
+                                    navController.navigate(
+                                        Screen.QueueDetailsScreen.passItemId(itemId = queueItemId)
+                                    )
+                                },
+                                onSwipeToDelete = { viewModel.deleteQueueItem(it) },
+                                onUserAvatarClicked = { pictureUrl ->
+                                    if (pictureUrl.isNotEmpty()) navController.navigate(
+                                        Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -276,6 +266,7 @@ fun QueueScreen(
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun QueueLeftContent(
     state: QueueState,
@@ -290,10 +281,9 @@ fun QueueLeftContent(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (leftQueue.isEmpty()) {
-            EmptyContent(modifier = Modifier.align(Alignment.Center))
-        } else {
-            LazyColumn(
+        AnimatedContent(targetState = leftQueue.isEmpty()) { isLeftQueueEmpty ->
+            if (isLeftQueueEmpty) EmptyContent(modifier = Modifier.align(Alignment.Center))
+            else LazyColumn(
                 contentPadding = PaddingValues(10.dp),
                 reverseLayout = true
             ) {
@@ -312,6 +302,7 @@ fun QueueLeftContent(
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun QueueRightContent(
     state: QueueState,
@@ -326,10 +317,9 @@ fun QueueRightContent(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (rightQueue.isEmpty()) {
-            EmptyContent(modifier = Modifier.align(Alignment.Center))
-        } else {
-            LazyColumn(
+        AnimatedContent(targetState = rightQueue.isEmpty()) { isRightQueueEmpty ->
+            if (isRightQueueEmpty) EmptyContent(modifier = Modifier.align(Alignment.Center))
+            else LazyColumn(
                 contentPadding = PaddingValues(10.dp),
                 reverseLayout = true
             ) {
@@ -345,121 +335,5 @@ fun QueueRightContent(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun QueueItem(
-    queueItem: Queue,
-    userId: String?,
-    imageLoader: ImageLoader,
-    onDetailsClicked: (String) -> Unit,
-    onSwipeToDelete: (String) -> Unit,
-    onUserAvatarClicked: (String) -> Unit
-) {
-    val haptic = LocalHapticFeedback.current
-    val isAdminQueueItem = queueItem.userId in ADMIN_IDS
-
-    val swipeToDelete = SwipeAction(
-        icon = {
-            Icon(
-                modifier = Modifier.padding(end = 20.dp),
-                imageVector = Icons.Default.Delete,
-                contentDescription = stringResource(id = R.string.delete_icon),
-                tint = MaterialTheme.colorScheme.onError
-            )
-        },
-        background = MaterialTheme.colorScheme.error,
-        onSwipe = {
-            onSwipeToDelete(queueItem.id)
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        }
-    )
-
-    Spacer(modifier = Modifier.height(12.dp))
-
-    if (queueItem.userId == userId || userId in ADMIN_IDS) {
-        SwipeableActionsBox(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(shape = MaterialTheme.shapes.medium)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable { if (!isAdminQueueItem) onDetailsClicked(queueItem.id) },
-            startActions = listOf(swipeToDelete),
-            swipeThreshold = 100.dp
-        ) {
-            if (isAdminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
-            else DefaultUserItem(
-                queueItem = queueItem,
-                imageLoader = imageLoader,
-                onDetailsClicked = onDetailsClicked,
-                onUserAvatarClicked = onUserAvatarClicked
-            )
-        }
-    } else {
-        if (isAdminQueueItem) UserAddedByAdminItem(firstName = queueItem.firstName)
-        else DefaultUserItem(
-            queueItem = queueItem,
-            imageLoader = imageLoader,
-            onDetailsClicked = onDetailsClicked,
-            onUserAvatarClicked = onUserAvatarClicked
-        )
-    }
-}
-
-@Composable
-fun DefaultUserItem(
-    queueItem: Queue,
-    imageLoader: ImageLoader,
-    onDetailsClicked: (String) -> Unit,
-    onUserAvatarClicked: (String) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onDetailsClicked(queueItem.id) }
-            .clip(shape = MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        StandardImageView(
-            imageLoader = imageLoader,
-            model = queueItem.profilePictureUri,
-            onUserAvatarClicked = onUserAvatarClicked
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column {
-            Text(
-                text = queueItem.firstName,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(1.dp))
-            Text(
-                text = queueItem.lastName,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-fun UserAddedByAdminItem(firstName: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape = MaterialTheme.shapes.medium)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = firstName,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
     }
 }

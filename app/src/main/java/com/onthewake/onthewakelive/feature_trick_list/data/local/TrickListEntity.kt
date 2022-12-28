@@ -2,21 +2,21 @@ package com.onthewake.onthewakelive.feature_trick_list.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.onthewake.onthewakelive.feature_trick_list.domain.model.TrickItem
+import com.onthewake.onthewakelive.feature_trick_list.data.remote.dto.TrickItem
 import com.onthewake.onthewakelive.feature_trick_list.domain.model.TrickList
 
 @Entity
 data class TrickListEntity(
     @PrimaryKey val id: Int? = null,
-    val spins: List<TrickItem>,
-    val raileyTricks: List<TrickItem>,
-    val backRollTricks: List<TrickItem>,
-    val frontFlipTricks: List<TrickItem>,
-    val frontRollTricks: List<TrickItem>,
-    val tantrumTricks: List<TrickItem>,
-    val whipTricks: List<TrickItem>,
-    val grabs: List<TrickItem>,
-    val rails: List<TrickItem>
+    val spins: List<TrickItem> = emptyList(),
+    val raileyTricks: List<TrickItem> = emptyList(),
+    val backRollTricks: List<TrickItem> = emptyList(),
+    val frontFlipTricks: List<TrickItem> = emptyList(),
+    val frontRollTricks: List<TrickItem> = emptyList(),
+    val tantrumTricks: List<TrickItem> = emptyList(),
+    val whipTricks: List<TrickItem> = emptyList(),
+    val grabs: List<TrickItem> = emptyList(),
+    val rails: List<TrickItem> = emptyList()
 )
 
 fun TrickListEntity.toTrickList(): TrickList = TrickList(

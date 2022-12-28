@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,13 +31,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
-import com.onthewake.onthewakelive.feature_trick_list.data.remote.dto.TrickListDto
-import com.onthewake.onthewakelive.feature_trick_list.presentation.TrickItemState
+import com.onthewake.onthewakelive.core.presentation.components.StandardLoadingView
+import com.onthewake.onthewakelive.feature_trick_list.domain.model.TrickList
 import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.components.DefaultFilterChip
 import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.components.SelectableItem
 import com.onthewake.onthewakelive.feature_trick_list.presentation.components.CategoryTextView
-import com.onthewake.onthewakelive.feature_trick_list.presentation.toTrickItemDto
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -50,14 +50,18 @@ fun AddTricksScreen(
     val trickList = viewModel.state.allTrickList
     val userTrickList = viewModel.state.userTrickList
 
+    val listState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     val snackBarHostState = remember { SnackbarHostState() }
+
     val systemUiController = rememberSystemUiController()
     val darkTheme = isSystemInDarkTheme()
     val surfaceColor = MaterialTheme.colorScheme.surface
 
     val sheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
+
     val scope = rememberCoroutineScope()
 
     var spinsSelected by remember { mutableStateOf(true) }
@@ -69,8 +73,6 @@ fun AddTricksScreen(
     var whipTricksSelected by remember { mutableStateOf(true) }
     var grabsSelected by remember { mutableStateOf(true) }
     var railsSelected by remember { mutableStateOf(true) }
-
-    val listState = rememberLazyListState()
 
     val expandedFab by remember {
         derivedStateOf { !listState.isScrollInProgress }
@@ -95,7 +97,7 @@ fun AddTricksScreen(
 
     if (trickList != null && userTrickList != null && !viewModel.state.isLoading) {
 
-        var spinItems by remember {
+        var spins by remember {
             mutableStateOf(trickList.spins.map {
                 TrickItemState(
                     name = it.name,
@@ -104,7 +106,7 @@ fun AddTricksScreen(
                 )
             })
         }
-        var raileyTrickItems by remember {
+        var raileyTricks by remember {
             mutableStateOf(trickList.raileyTricks.map {
                 TrickItemState(
                     name = it.name,
@@ -113,7 +115,7 @@ fun AddTricksScreen(
                 )
             })
         }
-        var backRollTrickItems by remember {
+        var backRollTricks by remember {
             mutableStateOf(trickList.backRollTricks.map {
                 TrickItemState(
                     name = it.name,
@@ -122,7 +124,7 @@ fun AddTricksScreen(
                 )
             })
         }
-        var frontFlipTrickItems by remember {
+        var frontFlipTricks by remember {
             mutableStateOf(trickList.frontFlipTricks.map {
                 TrickItemState(
                     name = it.name,
@@ -131,7 +133,7 @@ fun AddTricksScreen(
                 )
             })
         }
-        var frontRollTrickItems by remember {
+        var frontRollTricks by remember {
             mutableStateOf(trickList.frontRollTricks.map {
                 TrickItemState(
                     name = it.name,
@@ -140,7 +142,7 @@ fun AddTricksScreen(
                 )
             })
         }
-        var tantrumTrickItems by remember {
+        var tantrumTricks by remember {
             mutableStateOf(trickList.tantrumTricks.map {
                 TrickItemState(
                     name = it.name,
@@ -149,7 +151,7 @@ fun AddTricksScreen(
                 )
             })
         }
-        var whipTrickItems by remember {
+        var whipTricks by remember {
             mutableStateOf(trickList.whipTricks.map {
                 TrickItemState(
                     name = it.name,
@@ -158,7 +160,7 @@ fun AddTricksScreen(
                 )
             })
         }
-        var grabItems by remember {
+        var grabs by remember {
             mutableStateOf(trickList.grabs.map {
                 TrickItemState(
                     name = it.name,
@@ -167,7 +169,7 @@ fun AddTricksScreen(
                 )
             })
         }
-        var railItems by remember {
+        var rails by remember {
             mutableStateOf(trickList.rails.map {
                 TrickItemState(
                     name = it.name,
@@ -185,12 +187,12 @@ fun AddTricksScreen(
             topBar = {
                 TopAppBar(
                     scrollBehavior = scrollBehavior,
-                    title = { Text(text = "Trick List") },
+                    title = { Text(text = stringResource(R.string.trick_list)) },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Arrow Back"
+                                contentDescription = stringResource(R.string.arrow_back_icon)
                             )
                         }
                     },
@@ -203,7 +205,7 @@ fun AddTricksScreen(
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_filter),
-                                contentDescription = "Filter Icon"
+                                contentDescription = stringResource(R.string.filter_icon)
                             )
                         }
                     }
@@ -236,57 +238,51 @@ fun AddTricksScreen(
                         )
                         Row(modifier = Modifier.padding(top = 16.dp)) {
                             DefaultFilterChip(
-                                label = "Spins",
+                                label = stringResource(R.string.spins),
                                 selected = spinsSelected,
                                 onClick = { spinsSelected = !spinsSelected }
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
                             DefaultFilterChip(
-                                label = "Railey",
+                                label = stringResource(R.string.railey),
                                 selected = raileyTricksSelected,
                                 onClick = { raileyTricksSelected = !raileyTricksSelected }
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
                             DefaultFilterChip(
-                                label = "Back Roll",
+                                label = stringResource(R.string.back_roll),
                                 selected = backRollTricksSelected,
                                 onClick = { backRollTricksSelected = !backRollTricksSelected }
                             )
                         }
                         Row {
                             DefaultFilterChip(
-                                label = "Front Flip",
+                                label = stringResource(R.string.front_flip),
                                 selected = frontFlipTricksSelected,
                                 onClick = { frontFlipTricksSelected = !frontFlipTricksSelected }
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
                             DefaultFilterChip(
-                                label = "Front Roll",
+                                label = stringResource(R.string.front_roll),
                                 selected = frontRollTricksSelected,
                                 onClick = { frontRollTricksSelected = !frontRollTricksSelected }
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
                             DefaultFilterChip(
-                                label = "Tantrum",
+                                label = stringResource(R.string.tantrum),
                                 selected = tantrumTricksSelected,
                                 onClick = { tantrumTricksSelected = !tantrumTricksSelected }
                             )
                         }
                         Row {
                             DefaultFilterChip(
-                                label = "Whip",
+                                label = stringResource(R.string.whip),
                                 selected = whipTricksSelected,
                                 onClick = { whipTricksSelected = !whipTricksSelected }
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
                             DefaultFilterChip(
-                                label = "Grabs",
+                                label = stringResource(R.string.grabs),
                                 selected = grabsSelected,
                                 onClick = { grabsSelected = !grabsSelected }
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
                             DefaultFilterChip(
-                                label = "Rails",
+                                label = stringResource(R.string.rails),
                                 selected = railsSelected,
                                 onClick = { railsSelected = !railsSelected }
                             )
@@ -297,36 +293,36 @@ fun AddTricksScreen(
             floatingActionButton = {
                 ExtendedFloatingActionButton(
                     onClick = {
-                        val selectedSpins = spinItems.filter { it.isSelected }
-                        val selectedRaileyTricks = raileyTrickItems.filter { it.isSelected }
-                        val selectedBackRollTricks = backRollTrickItems.filter { it.isSelected }
-                        val selectedFrontFlipTricks = frontFlipTrickItems.filter { it.isSelected }
-                        val selectedFrontRollTricks = frontRollTrickItems.filter { it.isSelected }
-                        val selectedTantrumTricks = tantrumTrickItems.filter { it.isSelected }
-                        val selectedWhipTricks = whipTrickItems.filter { it.isSelected }
-                        val selectedGrabs = grabItems.filter { it.isSelected }
-                        val selectedRails = railItems.filter { it.isSelected }
+                        val selectedSpins = spins.filter { it.isSelected }
+                        val selectedRaileyTricks = raileyTricks.filter { it.isSelected }
+                        val selectedBackRollTricks = backRollTricks.filter { it.isSelected }
+                        val selectedFrontFlipTricks = frontFlipTricks.filter { it.isSelected }
+                        val selectedFrontRollTricks = frontRollTricks.filter { it.isSelected }
+                        val selectedTantrumTricks = tantrumTricks.filter { it.isSelected }
+                        val selectedWhipTricks = whipTricks.filter { it.isSelected }
+                        val selectedGrabs = grabs.filter { it.isSelected }
+                        val selectedRails = rails.filter { it.isSelected }
 
-                        val trickListDto = TrickListDto(
-                            spins = selectedSpins.map { it.toTrickItemDto() },
-                            raileyTricks = selectedRaileyTricks.map { it.toTrickItemDto() },
-                            backRollTricks = selectedBackRollTricks.map { it.toTrickItemDto() },
-                            frontFlipTricks = selectedFrontFlipTricks.map { it.toTrickItemDto() },
-                            frontRollTricks = selectedFrontRollTricks.map { it.toTrickItemDto() },
-                            tantrumTricks = selectedTantrumTricks.map { it.toTrickItemDto() },
-                            whipTricks = selectedWhipTricks.map { it.toTrickItemDto() },
-                            grabs = selectedGrabs.map { it.toTrickItemDto() },
-                            rails = selectedRails.map { it.toTrickItemDto() },
+                        val selectedTrickList = TrickList(
+                            spins = selectedSpins.map { it.toTrickItem() },
+                            raileyTricks = selectedRaileyTricks.map { it.toTrickItem() },
+                            backRollTricks = selectedBackRollTricks.map { it.toTrickItem() },
+                            frontFlipTricks = selectedFrontFlipTricks.map { it.toTrickItem() },
+                            frontRollTricks = selectedFrontRollTricks.map { it.toTrickItem() },
+                            tantrumTricks = selectedTantrumTricks.map { it.toTrickItem() },
+                            whipTricks = selectedWhipTricks.map { it.toTrickItem() },
+                            grabs = selectedGrabs.map { it.toTrickItem() },
+                            rails = selectedRails.map { it.toTrickItem() },
                         )
 
-                        viewModel.addTrick(trickListDto)
+                        viewModel.addTrick(selectedTrickList)
                     },
                     modifier = Modifier.padding(
                         bottom = BottomSheetScaffoldDefaults.SheetPeekHeight + 16.dp
                     ),
                     expanded = expandedFab,
-                    icon = { Icon(Icons.Filled.Done, "Done Icon") },
-                    text = { Text(text = "Finish setup") },
+                    icon = { Icon(Icons.Filled.Done, stringResource(R.string.icon_done)) },
+                    text = { Text(text = stringResource(R.string.finish_setup)) },
                 )
             },
         ) { paddingValues ->
@@ -338,107 +334,119 @@ fun AddTricksScreen(
                     .padding(top = paddingValues.calculateTopPadding())
             ) {
                 if (spinsSelected) {
-                    item { CategoryTextView(text = "Spins") }
-                    items(spinItems.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(id = R.string.spins))
+                    }
+                    itemsIndexed(spins) { index, spinItem ->
                         SelectableItem(
-                            title = spinItems[index].name,
-                            subtitle = spinItems[index].description,
-                            selected = spinItems[index].isSelected,
-                            onClick = { spinItems = onItemClick(spinItems, index) }
+                            title = spinItem.name,
+                            subtitle = spinItem.description,
+                            selected = spinItem.isSelected,
+                            onClick = { spins = onItemClick(spins, index) }
                         )
                     }
                 }
                 if (raileyTricksSelected) {
-                    item { CategoryTextView(text = "Railey Tricks") }
-                    items(trickList.raileyTricks.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(R.string.railey_tricks))
+                    }
+                    itemsIndexed(raileyTricks) { index, raileyTrickItem ->
                         SelectableItem(
-                            title = trickList.raileyTricks[index].name,
-                            subtitle = trickList.raileyTricks[index].description,
-                            selected = raileyTrickItems[index].isSelected,
-                            onClick = { raileyTrickItems = onItemClick(raileyTrickItems, index) }
+                            title = raileyTrickItem.name,
+                            subtitle = raileyTrickItem.description,
+                            selected = raileyTrickItem.isSelected,
+                            onClick = { raileyTricks = onItemClick(raileyTricks, index) }
                         )
                     }
                 }
                 if (backRollTricksSelected) {
-                    item { CategoryTextView(text = "Back Roll Tricks") }
-                    items(trickList.backRollTricks.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(R.string.back_roll_tricks))
+                    }
+                    itemsIndexed(backRollTricks) { index, backRollTrick ->
                         SelectableItem(
-                            title = trickList.backRollTricks[index].name,
-                            subtitle = trickList.backRollTricks[index].description,
-                            selected = backRollTrickItems[index].isSelected,
-                            onClick = {
-                                backRollTrickItems = onItemClick(backRollTrickItems, index)
-                            }
+                            title = backRollTrick.name,
+                            subtitle = backRollTrick.description,
+                            selected = backRollTrick.isSelected,
+                            onClick = { backRollTricks = onItemClick(backRollTricks, index) }
                         )
                     }
                 }
                 if (frontFlipTricksSelected) {
-                    item { CategoryTextView(text = "Front Flip Tricks") }
-                    items(trickList.frontFlipTricks.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(R.string.front_flip_tricks))
+                    }
+                    itemsIndexed(frontFlipTricks) { index, frontFlipTrick ->
                         SelectableItem(
-                            title = trickList.frontFlipTricks[index].name,
-                            subtitle = trickList.frontFlipTricks[index].description,
-                            selected = frontFlipTrickItems[index].isSelected,
-                            onClick = {
-                                frontFlipTrickItems = onItemClick(frontFlipTrickItems, index)
-                            }
+                            title = frontFlipTrick.name,
+                            subtitle = frontFlipTrick.description,
+                            selected = frontFlipTrick.isSelected,
+                            onClick = { frontFlipTricks = onItemClick(frontFlipTricks, index) }
                         )
                     }
                 }
                 if (frontRollTricksSelected) {
-                    item { CategoryTextView(text = "Front Roll Tricks") }
-                    items(trickList.frontRollTricks.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(R.string.front_roll_tricks))
+                    }
+                    itemsIndexed(frontRollTricks) { index, frontRollTrick ->
                         SelectableItem(
-                            title = trickList.frontRollTricks[index].name,
-                            subtitle = trickList.frontRollTricks[index].description,
-                            selected = frontRollTrickItems[index].isSelected,
-                            onClick = {
-                                frontRollTrickItems = onItemClick(frontRollTrickItems, index)
-                            }
+                            title = frontRollTrick.name,
+                            subtitle = frontRollTrick.description,
+                            selected = frontRollTrick.isSelected,
+                            onClick = { frontRollTricks = onItemClick(frontRollTricks, index) }
                         )
                     }
                 }
                 if (tantrumTricksSelected) {
-                    item { CategoryTextView(text = "Tantrum Tricks") }
-                    items(trickList.tantrumTricks.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(R.string.tantrum_tricks))
+                    }
+                    itemsIndexed(tantrumTricks) { index, tantrumTrick ->
                         SelectableItem(
-                            title = trickList.tantrumTricks[index].name,
-                            subtitle = trickList.tantrumTricks[index].description,
-                            selected = tantrumTrickItems[index].isSelected,
-                            onClick = { tantrumTrickItems = onItemClick(tantrumTrickItems, index) }
+                            title = tantrumTrick.name,
+                            subtitle = tantrumTrick.description,
+                            selected = tantrumTrick.isSelected,
+                            onClick = { tantrumTricks = onItemClick(tantrumTricks, index) }
                         )
                     }
                 }
                 if (whipTricksSelected) {
-                    item { CategoryTextView(text = "Whip Tricks") }
-                    items(trickList.whipTricks.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(R.string.whip_tricks))
+                    }
+                    itemsIndexed(whipTricks) { index, whipTrick ->
                         SelectableItem(
-                            title = trickList.whipTricks[index].name,
-                            subtitle = trickList.whipTricks[index].description,
-                            selected = whipTrickItems[index].isSelected,
-                            onClick = { whipTrickItems = onItemClick(whipTrickItems, index) }
+                            title = whipTrick.name,
+                            subtitle = whipTrick.description,
+                            selected = whipTrick.isSelected,
+                            onClick = { whipTricks = onItemClick(whipTricks, index) }
                         )
                     }
                 }
                 if (grabsSelected) {
-                    item { CategoryTextView(text = "Grabs") }
-                    items(trickList.grabs.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(R.string.grabs))
+                    }
+                    itemsIndexed(grabs) { index, grab ->
                         SelectableItem(
-                            title = trickList.grabs[index].name,
-                            subtitle = trickList.grabs[index].description,
-                            selected = grabItems[index].isSelected,
-                            onClick = { grabItems = onItemClick(grabItems, index) }
+                            title = grab.name,
+                            subtitle = grab.description,
+                            selected = grab.isSelected,
+                            onClick = { grabs = onItemClick(grabs, index) }
                         )
                     }
                 }
                 if (railsSelected) {
-                    item { CategoryTextView(text = "Rails") }
-                    items(trickList.rails.size) { index ->
+                    item {
+                        CategoryTextView(text = stringResource(R.string.rails))
+                    }
+                    itemsIndexed(rails) { index, railItem ->
                         SelectableItem(
-                            title = trickList.rails[index].name,
-                            subtitle = trickList.rails[index].description,
-                            selected = railItems[index].isSelected,
-                            onClick = { railItems = onItemClick(railItems, index) }
+                            title = railItem.name,
+                            subtitle = railItem.description,
+                            selected = railItem.isSelected,
+                            onClick = { rails = onItemClick(rails, index) }
                         )
                     }
                 }
@@ -447,8 +455,8 @@ fun AddTricksScreen(
     } else StandardLoadingView()
 }
 
-fun onItemClick(itemList: List<TrickItemState>, index: Int): List<TrickItemState> {
-    return itemList.mapIndexed { j, items ->
-        if (index == j) items.copy(isSelected = !items.isSelected) else items
-    }
+fun onItemClick(
+    itemList: List<TrickItemState>, index: Int
+): List<TrickItemState> = itemList.mapIndexed { j, items ->
+    if (index == j) items.copy(isSelected = !items.isSelected) else items
 }

@@ -2,7 +2,6 @@ package com.onthewake.onthewakelive.feature_queue.presentation.queue_list
 
 import android.app.Application
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,13 +10,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.onthewake.onthewakelive.R
+import com.onthewake.onthewakelive.core.util.Constants.ADMIN_IDS
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_FIRST_NAME
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_USER_ID
+import com.onthewake.onthewakelive.core.util.Resource
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueService
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueSocketService
 import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
-import com.onthewake.onthewakelive.util.Constants.ADMIN_IDS
-import com.onthewake.onthewakelive.util.Constants.PREFS_FIRST_NAME
-import com.onthewake.onthewakelive.util.Constants.PREFS_USER_ID
-import com.onthewake.onthewakelive.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -161,10 +160,5 @@ class QueueViewModel @Inject constructor(
         viewModelScope.launch {
             queueSocketService.closeSession()
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        Log.i("onCleared()", "onCleared()")
     }
 }

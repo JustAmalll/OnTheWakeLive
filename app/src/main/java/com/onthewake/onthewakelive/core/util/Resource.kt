@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.util
+package com.onthewake.onthewakelive.core.util
 
 typealias SimpleResource = Resource<Unit>
 

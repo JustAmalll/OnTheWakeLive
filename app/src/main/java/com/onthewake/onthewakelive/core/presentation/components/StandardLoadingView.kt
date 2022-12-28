@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.core.presentation
+package com.onthewake.onthewakelive.core.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

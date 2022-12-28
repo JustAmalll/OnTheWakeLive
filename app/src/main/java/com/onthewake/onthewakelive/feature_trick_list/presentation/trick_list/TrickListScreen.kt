@@ -1,9 +1,12 @@
 package com.onthewake.onthewakelive.feature_trick_list.presentation.trick_list
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -13,15 +16,18 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
+import com.onthewake.onthewakelive.R
+import com.onthewake.onthewakelive.core.presentation.components.StandardLoadingView
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components.EmptyContent
 import com.onthewake.onthewakelive.feature_trick_list.presentation.components.CategoryTextView
 import com.onthewake.onthewakelive.feature_trick_list.presentation.trick_list.components.TrickItem
 import kotlinx.coroutines.flow.collectLatest
 
+@ExperimentalAnimationApi
 @ExperimentalMaterial3Api
 @Composable
 fun TrickListScreen(
@@ -29,7 +35,7 @@ fun TrickListScreen(
     viewModel: TrickListViewModel = hiltViewModel()
 ) {
 
-    val trickListState = viewModel.state.allTrickList
+    val userTrickListState = viewModel.state.userTrickList
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -45,7 +51,7 @@ fun TrickListScreen(
 
     LaunchedEffect(key1 = true) {
         viewModel.snackBarEvent.collectLatest { message ->
-            snackBarHostState.showSnackbar(message = message, duration = SnackbarDuration.Short)
+            snackBarHostState.showSnackbar(message = message)
         }
     }
 
@@ -55,12 +61,12 @@ fun TrickListScreen(
         topBar = {
             TopAppBar(
                 scrollBehavior = scrollBehavior,
-                title = { Text(text = "Trick List") },
+                title = { Text(text = stringResource(R.string.trick_list)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Arrow Back"
+                            contentDescription = stringResource(R.string.arrow_back_icon)
                         )
                     }
                 }
@@ -68,97 +74,95 @@ fun TrickListScreen(
         }
     ) { paddingValues ->
 
-        if (viewModel.state.isLoading) StandardLoadingView()
-
-        if (trickListState == null && !viewModel.state.isLoading) EmptyContent()
-
-        if (trickListState != null)
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = paddingValues.calculateTopPadding())
-            ) {
-                if (trickListState.spins.isNotEmpty()) {
-                    item { CategoryTextView(text = "Spins") }
-                    items(trickListState.spins.size) { index ->
-                        TrickItem(
-                            title = trickListState.spins[index].name,
-                            subtitle = trickListState.spins[index].description
-                        )
+        AnimatedContent(targetState = viewModel.state.isLoading) { isLoading ->
+            if (isLoading) {
+                StandardLoadingView()
+            } else if (userTrickListState == null) {
+                EmptyContent()
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = paddingValues.calculateTopPadding())
+                ) {
+                    if (userTrickListState.spins.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(id = R.string.spins))
+                        }
+                        items(userTrickListState.spins) { spin ->
+                            TrickItem(title = spin.name, subtitle = spin.description)
+                        }
                     }
-                }
-                if (trickListState.raileyTricks.isNotEmpty()) {
-                    item { CategoryTextView(text = "Railey Tricks") }
-                    items(trickListState.raileyTricks.size) { index ->
-                        TrickItem(
-                            title = trickListState.raileyTricks[index].name,
-                            subtitle = trickListState.raileyTricks[index].description
-                        )
+                    if (userTrickListState.raileyTricks.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(R.string.railey_tricks))
+                        }
+                        items(userTrickListState.raileyTricks) { raileyTrick ->
+                            TrickItem(title = raileyTrick.name, subtitle = raileyTrick.description)
+                        }
                     }
-                }
-                if (trickListState.backRollTricks.isNotEmpty()) {
-                    item { CategoryTextView(text = "Back Roll Tricks") }
-                    items(trickListState.backRollTricks.size) { index ->
-                        TrickItem(
-                            title = trickListState.backRollTricks[index].name,
-                            subtitle = trickListState.backRollTricks[index].description
-                        )
+                    if (userTrickListState.backRollTricks.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(R.string.back_roll_tricks))
+                        }
+                        items(userTrickListState.backRollTricks) { backRollTrick ->
+                            TrickItem(title = backRollTrick.name, subtitle = backRollTrick.description)
+                        }
                     }
-                }
-                if (trickListState.frontFlipTricks.isNotEmpty()) {
-                    item { CategoryTextView(text = "Front Flip Tricks") }
-                    items(trickListState.frontFlipTricks.size) { index ->
-                        TrickItem(
-                            title = trickListState.frontFlipTricks[index].name,
-                            subtitle = trickListState.frontFlipTricks[index].description
-                        )
+                    if (userTrickListState.frontFlipTricks.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(R.string.front_flip_tricks))
+                        }
+                        items(userTrickListState.frontFlipTricks) { frontFlipTrick ->
+                            TrickItem(
+                                title = frontFlipTrick.name, subtitle = frontFlipTrick.description
+                            )
+                        }
                     }
-                }
-                if (trickListState.frontRollTricks.isNotEmpty()) {
-                    item { CategoryTextView(text = "Front Roll Tricks") }
-                    items(trickListState.frontRollTricks.size) { index ->
-                        TrickItem(
-                            title = trickListState.frontRollTricks[index].name,
-                            subtitle = trickListState.frontRollTricks[index].description
-                        )
+                    if (userTrickListState.frontRollTricks.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(R.string.front_roll_tricks))
+                        }
+                        items(userTrickListState.frontRollTricks) { frontRollTrick ->
+                            TrickItem(
+                                title = frontRollTrick.name, subtitle = frontRollTrick.description
+                            )
+                        }
                     }
-                }
-                if (trickListState.tantrumTricks.isNotEmpty()) {
-                    item { CategoryTextView(text = "Tantrum Tricks") }
-                    items(trickListState.tantrumTricks.size) { index ->
-                        TrickItem(
-                            title = trickListState.tantrumTricks[index].name,
-                            subtitle = trickListState.tantrumTricks[index].description
-                        )
+                    if (userTrickListState.tantrumTricks.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(R.string.tantrum_tricks))
+                        }
+                        items(userTrickListState.tantrumTricks) { tantrumTrick ->
+                            TrickItem(title = tantrumTrick.name, subtitle = tantrumTrick.description)
+                        }
                     }
-                }
-                if (trickListState.whipTricks.isNotEmpty()) {
-                    item { CategoryTextView(text = "Whip Tricks") }
-                    items(trickListState.whipTricks.size) { index ->
-                        TrickItem(
-                            title = trickListState.whipTricks[index].name,
-                            subtitle = trickListState.whipTricks[index].description,
-                        )
+                    if (userTrickListState.whipTricks.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(R.string.whip_tricks))
+                        }
+                        items(userTrickListState.whipTricks) { whipTrick ->
+                            TrickItem(title = whipTrick.name, subtitle = whipTrick.description)
+                        }
                     }
-                }
-                if (trickListState.grabs.isNotEmpty()) {
-                    item { CategoryTextView(text = "Grabs") }
-                    items(trickListState.grabs.size) { index ->
-                        TrickItem(
-                            title = trickListState.grabs[index].name,
-                            subtitle = trickListState.grabs[index].description
-                        )
+                    if (userTrickListState.grabs.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(R.string.grabs))
+                        }
+                        items(userTrickListState.grabs) { grab ->
+                            TrickItem(title = grab.name, subtitle = grab.description)
+                        }
                     }
-                }
-                if (trickListState.rails.isNotEmpty()) {
-                    item { CategoryTextView(text = "Rails") }
-                    items(trickListState.rails.size) { index ->
-                        TrickItem(
-                            title = trickListState.rails[index].name,
-                            subtitle = trickListState.rails[index].description
-                        )
+                    if (userTrickListState.rails.isNotEmpty()) {
+                        item {
+                            CategoryTextView(text = stringResource(R.string.rails))
+                        }
+                        items(userTrickListState.rails) { railTrick ->
+                            TrickItem(title = railTrick.name, subtitle = railTrick.description)
+                        }
                     }
                 }
             }
+        }
     }
 }

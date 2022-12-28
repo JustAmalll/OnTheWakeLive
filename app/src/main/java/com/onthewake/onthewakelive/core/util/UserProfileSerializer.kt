@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.util
+package com.onthewake.onthewakelive.core.util
 
 import androidx.datastore.core.Serializer
 import com.onthewake.onthewakelive.feature_profile.domain.module.Profile
@@ -22,9 +22,7 @@ object UserProfileSerializer : Serializer<Profile> {
             profilePictureUri = ""
         )
 
-    override suspend fun readFrom(
-        input: InputStream
-    ): Profile = try {
+    override suspend fun readFrom(input: InputStream): Profile = try {
         Json.decodeFromString(
             deserializer = Profile.serializer(),
             string = input.readBytes().decodeToString()

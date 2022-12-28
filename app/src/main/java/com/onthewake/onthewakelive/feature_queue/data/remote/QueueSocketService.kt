@@ -1,7 +1,7 @@
 package com.onthewake.onthewakelive.feature_queue.data.remote
 
 import com.onthewake.onthewakelive.feature_queue.domain.module.QueueResponse
-import com.onthewake.onthewakelive.util.Resource
+import com.onthewake.onthewakelive.core.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface QueueSocketService {

@@ -35,12 +35,12 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
+import com.onthewake.onthewakelive.core.presentation.components.StandardLoadingView
 import com.onthewake.onthewakelive.core.presentation.StandardTextField
-import com.onthewake.onthewakelive.dataStore
-import com.onthewake.onthewakelive.util.CropActivityResultContract
-import com.onthewake.onthewakelive.util.MaskVisualTransformation
-import com.onthewake.onthewakelive.util.UserProfileSerializer.defaultValue
+import com.onthewake.onthewakelive.core.presentation.dataStore
+import com.onthewake.onthewakelive.core.util.CropActivityResultContract
+import com.onthewake.onthewakelive.core.util.MaskVisualTransformation
+import com.onthewake.onthewakelive.core.util.UserProfileSerializer.defaultValue
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 

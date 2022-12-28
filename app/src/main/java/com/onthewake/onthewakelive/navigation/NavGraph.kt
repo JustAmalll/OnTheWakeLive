@@ -1,5 +1,6 @@
 package com.onthewake.onthewakelive.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -18,14 +19,15 @@ import com.onthewake.onthewakelive.feature_profile.presentation.edit_profile.Edi
 import com.onthewake.onthewakelive.feature_profile.presentation.profile.ProfileScreen
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_details.QueueDetailsScreen
 import com.onthewake.onthewakelive.feature_queue.presentation.queue_list.QueueScreen
-import com.onthewake.onthewakelive.feature_splash.SplashScreen
+import com.onthewake.onthewakelive.feature_splash.presentation.SplashScreen
 import com.onthewake.onthewakelive.feature_trick_list.presentation.add_tricks.AddTricksScreen
 import com.onthewake.onthewakelive.feature_trick_list.presentation.trick_list.TrickListScreen
-import com.onthewake.onthewakelive.util.Constants
-import com.onthewake.onthewakelive.util.Constants.DETAILS_ARGUMENT_KEY
-import com.onthewake.onthewakelive.util.Constants.PICTURE_URL_ARGUMENT_KEY
-import com.onthewake.onthewakelive.util.Constants.USER_ID_ARGUMENT_KEY
+import com.onthewake.onthewakelive.core.util.Constants
+import com.onthewake.onthewakelive.core.util.Constants.DETAILS_ARGUMENT_KEY
+import com.onthewake.onthewakelive.core.util.Constants.PICTURE_URL_ARGUMENT_KEY
+import com.onthewake.onthewakelive.core.util.Constants.USER_ID_ARGUMENT_KEY
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @ExperimentalMaterial3Api
 @ExperimentalPagerApi

@@ -4,37 +4,37 @@ import com.onthewake.onthewakelive.feature_trick_list.data.local.TrickListEntity
 import com.onthewake.onthewakelive.feature_trick_list.domain.model.TrickList
 
 data class TrickListDto(
-    val spins: List<TrickItemDto>,
-    val raileyTricks: List<TrickItemDto>,
-    val backRollTricks: List<TrickItemDto>,
-    val frontFlipTricks: List<TrickItemDto>,
-    val frontRollTricks: List<TrickItemDto>,
-    val tantrumTricks: List<TrickItemDto>,
-    val whipTricks: List<TrickItemDto>,
-    val grabs: List<TrickItemDto>,
-    val rails: List<TrickItemDto>
+    val spins: List<TrickItem> = emptyList(),
+    val raileyTricks: List<TrickItem> = emptyList(),
+    val backRollTricks: List<TrickItem> = emptyList(),
+    val frontFlipTricks: List<TrickItem> = emptyList(),
+    val frontRollTricks: List<TrickItem> = emptyList(),
+    val tantrumTricks: List<TrickItem> = emptyList(),
+    val whipTricks: List<TrickItem> = emptyList(),
+    val grabs: List<TrickItem> = emptyList(),
+    val rails: List<TrickItem> = emptyList()
 )
 
 fun TrickListDto.toTrickListEntity(): TrickListEntity = TrickListEntity(
-    spins = spins.map { it.toTrickItem() },
-    raileyTricks = raileyTricks.map { it.toTrickItem() },
-    backRollTricks = backRollTricks.map { it.toTrickItem() },
-    frontFlipTricks = frontFlipTricks.map { it.toTrickItem() },
-    frontRollTricks = frontRollTricks.map { it.toTrickItem() },
-    tantrumTricks = tantrumTricks.map { it.toTrickItem() },
-    whipTricks = whipTricks.map { it.toTrickItem() },
-    grabs = grabs.map { it.toTrickItem() },
-    rails = rails.map { it.toTrickItem() }
+    spins = spins,
+    raileyTricks = raileyTricks,
+    backRollTricks = backRollTricks,
+    frontFlipTricks = frontFlipTricks,
+    frontRollTricks = frontRollTricks,
+    tantrumTricks = tantrumTricks,
+    whipTricks = whipTricks,
+    grabs = grabs,
+    rails = rails
 )
 
 fun TrickListDto.toTrickList(): TrickList = TrickList(
-    spins = spins.map { it.toTrickItem() },
-    raileyTricks = raileyTricks.map { it.toTrickItem() },
-    backRollTricks = backRollTricks.map { it.toTrickItem() },
-    frontFlipTricks = frontFlipTricks.map { it.toTrickItem() },
-    frontRollTricks = frontRollTricks.map { it.toTrickItem() },
-    tantrumTricks = tantrumTricks.map { it.toTrickItem() },
-    whipTricks = whipTricks.map { it.toTrickItem() },
-    grabs = grabs.map { it.toTrickItem() },
-    rails = rails.map { it.toTrickItem() },
+    spins = spins,
+    raileyTricks = raileyTricks,
+    backRollTricks = backRollTricks,
+    frontFlipTricks = frontFlipTricks,
+    frontRollTricks = frontRollTricks,
+    tantrumTricks = tantrumTricks,
+    whipTricks = whipTricks,
+    grabs = grabs,
+    rails = rails
 )

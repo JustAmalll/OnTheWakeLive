@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.feature_splash
+package com.onthewake.onthewakelive.feature_splash.presentation
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable

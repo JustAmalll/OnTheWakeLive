@@ -1,12 +1,10 @@
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,31 +26,21 @@ fun EmptyContent(modifier: Modifier = Modifier) {
         speed = 1.0f
     )
 
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(key1 = true) {
-        isVisible = true
-    }
-
-    AnimatedVisibility(
-        visible = isVisible, enter = fadeIn(), exit = fadeOut()
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            LottieAnimation(
-                composition = compositionResult.value,
-                progress = { progress },
-                modifier = Modifier.size(240.dp)
-            )
-            Text(
-                text = stringResource(id = R.string.empty_queue_error),
-                fontSize = 17.sp,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Spacer(modifier = Modifier.height(150.dp))
-        }
+        LottieAnimation(
+            composition = compositionResult.value,
+            progress = { progress },
+            modifier = Modifier.size(240.dp)
+        )
+        Text(
+            text = stringResource(id = R.string.empty_queue_error),
+            fontSize = 17.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(150.dp))
     }
 }

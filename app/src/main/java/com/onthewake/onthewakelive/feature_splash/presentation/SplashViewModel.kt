@@ -1,4 +1,4 @@
-package com.onthewake.onthewakelive.feature_splash
+package com.onthewake.onthewakelive.feature_splash.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

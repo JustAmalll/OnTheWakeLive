@@ -3,8 +3,8 @@ package com.onthewake.onthewakelive.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.onthewake.onthewakelive.feature_queue.data.remote.*
-import com.onthewake.onthewakelive.util.Constants
-import com.onthewake.onthewakelive.util.Constants.PREFS_JWT_TOKEN
+import com.onthewake.onthewakelive.core.util.Constants
+import com.onthewake.onthewakelive.core.util.Constants.PREFS_JWT_TOKEN
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

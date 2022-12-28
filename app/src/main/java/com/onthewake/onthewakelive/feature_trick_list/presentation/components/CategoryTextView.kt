@@ -10,6 +10,8 @@ import androidx.compose.ui.unit.dp
 fun CategoryTextView(text: String) {
     Text(
         text = text,
-        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .padding(top = 16.dp, bottom = 6.dp)
     )
 }

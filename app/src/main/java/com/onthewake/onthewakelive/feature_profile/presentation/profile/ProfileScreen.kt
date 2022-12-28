@@ -27,11 +27,11 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.FormattedDateOfBirth
 import com.onthewake.onthewakelive.core.presentation.StandardImageView
-import com.onthewake.onthewakelive.core.presentation.StandardLoadingView
-import com.onthewake.onthewakelive.dataStore
+import com.onthewake.onthewakelive.core.presentation.components.StandardLoadingView
+import com.onthewake.onthewakelive.core.presentation.dataStore
 import com.onthewake.onthewakelive.navigation.Screen
-import com.onthewake.onthewakelive.util.UserProfileSerializer.defaultValue
-import com.onthewake.onthewakelive.util.openInstagramProfile
+import com.onthewake.onthewakelive.core.util.UserProfileSerializer.defaultValue
+import com.onthewake.onthewakelive.core.util.openInstagramProfile
 import kotlinx.coroutines.flow.collectLatest
 
 @ExperimentalMaterial3Api

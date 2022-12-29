@@ -16,7 +16,7 @@ import com.onthewake.onthewakelive.core.util.Constants.PREFS_USER_ID
 import com.onthewake.onthewakelive.core.util.Resource
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueService
 import com.onthewake.onthewakelive.feature_queue.data.remote.QueueSocketService
-import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
+import com.onthewake.onthewakelive.feature_queue.domain.module.QueueItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -40,7 +40,7 @@ class QueueViewModel @Inject constructor(
     private val _snackBarEvent = MutableSharedFlow<String>()
     val snackBarEvent = _snackBarEvent.asSharedFlow()
 
-    private val _snackBarWithActionEvent = MutableSharedFlow<Queue>()
+    private val _snackBarWithActionEvent = MutableSharedFlow<QueueItem>()
     val snackBarWithActionEvent = _snackBarWithActionEvent.asSharedFlow()
 
     var showDialog by mutableStateOf(false)
@@ -51,7 +51,7 @@ class QueueViewModel @Inject constructor(
     fun connectToQueue() {
         getQueue()
 
-        if (!queueSocketService.isSocketActive()) viewModelScope.launch {
+        viewModelScope.launch {
             when (val result = queueSocketService.initSession(firstName!!)) {
                 is Resource.Success -> {
                     observeQueue()
@@ -68,14 +68,14 @@ class QueueViewModel @Inject constructor(
     private fun observeQueue() {
         queueSocketService.observeQueue()
             .onEach { queueItem ->
-                val newList = state.value.queue
+                val newList = state.value.queueItem
                     .toMutableList()
                     .apply {
-                        if (queueItem.isDeleteAction) removeIf { it.id == queueItem.queue.id }
-                        else add(0, queueItem.queue)
+                        if (queueItem.isDeleteAction) removeIf { it.id == queueItem.queueItem.id }
+                        else add(0, queueItem.queueItem)
                     }
                     .sortedWith(compareByDescending { it.timestamp })
-                _state.value = state.value.copy(queue = newList)
+                _state.value = state.value.copy(queueItem = newList)
             }.launchIn(viewModelScope)
     }
 
@@ -83,7 +83,7 @@ class QueueViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = state.value.copy(isQueueLoading = true)
             val result = queueService.getQueue()
-            _state.value = state.value.copy(queue = result, isQueueLoading = false)
+            _state.value = state.value.copy(queueItem = result, isQueueLoading = false)
         }
     }
 
@@ -91,7 +91,7 @@ class QueueViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = state.value.copy(isQueueLoading = true)
 
-            val allQueue = _state.value.queue.sortedWith(compareBy { it.timestamp })
+            val allQueue = _state.value.queueItem.sortedWith(compareBy { it.timestamp })
             val leftQueueItems = allQueue.filter { it.isLeftQueue }
             val rightQueueItems = allQueue.filter { !it.isLeftQueue }
 
@@ -137,19 +137,25 @@ class QueueViewModel @Inject constructor(
     fun deleteQueueItem(queueItemId: String) {
         viewModelScope.launch {
             _state.value = state.value.copy(isQueueLoading = true)
-            val deletedItem = queueService.deleteQueueItem(queueItemId)
-            deletedItem?.let {
-                _snackBarWithActionEvent.emit(
-                    Queue(
-                        id = it.id,
-                        userId = it.userId,
-                        firstName = it.firstName,
-                        lastName = it.lastName,
-                        profilePictureUri = it.profilePictureUri,
-                        isLeftQueue = it.isLeftQueue,
-                        timestamp = it.timestamp
-                    )
-                )
+            when (val result = queueService.deleteQueueItem(queueItemId)) {
+                is Resource.Success -> {
+                    result.data?.let { queueItem ->
+                        _snackBarWithActionEvent.emit(
+                            QueueItem(
+                                id = queueItem.id,
+                                userId = queueItem.userId,
+                                firstName = queueItem.firstName,
+                                lastName = queueItem.lastName,
+                                profilePictureUri = queueItem.profilePictureUri,
+                                isLeftQueue = queueItem.isLeftQueue,
+                                timestamp = queueItem.timestamp
+                            )
+                        )
+                    }
+                }
+                is Resource.Error -> {
+                    _snackBarEvent.emit(result.message ?: "Unknown Error")
+                }
             }
             _state.value = state.value.copy(isQueueLoading = false)
         }

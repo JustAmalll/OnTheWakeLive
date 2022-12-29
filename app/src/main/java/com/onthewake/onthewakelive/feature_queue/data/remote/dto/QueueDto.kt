@@ -1,6 +1,6 @@
 package com.onthewake.onthewakelive.feature_queue.data.remote.dto
 
-import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
+import com.onthewake.onthewakelive.feature_queue.domain.module.QueueItem
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -13,7 +13,7 @@ data class QueueDto(
     val isLeftQueue: Boolean,
     val timestamp: Long
 ) {
-    fun toQueue(): Queue = Queue(
+    fun toQueueItem(): QueueItem = QueueItem(
         id = id,
         userId = userId,
         firstName = firstName,

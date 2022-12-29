@@ -145,7 +145,7 @@ fun QueueScreen(
 
     if (showDialog) AdminDialog(
         showDialog = { showDialog = it },
-        queue = state.queue,
+        queueItem = state.queueItem,
         onAddClicked = { isLeftQueue, firstName ->
             viewModel.addToQueue(
                 isLeftQueue = isLeftQueue,
@@ -276,8 +276,8 @@ fun QueueLeftContent(
     onSwipeToDelete: (String) -> Unit,
     onUserAvatarClicked: (String) -> Unit
 ) {
-    val leftQueue = remember(state.queue) {
-        state.queue.filter { it.isLeftQueue }
+    val leftQueue = remember(state.queueItem) {
+        state.queueItem.filter { it.isLeftQueue }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -312,8 +312,8 @@ fun QueueRightContent(
     onSwipeToDelete: (String) -> Unit,
     onUserAvatarClicked: (String) -> Unit
 ) {
-    val rightQueue = remember(state.queue) {
-        state.queue.filter { !it.isLeftQueue }
+    val rightQueue = remember(state.queueItem) {
+        state.queueItem.filter { !it.isLeftQueue }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

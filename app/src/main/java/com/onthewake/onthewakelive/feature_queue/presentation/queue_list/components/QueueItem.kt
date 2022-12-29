@@ -1,5 +1,6 @@
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
@@ -20,13 +21,14 @@ import androidx.compose.ui.unit.dp
 import coil.ImageLoader
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.util.Constants
-import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
+import com.onthewake.onthewakelive.feature_queue.domain.module.QueueItem
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 
+@ExperimentalAnimationApi
 @Composable
 fun QueueItem(
-    queueItem: Queue,
+    queueItem: QueueItem,
     userId: String?,
     imageLoader: ImageLoader,
     onDetailsClicked: (String) -> Unit,

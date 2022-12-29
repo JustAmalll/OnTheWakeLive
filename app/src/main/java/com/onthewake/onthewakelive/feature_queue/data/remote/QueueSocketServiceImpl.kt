@@ -2,9 +2,9 @@ package com.onthewake.onthewakelive.feature_queue.data.remote
 
 import android.content.Context
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.feature_queue.domain.module.QueueResponse
 import com.onthewake.onthewakelive.core.util.Constants.WS_BASE_URL
 import com.onthewake.onthewakelive.core.util.Resource
+import com.onthewake.onthewakelive.feature_queue.domain.module.QueueResponse
 import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
@@ -20,8 +20,6 @@ class QueueSocketServiceImpl(
 ) : QueueSocketService {
 
     private var socket: WebSocketSession? = null
-
-    override fun isSocketActive(): Boolean = socket?.isActive == true && socket != null
 
     override suspend fun initSession(
         firstName: String
@@ -42,7 +40,7 @@ class QueueSocketServiceImpl(
             .filterIsInstance<Frame.Text>()
             .mapNotNull {
                 val queueDto = Json.decodeFromString<QueueResponse>(it.readText())
-                QueueResponse(isDeleteAction = queueDto.isDeleteAction, queue = queueDto.queue)
+                QueueResponse(isDeleteAction = queueDto.isDeleteAction, queueItem = queueDto.queueItem)
             }
 
         emitAll(queueState)

@@ -3,6 +3,8 @@ package com.onthewake.onthewakelive.feature_profile.presentation.edit_profile
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -35,8 +37,8 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
-import com.onthewake.onthewakelive.core.presentation.components.StandardLoadingView
 import com.onthewake.onthewakelive.core.presentation.StandardTextField
+import com.onthewake.onthewakelive.core.presentation.components.StandardLoadingView
 import com.onthewake.onthewakelive.core.presentation.dataStore
 import com.onthewake.onthewakelive.core.util.CropActivityResultContract
 import com.onthewake.onthewakelive.core.util.MaskVisualTransformation
@@ -44,6 +46,7 @@ import com.onthewake.onthewakelive.core.util.UserProfileSerializer.defaultValue
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@ExperimentalAnimationApi
 @ExperimentalMaterial3Api
 @Composable
 fun EditProfileScreen(
@@ -102,210 +105,232 @@ fun EditProfileScreen(
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(text = stringResource(id = R.string.edit_profile)) },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = surfaceColor,
-                    titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                ),
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = stringResource(id = R.string.arrow_back_icon)
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior
-            )
-        }
-    ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.padding(
-                top = paddingValues.calculateTopPadding(),
-                bottom = paddingValues.calculateBottomPadding()
-            )
-        ) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(bgColor)
-                        .padding(24.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Card(
-                            modifier = Modifier
-                                .padding(top = 30.dp)
-                                .size(140.dp),
-                            shape = RoundedCornerShape(40.dp),
-                            onClick = {
-                                galleryLauncher.launch(
-                                    PickVisualMediaRequest(
-                                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                                    )
-                                )
-                            },
-                            colors = CardDefaults.cardColors(
-                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    AnimatedContent(targetState = state.isLoading) { isLoading ->
+
+        if (isLoading) StandardLoadingView()
+        else Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = { Text(text = stringResource(id = R.string.edit_profile)) },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = surfaceColor,
+                        titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = stringResource(id = R.string.arrow_back_icon)
                             )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+            }
+        ) { paddingValues ->
+
+            LazyColumn(
+                modifier = Modifier.padding(
+                    top = paddingValues.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding()
+                )
+            ) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(bgColor)
+                            .padding(24.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (!isImageLoading.value) {
-                                    Icon(
-                                        modifier = Modifier.size(30.dp),
-                                        imageVector = Icons.Default.Person,
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        contentDescription = stringResource(
-                                            id = R.string.person_icon
+                            Card(
+                                modifier = Modifier
+                                    .padding(top = 30.dp)
+                                    .size(140.dp),
+                                shape = RoundedCornerShape(40.dp),
+                                onClick = {
+                                    galleryLauncher.launch(
+                                        PickVisualMediaRequest(
+                                            ActivityResultContracts.PickVisualMedia.ImageOnly
                                         )
                                     )
-                                }
-                                if (isImageLoading.value) CircularProgressIndicator(
-                                    modifier = Modifier.size(42.dp)
+                                },
+                                colors = CardDefaults.cardColors(
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Image(
+                            ) {
+                                Box(
                                     modifier = Modifier.fillMaxSize(),
-                                    painter = rememberAsyncImagePainter(
-                                        model = profilePictureUri ?: state.profilePictureUri,
-                                        imageLoader = imageLoader,
-                                        onLoading = { isImageLoading.value = true },
-                                        onError = { isImageLoading.value = false },
-                                        onSuccess = { isImageLoading.value = false }
-                                    ),
-                                    contentDescription = stringResource(id = R.string.user_picture)
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(30.dp))
-                        StandardTextField(
-                            value = state.firstName,
-                            onValueChange = {
-                                viewModel.onEvent(EditProfileUiEvent.EditProfileFirstNameChanged(it))
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Sentences,
-                                imeAction = ImeAction.Next
-                            ),
-                            label = stringResource(id = R.string.first_name),
-                            isError = state.profileFirsNameError != null,
-                            errorText = state.profileFirsNameError
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        StandardTextField(
-                            value = state.lastName,
-                            onValueChange = {
-                                viewModel.onEvent(EditProfileUiEvent.EditProfileLastNameChanged(it))
-                            },
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Sentences,
-                                imeAction = ImeAction.Next
-                            ),
-                            label = stringResource(id = R.string.last_name),
-                            isError = state.profileLastNameError != null,
-                            errorText = state.profileLastNameError
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        StandardTextField(
-                            value = state.phoneNumber,
-                            onValueChange = {
-                                viewModel.onEvent(
-                                    EditProfileUiEvent.EditProfilePhoneNumberChanged(it)
-                                )
-                            },
-                            label = stringResource(id = R.string.phone_number),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Next
-                            ),
-                            isError = state.profilePhoneNumberError != null,
-                            errorText = state.profilePhoneNumberError
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        StandardTextField(
-                            value = state.telegram,
-                            onValueChange = {
-                                viewModel.onEvent(EditProfileUiEvent.EditProfileTelegramChanged(it))
-                            },
-                            label = stringResource(id = R.string.telegram)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        StandardTextField(
-                            value = state.instagram,
-                            onValueChange = {
-                                viewModel.onEvent(EditProfileUiEvent.EditProfileInstagramChanged(it))
-                            },
-                            label = stringResource(id = R.string.instagram)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = state.dateOfBirth,
-                            onValueChange = {
-                                if (it.length <= 8) {
-                                    viewModel.onEvent(
-                                        EditProfileUiEvent.EditProfileDateOfBirthChanged(it)
-                                    )
-                                }
-                            },
-                            isError = state.profileDateOfBirthError != null,
-                            label = {
-                                Text(
-                                    text = stringResource(id = R.string.edit_profile_date_of_birth)
-                                )
-                            },
-                            visualTransformation = MaskVisualTransformation("##/##/####"),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        )
-                        if (state.profileDateOfBirthError != null) {
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = state.profileDateOfBirthError,
-                                color = MaterialTheme.colorScheme.error,
-                                fontSize = 14.sp,
-                                textAlign = TextAlign.End
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                if (dataStore.value.firstName == state.firstName &&
-                                    dataStore.value.lastName == state.lastName &&
-                                    dataStore.value.phoneNumber == state.phoneNumber &&
-                                    viewModel.selectedProfilePictureUri.value == null &&
-                                    dataStore.value.instagram == state.instagram &&
-                                    dataStore.value.telegram == state.telegram &&
-                                    dataStore.value.dateOfBirth == state.dateOfBirth
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    scope.launch {
-                                        snackBarHostState.showSnackbar(
-                                            context.getString(R.string.nothing_to_update)
+                                    if (!isImageLoading.value) {
+                                        Icon(
+                                            modifier = Modifier.size(30.dp),
+                                            imageVector = Icons.Default.Person,
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            contentDescription = stringResource(
+                                                id = R.string.person_icon
+                                            )
                                         )
                                     }
-                                } else {
-                                    viewModel.onEvent(EditProfileUiEvent.EditProfile)
-                                    focusManager.clearFocus()
+                                    if (isImageLoading.value) CircularProgressIndicator(
+                                        modifier = Modifier.size(42.dp)
+                                    )
+                                    Image(
+                                        modifier = Modifier.fillMaxSize(),
+                                        painter = rememberAsyncImagePainter(
+                                            model = profilePictureUri ?: state.profilePictureUri,
+                                            imageLoader = imageLoader,
+                                            onLoading = { isImageLoading.value = true },
+                                            onError = { isImageLoading.value = false },
+                                            onSuccess = { isImageLoading.value = false }
+                                        ),
+                                        contentDescription = stringResource(id = R.string.user_picture)
+                                    )
                                 }
-                            },
-                            modifier = Modifier.align(Alignment.End)
-                        ) {
-                            Text(text = stringResource(id = R.string.edit))
+                            }
+                            Spacer(modifier = Modifier.height(30.dp))
+                            StandardTextField(
+                                value = state.firstName,
+                                onValueChange = {
+                                    viewModel.onEvent(
+                                        EditProfileUiEvent.EditProfileFirstNameChanged(
+                                            it
+                                        )
+                                    )
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    capitalization = KeyboardCapitalization.Sentences,
+                                    imeAction = ImeAction.Next
+                                ),
+                                label = stringResource(id = R.string.first_name),
+                                isError = state.profileFirsNameError != null,
+                                errorText = state.profileFirsNameError
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            StandardTextField(
+                                value = state.lastName,
+                                onValueChange = {
+                                    viewModel.onEvent(
+                                        EditProfileUiEvent.EditProfileLastNameChanged(
+                                            it
+                                        )
+                                    )
+                                },
+                                keyboardOptions = KeyboardOptions(
+                                    capitalization = KeyboardCapitalization.Sentences,
+                                    imeAction = ImeAction.Next
+                                ),
+                                label = stringResource(id = R.string.last_name),
+                                isError = state.profileLastNameError != null,
+                                errorText = state.profileLastNameError
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            StandardTextField(
+                                value = state.phoneNumber,
+                                onValueChange = {
+                                    viewModel.onEvent(
+                                        EditProfileUiEvent.EditProfilePhoneNumberChanged(it)
+                                    )
+                                },
+                                label = stringResource(id = R.string.phone_number),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Next
+                                ),
+                                isError = state.profilePhoneNumberError != null,
+                                errorText = state.profilePhoneNumberError
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            StandardTextField(
+                                value = state.telegram,
+                                onValueChange = {
+                                    viewModel.onEvent(
+                                        EditProfileUiEvent.EditProfileTelegramChanged(
+                                            it
+                                        )
+                                    )
+                                },
+                                label = stringResource(id = R.string.telegram)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            StandardTextField(
+                                value = state.instagram,
+                                onValueChange = {
+                                    viewModel.onEvent(
+                                        EditProfileUiEvent.EditProfileInstagramChanged(
+                                            it
+                                        )
+                                    )
+                                },
+                                label = stringResource(id = R.string.instagram)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            TextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = state.dateOfBirth,
+                                onValueChange = {
+                                    if (it.length <= 8) {
+                                        viewModel.onEvent(
+                                            EditProfileUiEvent.EditProfileDateOfBirthChanged(it)
+                                        )
+                                    }
+                                },
+                                isError = state.profileDateOfBirthError != null,
+                                label = {
+                                    Text(
+                                        text = stringResource(id = R.string.edit_profile_date_of_birth)
+                                    )
+                                },
+                                visualTransformation = MaskVisualTransformation("##/##/####"),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                ),
+                            )
+                            if (state.profileDateOfBirthError != null) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = state.profileDateOfBirthError,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontSize = 14.sp,
+                                    textAlign = TextAlign.End
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    if (dataStore.value.firstName == state.firstName &&
+                                        dataStore.value.lastName == state.lastName &&
+                                        dataStore.value.phoneNumber == state.phoneNumber &&
+                                        viewModel.selectedProfilePictureUri.value == null &&
+                                        dataStore.value.instagram == state.instagram &&
+                                        dataStore.value.telegram == state.telegram &&
+                                        dataStore.value.dateOfBirth == state.dateOfBirth
+                                    ) {
+                                        scope.launch {
+                                            snackBarHostState.showSnackbar(
+                                                context.getString(R.string.nothing_to_update)
+                                            )
+                                        }
+                                    } else {
+                                        viewModel.onEvent(EditProfileUiEvent.EditProfile)
+                                        focusManager.clearFocus()
+                                    }
+                                },
+                                modifier = Modifier.align(Alignment.End)
+                            ) {
+                                Text(text = stringResource(id = R.string.edit))
+                            }
                         }
                     }
                 }
             }
         }
     }
-    if (state.isLoading) StandardLoadingView()
 }

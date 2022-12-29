@@ -3,7 +3,7 @@ package com.onthewake.onthewakelive.feature_auth.domain.use_cases
 import android.content.Context
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.feature_auth.domain.models.ValidationResult
-import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
+import com.onthewake.onthewakelive.feature_queue.domain.module.QueueItem
 import java.util.*
 
 class ValidationUseCase(private val context: Context) {
@@ -18,14 +18,14 @@ class ValidationUseCase(private val context: Context) {
         return ValidationResult(successful = true)
     }
 
-    fun validateAdminAddToQueue(firstName: String, queue: List<Queue>): ValidationResult {
+    fun validateAdminAddToQueue(firstName: String, queueItem: List<QueueItem>): ValidationResult {
         if (firstName.isBlank()) {
             return ValidationResult(
                 successful = false,
                 errorMessage = context.getString(R.string.validate_first_name_error)
             )
         }
-        if (queue.toString().contains(firstName)) {
+        if (queueItem.toString().contains(firstName)) {
             return ValidationResult(
                 successful = false,
                 errorMessage = context.getString(R.string.validate_user_error)

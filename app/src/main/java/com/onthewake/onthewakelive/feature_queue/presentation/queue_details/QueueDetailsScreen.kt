@@ -29,7 +29,7 @@ import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.FormattedDateOfBirth
-import com.onthewake.onthewakelive.core.presentation.StandardImageView
+import com.onthewake.onthewakelive.core.presentation.components.StandardImageView
 import com.onthewake.onthewakelive.core.presentation.components.StandardLoadingView
 import com.onthewake.onthewakelive.core.util.openInstagramProfile
 import com.onthewake.onthewakelive.navigation.Screen

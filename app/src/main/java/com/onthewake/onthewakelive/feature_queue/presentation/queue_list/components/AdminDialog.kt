@@ -19,14 +19,14 @@ import androidx.compose.ui.window.Dialog
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.StandardTextField
 import com.onthewake.onthewakelive.feature_auth.domain.use_cases.ValidationUseCase
-import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
+import com.onthewake.onthewakelive.feature_queue.domain.module.QueueItem
 
 @ExperimentalMaterial3Api
 @Composable
 fun AdminDialog(
     showDialog: (Boolean) -> Unit,
     onAddClicked: (Boolean, String) -> Unit,
-    queue: List<Queue>
+    queueItem: List<QueueItem>
 ) {
 
     var leftButtonState by remember { mutableStateOf(false) }
@@ -105,7 +105,7 @@ fun AdminDialog(
                         onClick = {
                             val addToQueueResult = ValidationUseCase(context = context)
                                 .validateAdminAddToQueue(
-                                    firstName = firstNameFieldState, queue = queue
+                                    firstName = firstNameFieldState, queueItem = queueItem
                                 )
                             if (addToQueueResult.errorMessage != null) {
                                 errorMessage = addToQueueResult.errorMessage

@@ -1,5 +1,6 @@
 package com.onthewake.onthewakelive.feature_queue.presentation.queue_list.components
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,12 +14,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.ImageLoader
-import com.onthewake.onthewakelive.core.presentation.StandardImageView
-import com.onthewake.onthewakelive.feature_queue.domain.module.Queue
+import com.onthewake.onthewakelive.core.presentation.components.StandardImageView
+import com.onthewake.onthewakelive.feature_queue.domain.module.QueueItem
 
+@ExperimentalAnimationApi
 @Composable
 fun QueueItemContent(
-    queueItem: Queue,
+    queueItem: QueueItem,
     imageLoader: ImageLoader,
     onDetailsClicked: (String) -> Unit,
     onUserAvatarClicked: (String) -> Unit

@@ -1,2 +1,2 @@
 # OnTheWakeLive
-Online queue with ktor server based on websokets
+Online queue with ktor server based on web sockets

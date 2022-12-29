@@ -5,7 +5,6 @@ import com.onthewake.onthewakelive.core.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface QueueSocketService {
-    fun isSocketActive(): Boolean
     suspend fun initSession(firstName: String): Resource<Unit>
     fun observeQueue(): Flow<QueueResponse>
     suspend fun addToQueue(isLeftQueue: Boolean, firstName: String, timestamp: Long)

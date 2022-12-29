@@ -1,7 +1,10 @@
-package com.onthewake.onthewakelive.core.presentation
+package com.onthewake.onthewakelive.core.presentation.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -12,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -20,6 +24,7 @@ import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import com.onthewake.onthewakelive.R
 
+@ExperimentalAnimationApi
 @Composable
 fun StandardImageView(
     imageLoader: ImageLoader,
@@ -32,32 +37,40 @@ fun StandardImageView(
         onClick = { onUserAvatarClicked(model) },
         modifier = Modifier.size(46.dp),
     ) {
-        if (!isImageLoading) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = stringResource(id = R.string.person_icon)
-            )
+        AnimatedContent(targetState = isImageLoading) { isLoading ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!isLoading && model.isEmpty()) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = stringResource(id = R.string.person_icon)
+                    )
+                }
+                if (isLoading) CircularProgressIndicator(
+                    modifier = Modifier.size(26.dp),
+                    strokeWidth = 2.dp
+                )
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(CircleShape)
+                        .border(
+                            width = 1.dp,
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                    painter = rememberAsyncImagePainter(
+                        model = model,
+                        imageLoader = imageLoader,
+                        onLoading = { isImageLoading = true },
+                        onError = { isImageLoading = false },
+                        onSuccess = { isImageLoading = false }
+                    ),
+                    contentDescription = stringResource(id = R.string.user_picture)
+                )
+            }
         }
-        if (isImageLoading) CircularProgressIndicator(
-            modifier = Modifier.size(26.dp), strokeWidth = 2.dp
-        )
-        Image(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(CircleShape)
-                .border(
-                    width = 1.dp,
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                ),
-            painter = rememberAsyncImagePainter(
-                model = model,
-                imageLoader = imageLoader,
-                onLoading = { isImageLoading = true },
-                onError = { isImageLoading = false },
-                onSuccess = { isImageLoading = false }
-            ),
-            contentDescription = stringResource(id = R.string.user_picture)
-        )
     }
 }

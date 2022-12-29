@@ -1,5 +1,6 @@
 package com.onthewake.onthewakelive.feature_profile.presentation.profile
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -26,7 +27,7 @@ import coil.ImageLoader
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.onthewake.onthewakelive.R
 import com.onthewake.onthewakelive.core.presentation.FormattedDateOfBirth
-import com.onthewake.onthewakelive.core.presentation.StandardImageView
+import com.onthewake.onthewakelive.core.presentation.components.StandardImageView
 import com.onthewake.onthewakelive.core.presentation.components.StandardLoadingView
 import com.onthewake.onthewakelive.core.presentation.dataStore
 import com.onthewake.onthewakelive.navigation.Screen
@@ -34,6 +35,7 @@ import com.onthewake.onthewakelive.core.util.UserProfileSerializer.defaultValue
 import com.onthewake.onthewakelive.core.util.openInstagramProfile
 import kotlinx.coroutines.flow.collectLatest
 
+@ExperimentalAnimationApi
 @ExperimentalMaterial3Api
 @Composable
 fun ProfileScreen(

@@ -51,7 +51,7 @@ fun FullSizeAvatarScreen(
                 }
             )
         }
-    ) { paddingValues ->
+    ) { _ ->
 
         if (isImageLoading) StandardLoadingView()
 

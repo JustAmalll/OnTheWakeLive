@@ -44,16 +44,16 @@ fun RegisterScreen(
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
 
-    LaunchedEffect(viewModel, context) {
+    LaunchedEffect(viewModel.registerResults) {
         viewModel.registerResults.collect { result ->
             when (result) {
-                is AuthResult.OtpTooManyRequests -> snackBarHostState.showSnackbar(
+                AuthResult.OtpTooManyRequests -> snackBarHostState.showSnackbar(
                     message = "OtpTooManyRequests"
                 )
-                is AuthResult.OtpInvalidCredentials -> snackBarHostState.showSnackbar(
+                AuthResult.OtpInvalidCredentials -> snackBarHostState.showSnackbar(
                     message = "Invalid phone number format"
                 )
-                is AuthResult.UserAlreadyExist -> snackBarHostState.showSnackbar(
+                AuthResult.UserAlreadyExist -> snackBarHostState.showSnackbar(
                     message = "User with this phone number already exists"
                 )
                 else -> snackBarHostState.showSnackbar(
@@ -191,8 +191,5 @@ fun RegisterScreen(
                 )
             }
         }
-    }
-    if (state.isLoading) {
-        Text(text = "Loaging register")
     }
 }

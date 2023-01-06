@@ -24,7 +24,7 @@ class LoginViewModel @Inject constructor(
     var state by mutableStateOf(LoginState())
         private set
 
-    private val resultChannel = Channel<AuthResult<Unit>>()
+    private val resultChannel = Channel<AuthResult>()
     val loginResults = resultChannel.receiveAsFlow()
 
     fun onEvent(event: LoginUiEvent) {

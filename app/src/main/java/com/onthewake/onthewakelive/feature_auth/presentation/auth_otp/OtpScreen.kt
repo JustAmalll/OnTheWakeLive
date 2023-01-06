@@ -37,13 +37,13 @@ fun OtpScreen(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(viewModel, context) {
+    LaunchedEffect(viewModel.otpResults) {
         viewModel.otpResults.collect { result ->
             when (result) {
-                is AuthResult.Authorized -> navController.navigate(Screen.QueueScreen.route) {
+                AuthResult.Authorized -> navController.navigate(Screen.QueueScreen.route) {
                     popUpTo(Screen.LoginScreen.route) { inclusive = true }
                 }
-                is AuthResult.IncorrectOtp -> snackBarHostState.showSnackbar(
+                AuthResult.IncorrectOtp -> snackBarHostState.showSnackbar(
                     message = "Incorrect OTP"
                 )
                 else -> snackBarHostState.showSnackbar(

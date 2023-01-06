@@ -27,7 +27,7 @@ class RegisterViewModel @Inject constructor(
     var state by mutableStateOf(RegisterState())
         private set
 
-    private val resultChannel = Channel<AuthResult<Unit>>()
+    private val resultChannel = Channel<AuthResult>()
     val registerResults = resultChannel.receiveAsFlow()
 
     private val _navigateUpEvent = MutableSharedFlow<RegisterData>()
@@ -94,7 +94,7 @@ class RegisterViewModel @Inject constructor(
                     activity = activity,
                     isResendAction = false
                 )
-                if (result is AuthResult.OtpSentSuccess)
+                if (result == AuthResult.OtpSentSuccess)
                     _navigateUpEvent.emit(
                         RegisterData(
                             firstName = state.signUpFirstName.trim(),
@@ -105,7 +105,7 @@ class RegisterViewModel @Inject constructor(
                     )
                 resultChannel.send(result)
             } else {
-                resultChannel.send(AuthResult.UserAlreadyExist())
+                resultChannel.send(AuthResult.UserAlreadyExist)
             }
             state = state.copy(isLoading = false)
         }

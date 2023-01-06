@@ -37,7 +37,7 @@ fun EmptyContent(modifier: Modifier = Modifier) {
             modifier = Modifier.size(240.dp)
         )
         Text(
-            text = stringResource(id = R.string.empty_queue_error),
+            text = stringResource(id = R.string.empty_queue),
             fontSize = 17.sp,
             color = MaterialTheme.colorScheme.onBackground
         )

@@ -61,17 +61,17 @@ fun SplashScreen(
     LaunchedEffect(key1 = true) {
         viewModel.authResults.collect { result ->
             when (result) {
-                is AuthResult.Authorized -> {
+                AuthResult.Authorized -> {
                     navController.navigate(Screen.QueueScreen.route) {
                         popUpTo(Screen.SplashScreen.route) { inclusive = true }
                     }
                 }
-                is AuthResult.Unauthorized -> {
+                AuthResult.Unauthorized -> {
                     navController.navigate(Screen.LoginScreen.route) {
                         popUpTo(Screen.SplashScreen.route) { inclusive = true }
                     }
                 }
-                else -> {}
+                else -> Unit
             }
         }
     }

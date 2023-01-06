@@ -120,7 +120,7 @@ fun QueueScreen(
 
     LaunchedEffect(key1 = true) {
         viewModel.snackBarEvent.collectLatest { message ->
-            snackBarHostState.showSnackbar(message = message, duration = SnackbarDuration.Short)
+            snackBarHostState.showSnackbar(message = message)
         }
     }
 

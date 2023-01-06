@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -53,13 +50,13 @@ fun LoginScreen(
         )
     }
 
-    LaunchedEffect(viewModel, context) {
+    LaunchedEffect(viewModel.loginResults) {
         viewModel.loginResults.collect { result ->
             when (result) {
-                is AuthResult.Authorized -> navController.navigate(Screen.QueueScreen.route) {
+                AuthResult.Authorized -> navController.navigate(Screen.QueueScreen.route) {
                     popUpTo(Screen.LoginScreen.route) { inclusive = true }
                 }
-                is AuthResult.IncorrectData -> snackBarHostState.showSnackbar(
+                AuthResult.IncorrectData -> snackBarHostState.showSnackbar(
                     message = context.getString(R.string.incorrect_data)
                 )
                 else -> snackBarHostState.showSnackbar(

@@ -16,7 +16,7 @@ class SplashViewModel @Inject constructor(
     private val repository: AuthRepository
 ) : ViewModel() {
 
-    private val resultChannel = Channel<AuthResult<Unit>>()
+    private val resultChannel = Channel<AuthResult>()
     val authResults = resultChannel.receiveAsFlow()
 
     init {

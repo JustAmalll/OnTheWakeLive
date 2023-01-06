@@ -35,7 +35,7 @@ class OtpViewModel @Inject constructor(
     var state by mutableStateOf(RegisterState())
         private set
 
-    private val resultChannel = Channel<AuthResult<Unit>>()
+    private val resultChannel = Channel<AuthResult>()
     val otpResults = resultChannel.receiveAsFlow()
 
     init {
@@ -71,7 +71,7 @@ class OtpViewModel @Inject constructor(
 
             val otpResult = repository.verifyOtp(state.otp)
 
-            if (otpResult is AuthResult.OtpVerified) {
+            if (otpResult == AuthResult.OtpVerified) {
                 val signUpResult = repository.signUp(
                     CreateAccountRequest(
                         firstName = state.signUpFirstName,
@@ -89,7 +89,7 @@ class OtpViewModel @Inject constructor(
                 }
                 resultChannel.send(signUpResult)
             } else {
-                resultChannel.send(AuthResult.IncorrectOtp())
+                resultChannel.send(AuthResult.IncorrectOtp)
             }
             state = state.copy(isLoading = false)
         }

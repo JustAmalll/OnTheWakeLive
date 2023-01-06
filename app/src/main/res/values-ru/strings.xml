@@ -28,7 +28,7 @@
     <string name="couldnt_establish_a_connection">Не удалось установить соединение</string>
     <string name="add_to_queue">Добавить в очередь</string>
     <string name="add">Добавить</string>
-    <string name="empty_queue_error">В очереди никого нет</string>
+    <string name="empty_queue">В очереди никого нет</string>
     <string name="delete_message">Вы удалились из очереди</string>
     <string name="undo">Вернуться</string>
     <string name="add_icon">Иконка добавления</string>

@@ -33,7 +33,7 @@ class AuthRepositoryImpl(
 
     override suspend fun signUp(
         accountRequest: CreateAccountRequest
-    ): AuthResult<Unit> = try {
+    ): AuthResult = try {
         api.signUp(request = accountRequest)
         signIn(
             AuthRequest(
@@ -43,15 +43,15 @@ class AuthRepositoryImpl(
         )
     } catch (exception: HttpException) {
         when (exception.code()) {
-            401 -> AuthResult.Unauthorized()
-            409 -> AuthResult.UserAlreadyExist()
-            else -> AuthResult.UnknownError()
+            401 -> AuthResult.Unauthorized
+            409 -> AuthResult.UserAlreadyExist
+            else -> AuthResult.UnknownError
         }
     } catch (exception: Exception) {
-        AuthResult.UnknownError()
+        AuthResult.UnknownError
     }
 
-    override suspend fun signIn(authRequest: AuthRequest): AuthResult<Unit> = try {
+    override suspend fun signIn(authRequest: AuthRequest): AuthResult = try {
 
         val response = api.signIn(request = authRequest)
 
@@ -66,22 +66,22 @@ class AuthRepositoryImpl(
         OneSignal.setAppId(Constants.ONESIGNAL_APP_ID)
         OneSignal.setExternalUserId(response.userId)
 
-        AuthResult.Authorized()
+        AuthResult.Authorized
     } catch (exception: HttpException) {
         when (exception.code()) {
-            401 -> AuthResult.Unauthorized()
-            409 -> AuthResult.IncorrectData()
-            else -> AuthResult.UnknownError()
+            401 -> AuthResult.Unauthorized
+            409 -> AuthResult.IncorrectData
+            else -> AuthResult.UnknownError
         }
     } catch (exception: Exception) {
-        AuthResult.UnknownError()
+        AuthResult.UnknownError
     }
 
     override suspend fun sendOtp(
         phoneNumber: String,
         activity: Activity,
         isResendAction: Boolean
-    ): AuthResult<Unit> {
+    ): AuthResult {
         return suspendCoroutine { continuation ->
             val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
@@ -90,9 +90,9 @@ class AuthRepositoryImpl(
                 override fun onVerificationFailed(exception: FirebaseException) {
                     println(exception)
                     if (exception is FirebaseAuthInvalidCredentialsException) {
-                        continuation.resume(AuthResult.OtpInvalidCredentials())
+                        continuation.resume(AuthResult.OtpInvalidCredentials)
                     } else if (exception is FirebaseTooManyRequestsException) {
-                        continuation.resume(AuthResult.OtpTooManyRequests())
+                        continuation.resume(AuthResult.OtpTooManyRequests)
                     }
                 }
 
@@ -125,36 +125,36 @@ class AuthRepositoryImpl(
                 PhoneAuthProvider.verifyPhoneNumber(options)
             }
 
-            continuation.resume(AuthResult.OtpSentSuccess())
+            continuation.resume(AuthResult.OtpSentSuccess)
         }
     }
 
     override suspend fun verifyOtp(
         otp: String
-    ): AuthResult<Unit> = suspendCoroutine { continuation ->
+    ): AuthResult = suspendCoroutine { continuation ->
         if (!this::storedVerificationId.isInitialized) {
-            continuation.resume(AuthResult.IncorrectOtp())
+            continuation.resume(AuthResult.IncorrectOtp)
             return@suspendCoroutine
         }
         val credential = PhoneAuthProvider.getCredential(storedVerificationId, otp)
         firebaseAuth.signInWithCredential(credential).addOnSuccessListener {
-            continuation.resume(AuthResult.OtpVerified())
+            continuation.resume(AuthResult.OtpVerified)
         }.addOnFailureListener {
-            continuation.resume(AuthResult.IncorrectOtp())
+            continuation.resume(AuthResult.IncorrectOtp)
         }
     }
 
-    override suspend fun authenticate(): AuthResult<Unit> {
+    override suspend fun authenticate(): AuthResult {
         return try {
             val token = prefs.getString(
                 PREFS_JWT_TOKEN, null
-            ) ?: return AuthResult.Unauthorized()
+            ) ?: return AuthResult.Unauthorized
             api.authenticate("Bearer $token")
-            AuthResult.Authorized()
+            AuthResult.Authorized
         } catch (exception: HttpException) {
-            if (exception.code() == 401) AuthResult.Unauthorized() else AuthResult.UnknownError()
+            if (exception.code() == 401) AuthResult.Unauthorized else AuthResult.UnknownError
         } catch (exception: Exception) {
-            AuthResult.UnknownError()
+            AuthResult.UnknownError
         }
     }
 

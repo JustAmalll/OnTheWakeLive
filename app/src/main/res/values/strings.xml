@@ -49,7 +49,7 @@
 
     <string name="add">Add</string>
 
-    <string name="empty_queue_error">There is no one in the queue</string>
+    <string name="empty_queue">There is no one in the queue</string>
 
     <string name="delete_message">You have been removed from the queue</string>
     <string name="admin_delete_message">You have removed a person from the queue</string>

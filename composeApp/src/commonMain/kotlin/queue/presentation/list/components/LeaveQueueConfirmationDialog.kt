@@ -1,4 +1,4 @@
-package queue.presentation.components
+package queue.presentation.list.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text

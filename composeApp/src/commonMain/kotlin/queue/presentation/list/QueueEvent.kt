@@ -1,4 +1,4 @@
-package queue.presentation
+package queue.presentation.list
 
 import queue.domain.module.Line
 

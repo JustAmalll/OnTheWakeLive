@@ -1,4 +1,4 @@
-package queue.presentation
+package queue.presentation.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,9 +31,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import core.utils.filter
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toPersistentList
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.queue
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -41,23 +42,41 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import queue.domain.module.Line
 import queue.domain.module.QueueItem
-import queue.presentation.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
-import queue.presentation.QueueEvent.OnJoinClicked
-import queue.presentation.QueueEvent.OnLeaveQueueConfirmed
-import queue.presentation.QueueEvent.OnQueueItemClicked
-import queue.presentation.QueueEvent.OnQueueLeaved
-import queue.presentation.QueueEvent.OnUserPhotoClicked
-import queue.presentation.components.LeaveQueueConfirmationDialog
-import queue.presentation.components.QueueItem
-import queue.presentation.components.SwipeToDeleteContainer
-import queue.presentation.components.TabRow
+import queue.presentation.details.QueueItemDetailsAssembly
+import queue.presentation.list.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
+import queue.presentation.list.QueueEvent.OnJoinClicked
+import queue.presentation.list.QueueEvent.OnLeaveQueueConfirmed
+import queue.presentation.list.QueueEvent.OnQueueItemClicked
+import queue.presentation.list.QueueEvent.OnQueueLeaved
+import queue.presentation.list.QueueEvent.OnUserPhotoClicked
+import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
+import queue.presentation.list.components.LeaveQueueConfirmationDialog
+import queue.presentation.list.components.QueueItem
+import queue.presentation.list.components.SwipeToDeleteContainer
+import queue.presentation.list.components.TabRow
 
-@Composable
-fun QueueAssembly(viewModel: QueueViewModel = koinInject()) {
-    val state by viewModel.state.collectAsState()
+class QueueAssembly : Screen {
 
-    QueueScreen(state = state, onEvent = viewModel::onEvent)
+    @Composable
+    override fun Content() {
+        val viewModel: QueueViewModel = koinInject()
+        val state by viewModel.state.collectAsState()
+        val navigator = LocalNavigator.current
+
+        LaunchedEffect(key1 = Unit) {
+            viewModel.actions.collect { action ->
+                when(action) {
+                    is NavigateToQueueItemDetails -> navigator?.push(
+                        QueueItemDetailsAssembly(queueItemId = action.queueItemId)
+                    )
+                }
+            }
+        }
+
+        QueueScreen(state = state, onEvent = viewModel::onEvent)
+    }
 }
+
 
 @OptIn(
     ExperimentalMaterial3Api::class,

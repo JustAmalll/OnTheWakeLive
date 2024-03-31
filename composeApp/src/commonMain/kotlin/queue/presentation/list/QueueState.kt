@@ -1,4 +1,4 @@
-package queue.presentation
+package queue.presentation.list
 
 import androidx.compose.runtime.Stable
 import queue.domain.module.QueueItem

@@ -1,4 +1,4 @@
-package queue.presentation.components
+package queue.presentation.list.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

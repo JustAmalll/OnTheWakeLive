@@ -62,6 +62,9 @@ kotlin {
             implementation(libs.ktor.serialization.json)
 
             implementation(libs.coil.compose)
+
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.tabNavigator)
         }
         iosMain.dependencies {
             implementation(libs.ktor.darwin)

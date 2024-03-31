@@ -1,4 +1,4 @@
-package queue.presentation.components
+package queue.presentation.list.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.pager.PagerState

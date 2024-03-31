@@ -2,7 +2,6 @@ package queue.domain.module
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import queue.domain.module.Line
 
 @Serializable
 data class QueueItem(

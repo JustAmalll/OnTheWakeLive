@@ -1,19 +1,23 @@
-package queue.presentation
+package queue.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import queue.domain.module.Line
-import queue.domain.module.QueueSocketResponse
 import queue.domain.module.QueueSocketResponse.Join
 import queue.domain.module.QueueSocketResponse.Remove
 import queue.domain.repository.QueueRepository
-import queue.presentation.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
+import queue.presentation.list.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
+import queue.presentation.list.QueueEvent.OnQueueItemClicked
+import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 
 class QueueViewModel(
     private val queueRepository: QueueRepository
@@ -21,6 +25,9 @@ class QueueViewModel(
 
     private val _state = MutableStateFlow(QueueState())
     val state: StateFlow<QueueState> = _state.asStateFlow()
+
+    private val _action = Channel<QueueAction>()
+    val actions: Flow<QueueAction> = _action.receiveAsFlow()
 
     init {
         initSession()
@@ -42,7 +49,10 @@ class QueueViewModel(
                 leaveTheQueue()
             }
 
-            is QueueEvent.OnQueueItemClicked -> {}
+            is OnQueueItemClicked -> viewModelScope.launch {
+                _action.send(NavigateToQueueItemDetails(queueItemId = event.queueItemId))
+            }
+
             is QueueEvent.OnUserPhotoClicked -> {}
         }
     }
@@ -99,5 +109,9 @@ class QueueViewModel(
         _state.update {
             it.copy(showLeaveQueueConfirmationDialog = !it.showLeaveQueueConfirmationDialog)
         }
+    }
+
+    sealed interface QueueAction {
+        data class NavigateToQueueItemDetails(val queueItemId: String) : QueueAction
     }
 }

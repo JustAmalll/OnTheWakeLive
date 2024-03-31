@@ -1,0 +1,14 @@
+<resources>
+    <!-- Common-->
+    <string name="queue">Queue</string>
+    <string name="profile">Profile</string>
+
+    <!-- Leave Queue Confirmation Dialog-->
+    <string name="confirm_action">Confirm action</string>
+    <string name="leave_queue_confirmation">Are you sure you want to leave the queue? This action cannot be undone.</string>
+    <string name="admin_remove_user_from_queue_confirmation">Are you sure you want to remove a person from the queue? This action cannot be undone.</string>
+    <string name="leave">Leave</string>
+    <string name="remove">Remove</string>
+    <string name="cancel">Cancel</string>
+    <string name="stay">Stay</string>
+</resources>

@@ -1,0 +1,16 @@
+package queue.domain.module
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import queue.domain.module.Line
+
+@Serializable
+data class QueueItem(
+    @SerialName("_id") val id: String,
+    @SerialName("userId") val userId: String,
+    @SerialName("firstName") val firstName: String,
+    @SerialName("lastName") val lastName: String?,
+    @SerialName("profilePictureUri") val profilePictureUri: String?,
+    @SerialName("line") val line: Line,
+    @SerialName("timestamp") val timestamp: Long
+)

@@ -1,6 +1,5 @@
 package queue.data.source.remote
 
-import queue.domain.module.QueueItem
 import core.utils.Constants.WS_BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -19,10 +18,10 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import queue.data.model.QueueSocketAction
 import queue.domain.module.Line
+import queue.domain.module.QueueItem
 import queue.domain.module.QueueSocketResponse
 import user_profile.domain.model.UserProfile
 

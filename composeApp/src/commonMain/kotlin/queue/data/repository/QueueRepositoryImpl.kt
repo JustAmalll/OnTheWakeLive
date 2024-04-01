@@ -1,16 +1,16 @@
 package queue.data.repository
 
-import queue.domain.module.QueueItem
 import kotlinx.coroutines.flow.Flow
 import queue.data.source.remote.QueueRemoteDataSource
 import queue.domain.module.Line
+import queue.domain.module.QueueItem
 import queue.domain.module.QueueSocketResponse
 import queue.domain.repository.QueueRepository
 import user_profile.domain.model.UserProfile
 
 class QueueRepositoryImpl(
     private val queueRemoteDataSource: QueueRemoteDataSource
-): QueueRepository {
+) : QueueRepository {
 
     override suspend fun initSession(): Result<Unit> =
         queueRemoteDataSource.initSession()

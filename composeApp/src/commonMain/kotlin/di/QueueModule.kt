@@ -5,7 +5,6 @@ import queue.data.repository.QueueRepositoryImpl
 import queue.data.source.remote.QueueRemoteDataSource
 import queue.data.source.remote.QueueRemoteDataSourceImpl
 import queue.domain.repository.QueueRepository
-import queue.presentation.details.QueueItemDetailsAssembly
 import queue.presentation.details.QueueItemDetailsViewModel
 import queue.presentation.list.QueueViewModel
 

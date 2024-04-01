@@ -3,10 +3,6 @@ package auth.presentation.create_account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.CreateAccountUseCase
-import core.domain.use_case.validation.ValidateFirstNameUseCase
-import core.domain.use_case.validation.ValidateLastNameUseCase
-import core.domain.use_case.validation.ValidatePasswordUseCase
-import core.domain.use_case.validation.ValidatePhoneNumberUseCase
 import auth.presentation.create_account.CreateAccountEvent.OnCreateAccountClicked
 import auth.presentation.create_account.CreateAccountEvent.OnFirstNameChanged
 import auth.presentation.create_account.CreateAccountEvent.OnLastNameChanged
@@ -17,6 +13,10 @@ import auth.presentation.create_account.CreateAccountViewModel.CreateAccountActi
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.NavigateToQueueScreen
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.ShowError
 import core.domain.model.asString
+import core.domain.use_case.validation.ValidateFirstNameUseCase
+import core.domain.use_case.validation.ValidateLastNameUseCase
+import core.domain.use_case.validation.ValidatePasswordUseCase
+import core.domain.use_case.validation.ValidatePhoneNumberUseCase
 import core.domain.utils.asString
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
@@ -28,8 +28,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.getString
 
 class CreateAccountViewModel(
     private val createAccountUseCase: CreateAccountUseCase,

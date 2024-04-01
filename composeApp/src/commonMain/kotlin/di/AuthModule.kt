@@ -9,10 +9,6 @@ import auth.domain.repository.AuthRepository
 import auth.domain.use_case.AuthenticationUseCase
 import auth.domain.use_case.CreateAccountUseCase
 import auth.domain.use_case.LoginUseCase
-import core.domain.use_case.validation.ValidateFirstNameUseCase
-import core.domain.use_case.validation.ValidateLastNameUseCase
-import core.domain.use_case.validation.ValidatePasswordUseCase
-import core.domain.use_case.validation.ValidatePhoneNumberUseCase
 import auth.presentation.create_account.CreateAccountViewModel
 import auth.presentation.login.LoginViewModel
 import org.koin.dsl.module

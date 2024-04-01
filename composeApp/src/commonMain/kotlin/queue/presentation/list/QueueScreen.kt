@@ -65,7 +65,7 @@ object QueueAssembly : Screen {
 
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
-                when(action) {
+                when (action) {
                     is NavigateToQueueItemDetails -> navigator?.push(
                         QueueItemDetailsAssembly(queueItemId = action.queueItemId)
                     )

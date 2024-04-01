@@ -12,12 +12,7 @@ import core.presentation.MainViewModel
 import core.presentation.MainViewModel.MainAction.NavigateToLoginScreen
 import core.presentation.MainViewModel.MainAction.NavigateToQueueScreen
 import core.presentation.MainViewModel.MainAction.NavigateToServerUnavailableScreen
-import di.appModule
-import di.appModules
-import di.authModule
-import di.queueModule
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
 import queue.presentation.list.QueueAssembly
 
@@ -30,7 +25,7 @@ fun App() {
 
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
-                startScreen = when(action) {
+                startScreen = when (action) {
                     NavigateToLoginScreen -> LoginAssembly()
                     NavigateToQueueScreen -> QueueAssembly
                     NavigateToServerUnavailableScreen -> LoginAssembly()

@@ -56,9 +56,9 @@ class LoginAssembly : Screen {
 
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
-                when(action) {
+                when (action) {
                     NavigateToCreateAccountScreen -> navigator?.push(CreateAccountAssembly())
-                    NavigateToQueueScreen ->  navigator?.push(QueueAssembly)
+                    NavigateToQueueScreen -> navigator?.push(QueueAssembly)
                     is ShowError -> {}
                 }
             }

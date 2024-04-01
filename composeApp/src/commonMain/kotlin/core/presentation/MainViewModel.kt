@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.AuthenticationUseCase
-import auth.presentation.login.LoginViewModel
 import core.domain.utils.NetworkError
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess

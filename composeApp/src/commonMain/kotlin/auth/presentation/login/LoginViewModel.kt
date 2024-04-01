@@ -3,11 +3,11 @@ package auth.presentation.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.LoginUseCase
-import core.domain.use_case.validation.ValidatePasswordUseCase
-import core.domain.use_case.validation.ValidatePhoneNumberUseCase
 import auth.presentation.login.LoginEvent.OnPhoneNumberChanged
 import auth.presentation.login.LoginViewModel.LoginAction.NavigateToCreateAccountScreen
 import core.domain.model.asString
+import core.domain.use_case.validation.ValidatePasswordUseCase
+import core.domain.use_case.validation.ValidatePhoneNumberUseCase
 import core.domain.utils.asString
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
@@ -19,8 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.getString
 
 class LoginViewModel(
     private val loginUseCase: LoginUseCase,

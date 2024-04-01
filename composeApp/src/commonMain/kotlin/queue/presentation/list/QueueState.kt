@@ -1,10 +1,9 @@
 package queue.presentation.list
 
 import androidx.compose.runtime.Stable
-import queue.domain.module.QueueItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import queue.domain.module.Line
+import queue.domain.module.QueueItem
 
 @Stable
 data class QueueState(

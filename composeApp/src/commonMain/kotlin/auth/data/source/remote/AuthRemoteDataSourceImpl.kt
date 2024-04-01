@@ -1,11 +1,11 @@
 package auth.data.source.remote
 
+import auth.domain.model.AuthResponse
 import auth.domain.model.CreateAccountRequest
 import auth.domain.model.LoginRequest
-import auth.domain.model.AuthResponse
 import core.domain.utils.NetworkError
-import core.domain.utils.runCatching
 import core.domain.utils.Result
+import core.domain.utils.runCatching
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

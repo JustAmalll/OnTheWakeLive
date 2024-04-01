@@ -33,7 +33,6 @@ import auth.presentation.create_account.CreateAccountViewModel.CreateAccountActi
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.NavigateToQueueScreen
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.ShowError
 import auth.presentation.login.LoginAssembly
-import auth.presentation.login.LoginViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.StandardTextField

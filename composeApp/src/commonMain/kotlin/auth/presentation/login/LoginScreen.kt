@@ -1,5 +1,6 @@
 package auth.presentation.login
 
+import MainScreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import auth.presentation.create_account.CreateAccountAssembly
 import auth.presentation.login.LoginEvent.OnCreateAccountClicked
 import auth.presentation.login.LoginEvent.OnPhoneNumberChanged
 import auth.presentation.login.LoginViewModel.LoginAction.NavigateToCreateAccountScreen
@@ -44,7 +44,6 @@ import onthewakelive.composeapp.generated.resources.sign_in
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import queue.presentation.list.QueueAssembly
 
 class LoginAssembly : Screen {
 
@@ -57,8 +56,8 @@ class LoginAssembly : Screen {
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
                 when (action) {
-                    NavigateToCreateAccountScreen -> navigator?.push(CreateAccountAssembly())
-                    NavigateToQueueScreen -> navigator?.push(QueueAssembly)
+                    NavigateToCreateAccountScreen -> navigator?.push(MainScreen)
+                    NavigateToQueueScreen -> navigator?.push(MainScreen)
                     is ShowError -> {}
                 }
             }

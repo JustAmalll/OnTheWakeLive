@@ -49,6 +49,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import queue.presentation.list.QueueAssembly
+import queue.presentation.list.QueueTab
 
 class CreateAccountAssembly : Screen {
 
@@ -62,7 +63,7 @@ class CreateAccountAssembly : Screen {
             viewModel.actions.collect { action ->
                 when (action) {
                     NavigateToLoginScreen -> navigator?.push(LoginAssembly())
-                    NavigateToQueueScreen -> navigator?.push(QueueAssembly)
+                    NavigateToQueueScreen -> navigator?.push(QueueTab)
                     is ShowError -> TODO()
                 }
             }

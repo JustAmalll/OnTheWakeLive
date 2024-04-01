@@ -12,6 +12,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -28,14 +30,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.tab.Tab
+import cafe.adriel.voyager.navigator.tab.TabOptions
 import core.utils.filter
 import kotlinx.collections.immutable.ImmutableList
 import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.profile
 import onthewakelive.composeapp.generated.resources.queue
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
@@ -55,7 +62,25 @@ import queue.presentation.list.components.QueueItem
 import queue.presentation.list.components.SwipeToDeleteContainer
 import queue.presentation.list.components.TabRow
 
-object QueueAssembly : Screen {
+object QueueTab: Tab {
+
+    @Composable
+    override fun Content() {
+        Navigator(QueueAssembly())
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    override val options: TabOptions
+        @Composable
+        get() {
+            val title = stringResource(resource = Res.string.queue)
+            val icon = rememberVectorPainter(image = Icons.Default.Home)
+
+            return remember { TabOptions(index = 0u, title = title, icon = icon) }
+        }
+}
+
+class QueueAssembly: Screen {
 
     @Composable
     override fun Content() {

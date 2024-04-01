@@ -55,7 +55,7 @@ import queue.presentation.list.components.QueueItem
 import queue.presentation.list.components.SwipeToDeleteContainer
 import queue.presentation.list.components.TabRow
 
-class QueueAssembly : Screen {
+object QueueAssembly : Screen {
 
     @Composable
     override fun Content() {

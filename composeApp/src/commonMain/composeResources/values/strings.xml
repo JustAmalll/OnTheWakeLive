@@ -3,14 +3,26 @@
     <string name="queue">Queue</string>
     <string name="profile">Profile</string>
 
-    // Login Screen
+    <!-- Network Errors-->
+    <string name="unknown_error">Oops! An unexpected error has occurred. Please try again later or contact support if the issue persists.</string>
+    <string name="no_internet_error">Oops! Couldn't reach server. Please check your network connection and try again.</string>
+    <string name="server_error">Oops! A server error has occurred. We apologize for the inconvenience. Please try again later or contact support.</string>
+    <string name="request_timeout_error">Request timed out. Please check your internet connection and try again.</string>
+    <string name="incorrect_data_error">Oops! It looks like you've entered invalid data. Please double-check your input and try again.</string>
+    <string name="user_already_exists">Oops! A user with this phone number already exists. Please use a different number or contact support.</string>
+
+    <!-- Validation Errors-->
+    <string name="empty_field_error">This field is required. Please fill it in to proceed.</string>
+    <string name="validate_password_length_error">The password needs to consist of at least 6 characters.</string>
+
+    <!-- Login Screen-->
     <string name="sign_in">Sign In</string>
     <string name="phone_number">Phone number</string>
     <string name="password">Password</string>
-    <string name="dont_have_an_account_yet">Don\'t have an account yet?</string>
+    <string name="dont_have_an_account_yet">Don't have an account yet?</string>
     <string name="create">Create!</string>
 
-    // Register Screen
+    <!-- Register Screen-->
     <string name="sign_up">Sign Up</string>
     <string name="first_name">First name</string>
     <string name="last_name">Last name</string>
@@ -26,11 +38,11 @@
     <string name="cancel">Cancel</string>
     <string name="stay">Stay</string>
 
-    // Queue Item Details Screen
+    <!-- Queue Item Details Screen-->
     <string name="details">Details</string>
     <string name="not_specified">Not specified</string>
 
-    // Edit Profile Screen
+    <!-- Edit Profile Screen-->
     <string name="edit_profile">Edit Profile</string>
     <string name="telegram" translatable="false">Telegram</string>
     <string name="instagram" translatable="false">Instagram</string>

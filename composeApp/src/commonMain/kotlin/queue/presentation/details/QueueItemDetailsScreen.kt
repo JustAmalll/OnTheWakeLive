@@ -90,10 +90,10 @@ private fun QueueItemDetailsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(120.dp)
-                            .padding(horizontal = 16.dp, vertical = 22.dp)
+                            .padding(all = 16.dp)
                             .clip(shape = MaterialTheme.shapes.medium)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 //                    StandardImageView(

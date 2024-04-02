@@ -14,6 +14,12 @@ sealed interface Result<out D, out E : RootError> {
     val isFailure: Boolean get() = this is Error
 }
 
+inline fun <Data, Error : RootError> Result<Data, Error>.getOrNull(): Data? =
+    when(this) {
+        is Result.Error -> null
+        is Result.Success -> data
+    }
+
 @OptIn(ExperimentalContracts::class)
 inline fun <Data, Error : RootError> Result<Data, Error>.onSuccess(
     action: (value: Data) -> Unit
@@ -24,6 +30,9 @@ inline fun <Data, Error : RootError> Result<Data, Error>.onSuccess(
     if (this is Result.Success) {
         action(data)
     }
+    runCatching {
+
+    }.getOrNull()
     return this
 }
 

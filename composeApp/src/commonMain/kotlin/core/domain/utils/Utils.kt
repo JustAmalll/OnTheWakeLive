@@ -4,37 +4,27 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.http.HttpStatusCode
 import okio.IOException
+import core.domain.utils.DataError.Network.*
 
-inline fun <T, R> T.runCatching(block: T.() -> R): Result<R, NetworkError> = try {
+inline fun <T, R> T.runCatchingNetwork(block: T.() -> R): Result<R, DataError.Network> = try {
     Result.Success(block())
 } catch (exception: IOException) {
-    Result.Error(error = NetworkError.NO_INTERNET)
+    Result.Error(error = NO_INTERNET)
 } catch (exception: ClientRequestException) {
     when (exception.response.status) {
-        HttpStatusCode.Conflict -> Result.Error(error = NetworkError.INCORRECT_DATA)
-        HttpStatusCode.RequestTimeout -> Result.Error(error = NetworkError.REQUEST_TIMEOUT)
-        HttpStatusCode.Unauthorized -> Result.Error(error = NetworkError.UNAUTHORIZED)
-        else -> Result.Error(error = NetworkError.UNKNOWN)
+        HttpStatusCode.Conflict -> Result.Error(error = INCORRECT_DATA)
+        HttpStatusCode.RequestTimeout -> Result.Error(error = REQUEST_TIMEOUT)
+        HttpStatusCode.Unauthorized -> Result.Error(error = UNAUTHORIZED)
+        else -> Result.Error(error = UNKNOWN)
     }
 } catch (exception: ServerResponseException) {
-    Result.Error(error = NetworkError.SERVER_ERROR)
+    Result.Error(error = SERVER_ERROR)
 } catch (exception: Exception) {
-    Result.Error(error = NetworkError.UNKNOWN)
+    Result.Error(error = UNKNOWN)
 }
 
-//@OptIn(ExperimentalResourceApi::class)
-//internal inline fun <T, R> T.runCatching(block: T.() -> R): Result<R, NetworkError> = try {
-//    Result.Success(block())
-//} catch (exception: IOException) {
-//    Result.Error(error = Res.string.no_internet_error)
-//} catch (exception: ClientRequestException) {
-//    when (exception.response.status) {
-//        HttpStatusCode.Conflict -> Result.Error(message = Res.string.incorrect_data_error)
-//        HttpStatusCode.RequestTimeout -> Result.Error(message = Res.string.request_timeout_error)
-//        else -> Result.Error(message = Res.string.unknown_error)
-//    }
-//} catch (exception: ServerResponseException) {
-//    Result.Error(message = Res.string.server_error)
-//} catch (exception: Exception) {
-//    Result.Error(message = Res.string.unknown_error)
-//}
+inline fun <T, R> T.runCatchingLocal(block: T.() -> R): Result<R, DataError.Local> = try {
+    Result.Success(block())
+} catch (exception: Exception) {
+    Result.Error(error = DataError.Local.UNKNOWN)
+}

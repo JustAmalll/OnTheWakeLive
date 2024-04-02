@@ -8,4 +8,10 @@ fun initKoin() {
     }
 }
 
-fun appModules() = listOf(queueModule, appModule, authModule, validationModule)
+fun appModules() = listOf(
+    queueModule,
+    appModule,
+    authModule,
+    validationModule,
+    userProfileModule
+)

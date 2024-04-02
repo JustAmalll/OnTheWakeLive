@@ -6,7 +6,7 @@ import auth.domain.model.AuthResponse
 import auth.domain.model.CreateAccountRequest
 import auth.domain.model.LoginRequest
 import auth.domain.repository.AuthRepository
-import core.domain.utils.NetworkError
+import core.domain.utils.DataError
 import core.domain.utils.Result
 
 class AuthRepositoryImpl(
@@ -14,11 +14,20 @@ class AuthRepositoryImpl(
     private val authCacheDataSource: AuthCacheDataSource
 ) : AuthRepository {
 
-    override suspend fun authenticate(): Result<Unit, NetworkError> =
+    override suspend fun authenticate(): Result<Unit, DataError.Network> =
         authRemoteDataSource.authenticate()
 
-    override suspend fun login(loginRequest: LoginRequest): Result<AuthResponse, NetworkError> =
-        authRemoteDataSource.login(loginRequest = loginRequest)
+    override suspend fun login(
+        loginRequest: LoginRequest
+    ): Result<AuthResponse, DataError.Network> = authRemoteDataSource.login(
+        loginRequest = loginRequest
+    )
+
+    override suspend fun createAccount(
+        createAccountRequest: CreateAccountRequest
+    ): Result<AuthResponse, DataError.Network> = authRemoteDataSource.createAccount(
+        createAccountRequest = createAccountRequest
+    )
 
     override suspend fun cacheJwtTokenAndUserId(token: String, userId: String) =
         authCacheDataSource.cacheJwtTokenAndUserId(token = token, userId = userId)
@@ -26,11 +35,6 @@ class AuthRepositoryImpl(
     override suspend fun getUserId(): String? =
         authCacheDataSource.getUserId()
 
-    override suspend fun createAccount(
-        createAccountRequest: CreateAccountRequest
-    ): Result<AuthResponse, NetworkError> = authRemoteDataSource.createAccount(
-        createAccountRequest = createAccountRequest
-    )
 
     override suspend fun logout() =
         authCacheDataSource.logout()

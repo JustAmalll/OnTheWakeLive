@@ -9,6 +9,7 @@ import auth.domain.repository.AuthRepository
 import auth.domain.use_case.AuthenticationUseCase
 import auth.domain.use_case.CreateAccountUseCase
 import auth.domain.use_case.LoginUseCase
+import auth.domain.use_case.LogoutUseCase
 import auth.presentation.create_account.CreateAccountViewModel
 import auth.presentation.login.LoginViewModel
 import org.koin.dsl.module
@@ -21,6 +22,7 @@ val authModule = module {
     factory { AuthenticationUseCase(get()) }
     factory { LoginUseCase(get()) }
     factory { CreateAccountUseCase(get()) }
+    factory { LogoutUseCase(get()) }
 
     factory { LoginViewModel(get(), get(), get()) }
     factory { CreateAccountViewModel(get(), get(), get(), get(), get()) }

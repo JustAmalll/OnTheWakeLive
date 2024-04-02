@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.AuthenticationUseCase
-import core.domain.utils.NetworkError
+import core.domain.utils.DataError
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
 import kotlinx.coroutines.channels.Channel
@@ -34,7 +34,7 @@ class MainViewModel(
             authenticationUseCase().onSuccess {
                 _action.send(MainAction.NavigateToQueueScreen)
             }.onFailure { error ->
-                if (error == NetworkError.UNAUTHORIZED) {
+                if (error == DataError.Network.UNAUTHORIZED) {
                     _action.send(MainAction.NavigateToLoginScreen)
                 } else {
                     _action.send(MainAction.NavigateToServerUnavailableScreen)

@@ -9,7 +9,7 @@ data class QueueItem(
     @SerialName("userId") val userId: String,
     @SerialName("firstName") val firstName: String,
     @SerialName("lastName") val lastName: String?,
-    @SerialName("profilePictureUri") val profilePictureUri: String?,
+    @SerialName("photo") val photo: String?,
     @SerialName("line") val line: Line,
     @SerialName("timestamp") val timestamp: Long
 )

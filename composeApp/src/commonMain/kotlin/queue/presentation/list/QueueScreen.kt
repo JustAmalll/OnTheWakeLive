@@ -13,7 +13,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -42,7 +41,6 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import core.utils.filter
 import kotlinx.collections.immutable.ImmutableList
 import onthewakelive.composeapp.generated.resources.Res
-import onthewakelive.composeapp.generated.resources.profile
 import onthewakelive.composeapp.generated.resources.queue
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
@@ -205,9 +203,9 @@ private fun QueueContent(
                 QueueItem(
                     firstName = item.firstName,
                     lastName = item.lastName,
-                    profilePictureUri = item.profilePictureUri,
+                    photo = item.photo,
                     onItemClicked = { onQueueItemClicked(item.id) },
-                    onUserPhotoClicked = onUserPhotoClicked
+                    onPhotoClicked = onUserPhotoClicked
                 )
             }
         }

@@ -26,7 +26,6 @@ kotlin {
     }
     
     sourceSets {
-        
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
             implementation(libs.androidx.activity.compose)
@@ -71,6 +70,7 @@ kotlin {
             implementation(libs.ktor.darwin)
         }
     }
+    task("testClasses")
 }
 
 android {

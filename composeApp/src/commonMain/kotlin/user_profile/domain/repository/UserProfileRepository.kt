@@ -6,4 +6,5 @@ import user_profile.domain.model.UserProfile
 
 interface UserProfileRepository {
     suspend fun getUserProfile(): Result<UserProfile, DataError.Network>
+    suspend fun updateUserProfile(userProfile: UserProfile): Result<Unit, DataError>
 }

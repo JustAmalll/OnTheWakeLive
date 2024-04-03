@@ -34,7 +34,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.UserDataItem
 import core.utils.Constants.INSTAGRAM_URL
 import onthewakelive.composeapp.generated.resources.Res
-import onthewakelive.composeapp.generated.resources.date_of_birth
 import onthewakelive.composeapp.generated.resources.details
 import onthewakelive.composeapp.generated.resources.instagram
 import onthewakelive.composeapp.generated.resources.phone_number
@@ -138,19 +137,16 @@ private fun QueueItemDetailsScreen(
                 )
                 UserDataItem(
                     title = stringResource(resource = Res.string.telegram),
-                    value = userProfile.telegram
+                    value = userProfile.telegram,
+                    showDivider = state.isUserAdmin
                 )
                 if (state.isUserAdmin) {
                     UserDataItem(
                         title = stringResource(resource = Res.string.phone_number),
-                        value = "+${userProfile.phoneNumber}"
+                        value = "+${userProfile.phoneNumber}",
+                        showDivider = false
                     )
                 }
-                UserDataItem(
-                    title = stringResource(resource = Res.string.date_of_birth),
-                    value = userProfile.dateOfBirth,
-                    showDivider = false
-                )
             }
         }
     }

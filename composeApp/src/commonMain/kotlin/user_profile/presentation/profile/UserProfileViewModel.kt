@@ -1,4 +1,4 @@
-package user_profile.presentation
+package user_profile.presentation.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import user_profile.domain.use_case.GetUserProfileUseCase
-import user_profile.presentation.UserProfileEvent.OnLogoutClicked
+import user_profile.presentation.profile.UserProfileEvent.OnEditProfileClicked
+import user_profile.presentation.profile.UserProfileEvent.OnLogoutClicked
+import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToEditProfileScreen
 
 class UserProfileViewModel(
     private val getUserProfileUseCase: GetUserProfileUseCase,
@@ -35,7 +37,12 @@ class UserProfileViewModel(
     fun onEvent(event: UserProfileEvent) {
         when (event) {
             OnLogoutClicked -> logout()
-            UserProfileEvent.OnEditProfileClicked -> TODO()
+
+            OnEditProfileClicked -> viewModelScope.launch {
+                _action.send(NavigateToEditProfileScreen)
+            }
+
+            UserProfileEvent.OnUserPhotoClicked -> TODO()
         }
     }
 
@@ -58,6 +65,7 @@ class UserProfileViewModel(
 
     sealed interface UserProfileAction {
         data object NavigateToLoginScreen : UserProfileAction
+        data object NavigateToEditProfileScreen : UserProfileAction
         data class ShowError(val message: String) : UserProfileAction
     }
 }

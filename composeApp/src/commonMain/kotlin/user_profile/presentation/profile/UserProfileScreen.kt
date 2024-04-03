@@ -1,6 +1,10 @@
-package user_profile.presentation
+package user_profile.presentation.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
@@ -30,18 +36,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import auth.presentation.login.LoginAssembly
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import core.presentation.components.UserDataItem
+import core.presentation.utils.rememberBitmapFromBytes
 import core.utils.Constants
 import onthewakelive.composeapp.generated.resources.Res
-import onthewakelive.composeapp.generated.resources.date_of_birth
 import onthewakelive.composeapp.generated.resources.instagram
 import onthewakelive.composeapp.generated.resources.phone_number
 import onthewakelive.composeapp.generated.resources.profile
@@ -49,27 +58,19 @@ import onthewakelive.composeapp.generated.resources.telegram
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import user_profile.presentation.UserProfileEvent.OnLogoutClicked
-import user_profile.presentation.UserProfileViewModel.UserProfileAction.NavigateToLoginScreen
+import user_profile.presentation.edit_profile.EditUserProfileAssembly
+import user_profile.presentation.profile.UserProfileEvent.OnEditProfileClicked
+import user_profile.presentation.profile.UserProfileEvent.OnLogoutClicked
+import user_profile.presentation.profile.UserProfileEvent.OnUserPhotoClicked
+import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToEditProfileScreen
+import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToLoginScreen
+import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.ShowError
 
-object UserProfileAssembly : Tab {
+object UserProfileTab : Tab {
 
     @Composable
     override fun Content() {
-        val viewModel: UserProfileViewModel = koinInject()
-        val state by viewModel.state.collectAsState()
-        val navigator = LocalNavigator.current
-
-        LaunchedEffect(key1 = Unit) {
-            viewModel.actions.collect { action ->
-                when (action) {
-                    NavigateToLoginScreen -> navigator?.push(LoginAssembly())
-                    is UserProfileViewModel.UserProfileAction.ShowError -> TODO()
-                }
-            }
-        }
-
-        UserProfileScreen(state = state, onEvent = viewModel::onEvent)
+        Navigator(UserProfileAssembly())
     }
 
     @OptIn(ExperimentalResourceApi::class)
@@ -81,6 +82,28 @@ object UserProfileAssembly : Tab {
 
             return remember { TabOptions(index = 1u, title = title, icon = icon) }
         }
+}
+
+private class UserProfileAssembly : Screen {
+
+    @Composable
+    override fun Content() {
+        val viewModel: UserProfileViewModel = koinInject()
+        val state by viewModel.state.collectAsState()
+        val navigator = LocalNavigator.current
+
+        LaunchedEffect(key1 = Unit) {
+            viewModel.actions.collect { action ->
+                when (action) {
+                    NavigateToLoginScreen -> navigator?.push(LoginAssembly())
+                    NavigateToEditProfileScreen -> navigator?.push(EditUserProfileAssembly())
+                    is ShowError -> {}
+                }
+            }
+        }
+
+        UserProfileScreen(state = state, onEvent = viewModel::onEvent)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
@@ -111,21 +134,36 @@ private fun UserProfileScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(120.dp)
                             .padding(all = 16.dp)
                             .clip(shape = MaterialTheme.shapes.medium)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-//                    StandardImageView(
-//                        model = state.profilePictureUri,
-//                        onUserAvatarClicked = { pictureUrl ->
-//                            navController.navigate(
-//                                Screen.FullSizeAvatarScreen.passPictureUrl(pictureUrl)
-//                            )
-//                        }
-//                    )
+                        Box(
+                            modifier = Modifier
+                                .size(46.dp)
+                                .clickable { onEvent(OnUserPhotoClicked) }
+                                .clip(CircleShape)
+                                .border(
+                                    width = 1.dp,
+                                    shape = CircleShape,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            rememberBitmapFromBytes(bytes = state.userProfile.photo)?.let {
+                                Image(
+                                    modifier = Modifier.fillMaxSize(),
+                                    bitmap = it,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop
+                                )
+                            } ?: Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = null
+                            )
+                        }
                         Column(
                             modifier = Modifier
                                 .padding(start = 12.dp)
@@ -137,16 +175,14 @@ private fun UserProfileScreen(
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
-                            Spacer(modifier = Modifier.height(1.dp))
                             Text(
                                 text = userProfile.lastName,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        IconButton(
-                            onClick = { onEvent(UserProfileEvent.OnEditProfileClicked) }
-                        ) {
+                        IconButton(onClick = { onEvent(OnEditProfileClicked) }) {
                             Icon(
+                                modifier = Modifier.size(20.dp),
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = null
                             )
@@ -176,11 +212,7 @@ private fun UserProfileScreen(
                 )
                 UserDataItem(
                     title = stringResource(resource = Res.string.phone_number),
-                    value = "+${userProfile.phoneNumber}"
-                )
-                UserDataItem(
-                    title = stringResource(resource = Res.string.date_of_birth),
-                    value = userProfile.dateOfBirth,
+                    value = "+${userProfile.phoneNumber}",
                     showDivider = false
                 )
             }

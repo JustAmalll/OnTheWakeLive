@@ -27,6 +27,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import auth.presentation.create_account.CreateAccountAssembly
+import auth.presentation.create_account.CreateAccountScreen
 import auth.presentation.login.LoginEvent.OnCreateAccountClicked
 import auth.presentation.login.LoginEvent.OnPhoneNumberChanged
 import auth.presentation.login.LoginViewModel.LoginAction.NavigateToCreateAccountScreen
@@ -56,7 +58,7 @@ class LoginAssembly : Screen {
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
                 when (action) {
-                    NavigateToCreateAccountScreen -> navigator?.push(MainScreen)
+                    NavigateToCreateAccountScreen -> navigator?.push(CreateAccountAssembly())
                     NavigateToQueueScreen -> navigator?.push(MainScreen)
                     is ShowError -> {}
                 }

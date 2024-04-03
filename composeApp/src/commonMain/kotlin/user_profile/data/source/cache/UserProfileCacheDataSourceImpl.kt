@@ -12,13 +12,11 @@ class UserProfileCacheDataSourceImpl(
     private val observableSettings: ObservableSettings
 ) : UserProfileCacheDataSource {
 
-    override suspend fun cacheUserProfile(userProfile: UserProfile) {
-        runCatchingLocal {
-            observableSettings.putString(
-                key = USER_PROFILE,
-                value = Json.encodeToString(userProfile)
-            )
-        }
+    override suspend fun cacheUserProfile(userProfile: UserProfile) = runCatchingLocal {
+        observableSettings.putString(
+            key = USER_PROFILE,
+            value = Json.encodeToString(userProfile)
+        )
     }
 
     override suspend fun getUserProfile(): Result<UserProfile?, DataError.Local> =

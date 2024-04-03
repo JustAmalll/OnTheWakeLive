@@ -25,7 +25,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import queue.presentation.list.QueueTab
 import server_unavailable.ServerUnavailableAssembly
-import user_profile.presentation.UserProfileAssembly
+import user_profile.presentation.profile.UserProfileTab
 
 @Composable
 @Preview
@@ -56,7 +56,7 @@ object MainScreen : Screen {
                 bottomBar = {
                     NavigationBar {
                         TabNavigationItem(tab = QueueTab, tabNavigator = tabNavigator)
-                        TabNavigationItem(tab = UserProfileAssembly, tabNavigator = tabNavigator)
+                        TabNavigationItem(tab = UserProfileTab, tabNavigator = tabNavigator)
                     }
                 }
             ) {

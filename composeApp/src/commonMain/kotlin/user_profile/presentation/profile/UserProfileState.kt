@@ -1,4 +1,4 @@
-package user_profile.presentation
+package user_profile.presentation.profile
 
 import androidx.compose.runtime.Stable
 import user_profile.domain.model.UserProfile

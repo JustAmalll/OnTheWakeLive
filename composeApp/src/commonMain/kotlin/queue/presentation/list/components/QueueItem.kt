@@ -23,9 +23,9 @@ import coil3.compose.AsyncImage
 fun QueueItem(
     firstName: String,
     lastName: String?,
-    profilePictureUri: String?,
+    photo: String?,
     onItemClicked: () -> Unit,
-    onUserPhotoClicked: (String) -> Unit
+    onPhotoClicked: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -36,7 +36,7 @@ fun QueueItem(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        profilePictureUri?.let {
+        photo?.let {
             AsyncImage(
                 modifier = Modifier
                     .clip(CircleShape)

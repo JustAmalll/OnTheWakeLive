@@ -17,7 +17,9 @@ import kotlinx.coroutines.launch
 import user_profile.domain.use_case.GetUserProfileUseCase
 import user_profile.presentation.profile.UserProfileEvent.OnEditProfileClicked
 import user_profile.presentation.profile.UserProfileEvent.OnLogoutClicked
+import user_profile.presentation.profile.UserProfileEvent.OnUserPhotoClicked
 import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToEditProfileScreen
+import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToFullSizePhotoScreen
 
 class UserProfileViewModel(
     private val getUserProfileUseCase: GetUserProfileUseCase,
@@ -42,7 +44,11 @@ class UserProfileViewModel(
                 _action.send(NavigateToEditProfileScreen)
             }
 
-            UserProfileEvent.OnUserPhotoClicked -> TODO()
+            is OnUserPhotoClicked -> viewModelScope.launch {
+                state.value.userProfile?.photo?.let { photo ->
+                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
+                }
+            }
         }
     }
 
@@ -64,8 +70,11 @@ class UserProfileViewModel(
     }
 
     sealed interface UserProfileAction {
+        data class ShowError(val message: String) : UserProfileAction
         data object NavigateToLoginScreen : UserProfileAction
         data object NavigateToEditProfileScreen : UserProfileAction
-        data class ShowError(val message: String) : UserProfileAction
+
+        @Suppress("ArrayInDataClass")
+        data class NavigateToFullSizePhotoScreen(val photo: ByteArray) : UserProfileAction
     }
 }

@@ -1,19 +1,12 @@
 package user_profile.presentation.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
@@ -36,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,8 +40,9 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import core.presentation.components.UserDataItem
-import core.presentation.utils.rememberBitmapFromBytes
+import core.presentation.components.UserPhoto
 import core.utils.Constants
+import full_size_photo.presentation.FullSizePhotoAssembly
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.instagram
 import onthewakelive.composeapp.generated.resources.phone_number
@@ -63,6 +56,7 @@ import user_profile.presentation.profile.UserProfileEvent.OnEditProfileClicked
 import user_profile.presentation.profile.UserProfileEvent.OnLogoutClicked
 import user_profile.presentation.profile.UserProfileEvent.OnUserPhotoClicked
 import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToEditProfileScreen
+import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToFullSizePhotoScreen
 import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToLoginScreen
 import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.ShowError
 
@@ -97,6 +91,11 @@ private class UserProfileAssembly : Screen {
                 when (action) {
                     NavigateToLoginScreen -> navigator?.push(LoginAssembly())
                     NavigateToEditProfileScreen -> navigator?.push(EditUserProfileAssembly())
+
+                    is NavigateToFullSizePhotoScreen -> navigator?.push(
+                        FullSizePhotoAssembly(photo = action.photo)
+                    )
+
                     is ShowError -> {}
                 }
             }
@@ -140,30 +139,10 @@ private fun UserProfileScreen(
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(46.dp)
-                                .clickable { onEvent(OnUserPhotoClicked) }
-                                .clip(CircleShape)
-                                .border(
-                                    width = 1.dp,
-                                    shape = CircleShape,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            rememberBitmapFromBytes(bytes = state.userProfile.photo)?.let {
-                                Image(
-                                    modifier = Modifier.fillMaxSize(),
-                                    bitmap = it,
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop
-                                )
-                            } ?: Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = null
-                            )
-                        }
+                        UserPhoto(
+                            photo = state.userProfile.photo,
+                            onClick = { onEvent(OnUserPhotoClicked) }
+                        )
                         Column(
                             modifier = Modifier
                                 .padding(start = 12.dp)

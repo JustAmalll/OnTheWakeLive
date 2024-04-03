@@ -60,7 +60,7 @@ import queue.presentation.list.components.QueueItem
 import queue.presentation.list.components.SwipeToDeleteContainer
 import queue.presentation.list.components.TabRow
 
-object QueueTab: Tab {
+object QueueTab : Tab {
 
     @Composable
     override fun Content() {
@@ -78,7 +78,7 @@ object QueueTab: Tab {
         }
 }
 
-class QueueAssembly: Screen {
+class QueueAssembly : Screen {
 
     @Composable
     override fun Content() {
@@ -188,7 +188,7 @@ private fun QueueContent(
     queue: ImmutableList<QueueItem>,
     onQueueItemClicked: (String) -> Unit,
     onQueueLeaved: (String) -> Unit,
-    onUserPhotoClicked: (String) -> Unit
+    onUserPhotoClicked: (ByteArray) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -205,7 +205,7 @@ private fun QueueContent(
                     lastName = item.lastName,
                     photo = item.photo,
                     onItemClicked = { onQueueItemClicked(item.id) },
-                    onPhotoClicked = onUserPhotoClicked
+                    onPhotoClicked = { item.photo?.let(onUserPhotoClicked) }
                 )
             }
         }

@@ -69,6 +69,8 @@ kotlin {
             implementation(libs.reorderable)
 
             implementation(libs.uuid)
+
+            implementation("io.github.alexzhirkevich:compottie:1.1.1")
         }
         iosMain.dependencies {
             implementation(libs.ktor.darwin)

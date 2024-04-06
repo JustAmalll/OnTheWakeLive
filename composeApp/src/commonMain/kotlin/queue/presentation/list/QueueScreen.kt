@@ -68,6 +68,7 @@ import queue.presentation.list.QueueEvent.OnSaveReorderedQueueClicked
 import queue.presentation.list.QueueEvent.OnUserPhotoClicked
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
+import queue.presentation.list.components.EmptyQueueContent
 import queue.presentation.list.components.LeaveQueueConfirmationDialog
 import queue.presentation.list.components.QueueItem
 import queue.presentation.list.components.SwipeToDeleteContainer
@@ -238,7 +239,7 @@ private fun QueueContent(
     queue: ImmutableList<QueueItem>,
     onQueueItemClicked: (Uuid) -> Unit,
     onQueueLeaved: (Uuid) -> Unit,
-    onUserPhotoClicked: (ByteArray) -> Unit,
+    onUserPhotoClicked: (String) -> Unit,
     onQueueReordered: (from: Int, to: Int) -> Unit
 ) {
     val isUserAdmin = LocalIsUserAdmin.current
@@ -252,28 +253,32 @@ private fun QueueContent(
         haptic.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        state = lazyListState,
-        contentPadding = PaddingValues(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(key = { it.id }, items = queue) { item ->
-            ReorderableItem(reorderableLazyListState = reorderableLazyColumnState, key = item.id) {
-
-                SwipeToDeleteContainer(
-                    swipeEnabled = isUserAdmin || userId == item.userId,
-                    onDelete = { onQueueLeaved(item.id) }
+    if (queue.isEmpty()) {
+        EmptyQueueContent()
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = lazyListState,
+            contentPadding = PaddingValues(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(key = { it.id }, items = queue) { item ->
+                ReorderableItem(
+                    reorderableLazyListState = reorderableLazyColumnState,
+                    key = item.id
                 ) {
-                    QueueItem(
-                        firstName = item.firstName,
-                        lastName = item.lastName,
-                        photo = null,
-                        onItemClicked = { onQueueItemClicked(item.userId) },
-                        onPhotoClicked = {
-//                            item.photo?.let(onUserPhotoClicked)
-                        }
-                    )
+                    SwipeToDeleteContainer(
+                        swipeEnabled = isUserAdmin || userId == item.userId,
+                        onDelete = { onQueueLeaved(item.id) }
+                    ) {
+                        QueueItem(
+                            firstName = item.firstName,
+                            lastName = item.lastName,
+                            photo = null,
+                            onItemClicked = { item.userId?.let(onQueueItemClicked) },
+                            onPhotoClicked = { item.photo?.let(onUserPhotoClicked) }
+                        )
+                    }
                 }
             }
         }

@@ -40,6 +40,9 @@
     <string name="cancel">Cancel</string>
     <string name="stay">Stay</string>
 
+    <!-- Empty Queue Content-->
+    <string name="empty_queue">There is no one in the queue</string>
+
     <!-- Queue Item Details Screen-->
     <string name="details">Details</string>
     <string name="not_specified">Not specified</string>

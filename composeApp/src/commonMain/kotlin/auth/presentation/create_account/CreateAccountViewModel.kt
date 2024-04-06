@@ -30,11 +30,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CreateAccountViewModel(
-    private val createAccountUseCase: CreateAccountUseCase,
-    private val validateFirstNameUseCase: ValidateFirstNameUseCase,
-    private val validateLastNameUseCase: ValidateLastNameUseCase,
-    private val validatePhoneNumberUseCase: ValidatePhoneNumberUseCase,
-    private val validatePasswordUseCase: ValidatePasswordUseCase
+    private val createAccount: CreateAccountUseCase,
+    private val validateFirstName: ValidateFirstNameUseCase,
+    private val validateLastName: ValidateLastNameUseCase,
+    private val validatePhoneNumber: ValidatePhoneNumberUseCase,
+    private val validatePassword: ValidatePasswordUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateAccountState())
@@ -58,39 +58,32 @@ class CreateAccountViewModel(
 
     private fun createAccount() {
         viewModelScope.launch {
-            val firstNameResult = validateFirstNameUseCase(
-                firstName = state.value.firstName
-            ).onFailure { error ->
-                _state.update { it.copy(firstNameError = error.asString()) }
-            }
-            val lastNameError = validateLastNameUseCase(
-                lastName = state.value.lastName
-            ).onFailure { error ->
-                _state.update { it.copy(lastNameError = error.asString()) }
-            }
-            val phoneNumberResult = validatePhoneNumberUseCase(
-                phoneNumber = state.value.phoneNumber
-            ).onFailure { error ->
-                _state.update { it.copy(phoneNumberError = error.asString()) }
-            }
-            val passwordResult = validatePasswordUseCase(
-                password = state.value.password
-            ).onFailure { error ->
-                _state.update { it.copy(passwordError = error.asString()) }
+            val firstNameError = validateFirstName(state.value.firstName).errorOrNull()
+            val lastNameError = validateLastName(state.value.lastName).errorOrNull()
+            val phoneNumberError = validatePhoneNumber(state.value.phoneNumber).errorOrNull()
+            val passwordError = validatePassword(state.value.password).errorOrNull()
+
+            _state.update {
+                it.copy(
+                    firstNameError = firstNameError?.asString(),
+                    lastNameError = lastNameError?.asString(),
+                    phoneNumberError = phoneNumberError?.asString(),
+                    passwordError = passwordError?.asString()
+                )
             }
             val hasError = listOf(
-                firstNameResult.isFailure,
-                lastNameError.isFailure,
-                phoneNumberResult.isFailure,
-                passwordResult.isFailure
+                firstNameError != null,
+                lastNameError != null,
+                phoneNumberError != null,
+                passwordError != null
             ).any { it }
 
             if (hasError) {
                 return@launch
             }
-            _state.value = state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
 
-            createAccountUseCase(
+            createAccount(
                 firstName = state.value.firstName,
                 lastName = state.value.lastName,
                 phoneNumber = state.value.phoneNumber,
@@ -100,7 +93,7 @@ class CreateAccountViewModel(
             }.onFailure { error ->
                 _action.send(ShowError(errorMessage = error.asString()))
             }
-            _state.value = state.value.copy(isLoading = false)
+            _state.update { it.copy(isLoading = false) }
         }
     }
 

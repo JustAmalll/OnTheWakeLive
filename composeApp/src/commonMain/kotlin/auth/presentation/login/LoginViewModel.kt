@@ -21,9 +21,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-    private val loginUseCase: LoginUseCase,
-    private val validatePhoneNumberUseCase: ValidatePhoneNumberUseCase,
-    private val validatePasswordUseCase: ValidatePasswordUseCase
+    private val login: LoginUseCase,
+    private val validatePhoneNumber: ValidatePhoneNumberUseCase,
+    private val validatePassword: ValidatePasswordUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -46,22 +46,21 @@ class LoginViewModel(
 
     private fun signIn() {
         viewModelScope.launch {
-            val phoneNumberResult = validatePhoneNumberUseCase(
-                phoneNumber = state.value.phoneNumber
-            ).onFailure { error ->
-                _state.update { it.copy(phoneNumberError = error.asString()) }
+            val phoneNumberError = validatePhoneNumber(state.value.phoneNumber).errorOrNull()
+            val passwordError = validatePassword(state.value.password).errorOrNull()
+
+            _state.update {
+                it.copy(
+                    phoneNumberError = phoneNumberError?.asString(),
+                    passwordError = passwordError?.asString()
+                )
             }
-            val passwordResult = validatePasswordUseCase(
-                password = state.value.password
-            ).onFailure { error ->
-                _state.update { it.copy(passwordError = error.asString()) }
-            }
-            if (phoneNumberResult.isFailure || passwordResult.isFailure) {
+            if (phoneNumberError != null || passwordError != null) {
                 return@launch
             }
-            _state.value = state.value.copy(isLoading = true)
+            _state.update { it.copy(isLoading = true) }
 
-            loginUseCase(
+            login(
                 phoneNumber = state.value.phoneNumber,
                 password = state.value.password
             ).onSuccess {
@@ -69,7 +68,7 @@ class LoginViewModel(
             }.onFailure { error ->
                 _action.send(LoginAction.ShowError(errorMessage = error.asString()))
             }
-            _state.value = state.value.copy(isLoading = false)
+            _state.update { it.copy(isLoading = false) }
         }
     }
 

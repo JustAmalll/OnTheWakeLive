@@ -35,8 +35,10 @@ import auth.presentation.create_account.CreateAccountViewModel.CreateAccountActi
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.NavigateToQueueScreen
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.ShowError
 import auth.presentation.login.LoginAssembly
+import auth.presentation.login.LoginEvent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import core.presentation.components.StandardButton
 import core.presentation.components.StandardTextField
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.already_have_an_account
@@ -169,17 +171,17 @@ fun CreateAccountScreen(
                 ),
                 error = state.passwordError
             )
-            Button(
+            StandardButton(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(top = 16.dp),
                 onClick = {
                     onEvent(CreateAccountEvent.OnCreateAccountClicked)
                     focusManager.clearFocus()
                 },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(top = 16.dp)
-            ) {
-                Text(text = stringResource(resource = Res.string.create_account))
-            }
+                text = stringResource(resource = Res.string.create_account),
+                isLoading = state.isLoading
+            )
         }
     }
 }

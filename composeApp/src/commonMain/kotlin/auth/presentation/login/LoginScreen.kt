@@ -1,6 +1,8 @@
 package auth.presentation.login
 
 import MainScreen
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +38,7 @@ import auth.presentation.login.LoginViewModel.LoginAction.NavigateToQueueScreen
 import auth.presentation.login.LoginViewModel.LoginAction.ShowError
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import core.presentation.components.StandardButton
 import core.presentation.components.StandardTextField
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.create
@@ -143,17 +146,17 @@ private fun LoginScreen(
                 ),
                 error = state.passwordError
             )
-            Button(
+            StandardButton(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(top = 16.dp),
                 onClick = {
                     onEvent(LoginEvent.OnSignInClicked)
                     focusManager.clearFocus()
                 },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(top = 16.dp)
-            ) {
-                Text(text = stringResource(resource = Res.string.sign_in))
-            }
+                text = stringResource(resource = Res.string.sign_in),
+                isLoading = state.isLoading
+            )
         }
     }
 }

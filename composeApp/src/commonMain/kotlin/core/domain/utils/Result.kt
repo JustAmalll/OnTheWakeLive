@@ -12,13 +12,17 @@ sealed interface Result<out D, out E : RootError> {
 
     val isSuccess: Boolean get() = this !is Error
     val isFailure: Boolean get() = this is Error
-}
 
-inline fun <Data, Error : RootError> Result<Data, Error>.getOrNull(): Data? =
-    when (this) {
-        is Result.Error -> null
-        is Result.Success -> data
+    fun getOrNull(): D? = when (this) {
+        is Error -> null
+        is Success -> data
     }
+
+    fun errorOrNull(): E? = when (this) {
+        is Error -> error
+        else -> null
+    }
+}
 
 @OptIn(ExperimentalContracts::class)
 inline fun <Data, Error : RootError> Result<Data, Error>.onSuccess(

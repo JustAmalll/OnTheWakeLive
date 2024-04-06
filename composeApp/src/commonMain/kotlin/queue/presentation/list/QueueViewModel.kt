@@ -135,9 +135,12 @@ class QueueViewModel(
 
     private fun getQueue() {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+
             queueRepository.getQueue().onSuccess { queue ->
                 _state.update { it.copy(queue = queue.toPersistentList()) }
             }
+            _state.update { it.copy(isLoading = false) }
         }
     }
 

@@ -10,7 +10,7 @@ data class QueueItem(
     @Serializable(with = UuidSerializer::class)
     @SerialName("id") val id: Uuid,
     @Serializable(with = UuidSerializer::class)
-    @SerialName("userId") val userId: Uuid,
+    @SerialName("userId") val userId: Uuid?,
     @SerialName("firstName") val firstName: String,
     @SerialName("lastName") val lastName: String?,
     @SerialName("photo") val photo: String?,

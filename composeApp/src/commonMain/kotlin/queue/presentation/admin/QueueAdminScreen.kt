@@ -1,6 +1,5 @@
 package queue.presentation.admin
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,16 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +36,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import core.presentation.components.StandardButton
 import core.presentation.components.StandardTextField
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.add
@@ -166,28 +163,15 @@ private fun QueueAdminScreen(
                     }
                 }
             }
-            Button(
+            StandardButton(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
                 onClick = { onEvent(QueueAdminEvent.OnAddUserClicked) },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                enabled = state.firstName.isNotEmpty() || state.selectedUser != null
-            ) {
-                AnimatedContent(targetState = state.isUserSearching) { isUserSearching ->
-                    if (isUserSearching) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(25.dp),
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(text = stringResource(resource = Res.string.add))
-                    }
-                }
-            }
+                enabled = state.firstName.isNotEmpty() || state.selectedUser != null,
+                isLoading = state.isUserSearching,
+                text = stringResource(resource = Res.string.add)
+            )
         }
     }
 }

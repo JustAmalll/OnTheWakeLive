@@ -1,5 +1,6 @@
 package user_profile.presentation.profile
 
+import LocalSnackBarHostState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ import auth.presentation.login.LoginAssembly
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import core.presentation.components.UserDataItem
@@ -64,7 +66,27 @@ object UserProfileTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(UserProfileAssembly())
+        val viewModel: UserProfileViewModel = koinInject()
+        val state by viewModel.state.collectAsState()
+        val navigator = LocalNavigator.currentOrThrow.parent
+        val snackBarHostState = LocalSnackBarHostState.current
+
+        LaunchedEffect(key1 = Unit) {
+            viewModel.actions.collect { action ->
+                when (action) {
+                    NavigateToLoginScreen -> navigator?.replaceAll(LoginAssembly())
+                    NavigateToEditProfileScreen -> navigator?.push(EditUserProfileAssembly())
+
+                    is NavigateToFullSizePhotoScreen -> navigator?.push(
+                        FullSizePhotoAssembly(photo = action.photo)
+                    )
+
+                    is ShowError -> snackBarHostState(action.message)
+                }
+            }
+        }
+
+        UserProfileScreen(state = state, onEvent = viewModel::onEvent)
     }
 
     @OptIn(ExperimentalResourceApi::class)
@@ -76,33 +98,6 @@ object UserProfileTab : Tab {
 
             return remember { TabOptions(index = 1u, title = title, icon = icon) }
         }
-}
-
-private class UserProfileAssembly : Screen {
-
-    @Composable
-    override fun Content() {
-        val viewModel: UserProfileViewModel = koinInject()
-        val state by viewModel.state.collectAsState()
-        val navigator = LocalNavigator.current
-
-        LaunchedEffect(key1 = Unit) {
-            viewModel.actions.collect { action ->
-                when (action) {
-                    NavigateToLoginScreen -> navigator?.push(LoginAssembly())
-                    NavigateToEditProfileScreen -> navigator?.push(EditUserProfileAssembly())
-
-                    is NavigateToFullSizePhotoScreen -> navigator?.push(
-                        FullSizePhotoAssembly(photo = action.photo)
-                    )
-
-                    is ShowError -> {}
-                }
-            }
-        }
-
-        UserProfileScreen(state = state, onEvent = viewModel::onEvent)
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
@@ -140,7 +135,7 @@ private fun UserProfileScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         UserPhoto(
-                            photo = state.userProfile.photo,
+                            photo = null,
                             onClick = { onEvent(OnUserPhotoClicked) }
                         )
                         Column(

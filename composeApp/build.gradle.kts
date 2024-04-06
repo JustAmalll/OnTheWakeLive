@@ -65,6 +65,10 @@ kotlin {
             implementation(libs.voyager.tabNavigator)
 
             implementation(libs.multiplatform.settings)
+
+            implementation(libs.reorderable)
+
+            implementation(libs.uuid)
         }
         iosMain.dependencies {
             implementation(libs.ktor.darwin)

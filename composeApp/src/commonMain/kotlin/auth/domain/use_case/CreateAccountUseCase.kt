@@ -22,9 +22,6 @@ class CreateAccountUseCase(private val authRepository: AuthRepository) {
             password = password.trim()
         )
     ).onSuccess { response ->
-        authRepository.cacheJwtTokenAndUserId(
-            token = response.token,
-            userId = response.userId
-        )
+        authRepository.cacheAuthResponse(authResponse = response)
     }
 }

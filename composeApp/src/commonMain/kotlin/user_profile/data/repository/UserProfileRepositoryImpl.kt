@@ -1,5 +1,6 @@
 package user_profile.data.repository
 
+import com.benasher44.uuid.Uuid
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import core.domain.utils.onSuccess
@@ -29,4 +30,13 @@ class UserProfileRepositoryImpl(
         userProfileRemoteDataSource.updateUserProfile(userProfile = userProfile).onSuccess {
             return userProfileCacheDataSource.cacheUserProfile(userProfile = userProfile)
         }
+
+    override suspend fun getQueueItemDetails(userId: Uuid): Result<UserProfile, DataError.Network> =
+        userProfileRemoteDataSource.getQueueItemDetails(userId = userId)
+
+    override suspend fun searchUsers(
+        searchQuery: String
+    ): Result<List<UserProfile>, DataError.Network> = userProfileRemoteDataSource.searchUsers(
+        searchQuery = searchQuery
+    )
 }

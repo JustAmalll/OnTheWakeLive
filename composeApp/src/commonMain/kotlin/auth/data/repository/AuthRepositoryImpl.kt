@@ -6,6 +6,7 @@ import auth.domain.model.AuthResponse
 import auth.domain.model.CreateAccountRequest
 import auth.domain.model.LoginRequest
 import auth.domain.repository.AuthRepository
+import com.benasher44.uuid.Uuid
 import core.domain.utils.DataError
 import core.domain.utils.Result
 
@@ -29,12 +30,14 @@ class AuthRepositoryImpl(
         createAccountRequest = createAccountRequest
     )
 
-    override suspend fun cacheJwtTokenAndUserId(token: String, userId: String) =
-        authCacheDataSource.cacheJwtTokenAndUserId(token = token, userId = userId)
+    override suspend fun cacheAuthResponse(authResponse: AuthResponse) =
+        authCacheDataSource.cacheAuthResponse(authResponse = authResponse)
 
-    override suspend fun getUserId(): String? =
+    override suspend fun isUserAdmin(): Boolean =
+        authCacheDataSource.isUserAdmin()
+
+    override suspend fun getUserId(): Uuid? =
         authCacheDataSource.getUserId()
-
 
     override suspend fun logout() =
         authCacheDataSource.logout()

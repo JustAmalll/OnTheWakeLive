@@ -2,6 +2,8 @@ package queue.presentation.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.benasher44.uuid.Uuid
+import core.domain.utils.onSuccess
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,14 +12,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import queue.domain.repository.QueueRepository
 import queue.presentation.details.QueueItemDetailsEvent.OnNavigateBackClicked
 import queue.presentation.details.QueueItemDetailsViewModel.QueueItemDetailsAction.NavigateBack
-import queue.presentation.details.QueueItemDetailsViewModel.QueueItemDetailsAction.NavigateToFullSizePhotoScreen
+import user_profile.domain.use_case.GetQueueItemDetailsUseCase
 
 class QueueItemDetailsViewModel(
-    private val queueRepository: QueueRepository,
-    private val queueItemId: String
+    private val getQueueItemDetails: GetQueueItemDetailsUseCase,
+    private val userId: Uuid
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(QueueItemDetailsState())
@@ -37,9 +38,9 @@ class QueueItemDetailsViewModel(
             }
 
             QueueItemDetailsEvent.OnPhotoClicked -> viewModelScope.launch {
-                state.value.userProfile?.photo?.let { photo ->
-                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
-                }
+//                state.value.userProfile?.photo?.let { photo ->
+//                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
+//                }
             }
         }
     }
@@ -48,12 +49,8 @@ class QueueItemDetailsViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            queueRepository.getQueueItemDetails(
-                queueItemId = queueItemId
-            ).onSuccess { userProfile ->
+            getQueueItemDetails(userId = userId).onSuccess { userProfile ->
                 _state.update { it.copy(userProfile = userProfile) }
-            }.onFailure {
-                it.printStackTrace()
             }
             _state.update { it.copy(isLoading = false) }
         }

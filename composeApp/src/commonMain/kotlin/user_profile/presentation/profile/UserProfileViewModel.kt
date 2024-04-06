@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import queue.domain.use_case.CloseSessionUseCase
 import user_profile.domain.use_case.GetUserProfileUseCase
 import user_profile.presentation.profile.UserProfileEvent.OnEditProfileClicked
 import user_profile.presentation.profile.UserProfileEvent.OnLogoutClicked
@@ -23,7 +24,8 @@ import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.
 
 class UserProfileViewModel(
     private val getUserProfileUseCase: GetUserProfileUseCase,
-    private val logoutUseCase: LogoutUseCase
+    private val logoutUseCase: LogoutUseCase,
+    private val closeSessionUseCase: CloseSessionUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UserProfileState())
@@ -45,15 +47,17 @@ class UserProfileViewModel(
             }
 
             is OnUserPhotoClicked -> viewModelScope.launch {
-                state.value.userProfile?.photo?.let { photo ->
-                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
-                }
+//                state.value.userProfile?.photo?.let { photo ->
+//                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
+//                }
             }
         }
     }
 
     private fun getUserProfile() {
         viewModelScope.launch {
+            _action.send(UserProfileAction.ShowError("Test"))
+
             getUserProfileUseCase().onSuccess { userProfile ->
                 _state.update { it.copy(userProfile = userProfile) }
             }.onFailure { error ->
@@ -65,6 +69,7 @@ class UserProfileViewModel(
     private fun logout() {
         viewModelScope.launch {
             logoutUseCase()
+            closeSessionUseCase()
             _action.send(UserProfileAction.NavigateToLoginScreen)
         }
     }

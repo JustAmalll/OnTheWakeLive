@@ -1,5 +1,6 @@
 package queue.data.source.remote
 
+import com.benasher44.uuid.Uuid
 import core.utils.Constants.WS_BASE_URL
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -16,13 +17,17 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import queue.data.model.QueueSocketAction
-import queue.domain.module.Line
-import queue.domain.module.QueueItem
-import queue.domain.module.QueueSocketResponse
+import queue.data.model.QueueSocketAction.Leave
+import queue.data.model.QueueSocketAction.Reorder
+import queue.domain.model.Line
+import queue.domain.model.QueueItem
+import queue.domain.model.QueueSocketResponse
+import queue.domain.model.ReorderedQueueItem
 import user_profile.domain.model.UserProfile
 
 class QueueRemoteDataSourceImpl(
@@ -31,15 +36,14 @@ class QueueRemoteDataSourceImpl(
 
     private var session: WebSocketSession? = null
 
-    override suspend fun initSession(): Result<Unit> = runCatching {
-        withContext(Dispatchers.IO) {
-            session = client.webSocketSession { url(urlString = WS_BASE_URL) }
-        }
+    override suspend fun initSession(): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching { session = client.webSocketSession { url(urlString = WS_BASE_URL) } }
     }
 
     override fun observeQueue(): Flow<QueueSocketResponse> = session!!
         .incoming
         .consumeAsFlow()
+        .flowOn(Dispatchers.IO)
         .filterIsInstance<Frame.Text>()
         .mapNotNull {
             Json.decodeFromString(
@@ -48,55 +52,52 @@ class QueueRemoteDataSourceImpl(
             )
         }
 
-    override suspend fun getQueue(): Result<List<QueueItem>> = runCatching {
-        withContext(Dispatchers.IO) {
-            client.get("/queue").body<List<QueueItem>>()
-        }
+    override suspend fun getQueue(): Result<List<QueueItem>> = withContext(Dispatchers.IO) {
+        runCatching { client.get("/queue").body<List<QueueItem>>() }
     }
 
     override suspend fun adminAddUserToTheQueue(
-        userId: String?,
+        userId: Uuid?,
         line: Line,
         fullName: String
-    ): Result<Unit> = runCatching {
-        val session = session ?: return@runCatching
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val session = session ?: return@runCatching
 
-        session.sendQueueSocketAction(
-            action = QueueSocketAction.AdminAddUser(
-                userId = userId,
-                line = line,
-                fullName = fullName
+            session.sendQueueSocketAction(
+                action = QueueSocketAction.AdminAddUser(
+                    userId = userId,
+                    line = line,
+                    fullName = fullName
+                )
             )
-        )
-    }
-
-    override suspend fun joinTheQueue(line: Line): Result<Unit> = runCatching {
-        val session = session ?: return@runCatching
-        session.sendQueueSocketAction(action = QueueSocketAction.Join(line = line))
-    }
-
-    override suspend fun leaveTheQueue(queueItemId: String): Result<Unit> = runCatching {
-        val session = session ?: return@runCatching
-        session.sendQueueSocketAction(action = QueueSocketAction.Leave(queueItemId = queueItemId))
-    }
-
-    override suspend fun getQueueItemDetails(
-        queueItemId: String
-    ): Result<UserProfile> = runCatching {
-        withContext(Dispatchers.IO) {
-            client.get("/queue_item_details") {
-                parameter("queueItemId", queueItemId)
-            }.body<UserProfile>()
         }
     }
 
-    override suspend fun adminSearchUsers(
-        searchQuery: String
-    ): Result<List<UserProfile>> = runCatching {
+    override suspend fun joinTheQueue(line: Line): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val session = session ?: return@runCatching
+            session.sendQueueSocketAction(action = QueueSocketAction.Join(line = line))
+        }
+    }
+
+    override suspend fun leaveTheQueue(queueItemId: Uuid): Result<Unit> =
         withContext(Dispatchers.IO) {
-            client.get("/search_users") {
-                parameter("search_query", searchQuery)
-            }.body<List<UserProfile>>()
+            runCatching {
+                val session = session ?: return@runCatching
+                session.sendQueueSocketAction(action = Leave(queueItemId = queueItemId))
+            }
+        }
+
+    override suspend fun reorderQueue(
+        reorderedQueueItems: List<ReorderedQueueItem>
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val session = session ?: return@runCatching
+
+            session.sendQueueSocketAction(
+                action = Reorder(reorderedQueueItems = reorderedQueueItems)
+            )
         }
     }
 

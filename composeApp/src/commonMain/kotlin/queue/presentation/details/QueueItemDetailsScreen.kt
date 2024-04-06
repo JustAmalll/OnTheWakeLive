@@ -1,5 +1,6 @@
 package queue.presentation.details
 
+import LocalIsUserAdmin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import com.benasher44.uuid.Uuid
 import core.presentation.components.UserDataItem
-import core.presentation.components.UserPhoto
 import core.utils.Constants.INSTAGRAM_URL
 import full_size_photo.presentation.FullSizePhotoAssembly
 import onthewakelive.composeapp.generated.resources.Res
@@ -44,16 +45,15 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import queue.presentation.details.QueueItemDetailsEvent.OnNavigateBackClicked
-import queue.presentation.details.QueueItemDetailsEvent.OnPhotoClicked
 import queue.presentation.details.QueueItemDetailsViewModel.QueueItemDetailsAction.NavigateBack
 import queue.presentation.details.QueueItemDetailsViewModel.QueueItemDetailsAction.NavigateToFullSizePhotoScreen
 
-data class QueueItemDetailsAssembly(val queueItemId: String) : Screen {
+data class QueueItemDetailsAssembly(val userId: Uuid) : Screen {
 
     @Composable
     override fun Content() {
         val viewModel: QueueItemDetailsViewModel = koinInject(
-            parameters = { parametersOf(queueItemId) }
+            parameters = { parametersOf(userId) }
         )
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.current
@@ -83,6 +83,7 @@ private fun QueueItemDetailsScreen(
     state: QueueItemDetailsState,
     onEvent: (QueueItemDetailsEvent) -> Unit
 ) {
+    val isUserAdmin = LocalIsUserAdmin.current
     val uriHandler = LocalUriHandler.current
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 
@@ -111,10 +112,10 @@ private fun QueueItemDetailsScreen(
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        UserPhoto(
-                            photo = state.userProfile.photo,
-                            onClick = { onEvent(OnPhotoClicked) }
-                        )
+//                        UserPhoto(
+//                            photo = state.userProfile.photo,
+//                            onClick = { onEvent(OnPhotoClicked) }
+//                        )
                         Column(modifier = Modifier.padding(start = 12.dp)) {
                             Text(
                                 text = userProfile.firstName,
@@ -149,9 +150,9 @@ private fun QueueItemDetailsScreen(
                 UserDataItem(
                     title = stringResource(resource = Res.string.telegram),
                     value = userProfile.telegram,
-                    showDivider = state.isUserAdmin
+                    showDivider = isUserAdmin
                 )
-                if (state.isUserAdmin) {
+                if (isUserAdmin) {
                     UserDataItem(
                         title = stringResource(resource = Res.string.phone_number),
                         value = "+${userProfile.phoneNumber}",

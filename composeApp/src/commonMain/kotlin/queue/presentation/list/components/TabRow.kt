@@ -20,20 +20,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.left
 import onthewakelive.composeapp.generated.resources.profile
 import onthewakelive.composeapp.generated.resources.queue
+import onthewakelive.composeapp.generated.resources.right
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
+import queue.domain.model.Line
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
 @Composable
 fun TabRow(pagerState: PagerState) {
     val scope = rememberCoroutineScope()
-
-    val tabs = listOf(
-        stringResource(Res.string.queue) to Icons.AutoMirrored.Filled.ArrowBack,
-        stringResource(Res.string.profile) to Icons.AutoMirrored.Filled.ArrowForward
-    )
 
     TabRow(
         selectedTabIndex = pagerState.currentPage,
@@ -47,11 +45,14 @@ fun TabRow(pagerState: PagerState) {
         },
         containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
     ) {
-        tabs.forEachIndexed { index, (tab, icon) ->
+        Line.entries.forEachIndexed { index, line ->
             Tab(
                 icon = {
                     Icon(
-                        imageVector = icon,
+                        imageVector = when(line) {
+                            Line.LEFT -> Icons.AutoMirrored.Filled.ArrowBack
+                            Line.RIGHT -> Icons.AutoMirrored.Filled.ArrowForward
+                        },
                         contentDescription = null,
                         tint = if (pagerState.currentPage == index) {
                             MaterialTheme.colorScheme.onSecondaryContainer
@@ -62,7 +63,7 @@ fun TabRow(pagerState: PagerState) {
                 },
                 text = {
                     Text(
-                        text = tab,
+                        text = stringResource(resource = line.displayName),
                         color = if (pagerState.currentPage == index) {
                             MaterialTheme.colorScheme.onSurface
                         } else {

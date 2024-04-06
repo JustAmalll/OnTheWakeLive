@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,7 +29,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import auth.presentation.create_account.CreateAccountAssembly
-import auth.presentation.create_account.CreateAccountScreen
 import auth.presentation.login.LoginEvent.OnCreateAccountClicked
 import auth.presentation.login.LoginEvent.OnPhoneNumberChanged
 import auth.presentation.login.LoginViewModel.LoginAction.NavigateToCreateAccountScreen
@@ -78,11 +78,13 @@ private fun LoginScreen(
     val focusManager = LocalFocusManager.current
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         bottomBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp)
+                    .navigationBarsPadding()
+                    .padding(bottom = 16.dp)
                     .clickable { onEvent(OnCreateAccountClicked) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -103,8 +105,7 @@ private fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(all = 24.dp)
-                .imePadding(),
+                .padding(all = 24.dp),
             verticalArrangement = Arrangement.Center
         ) {
             Text(

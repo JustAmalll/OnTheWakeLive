@@ -8,6 +8,8 @@ import auth.data.source.remote.AuthRemoteDataSourceImpl
 import auth.domain.repository.AuthRepository
 import auth.domain.use_case.AuthenticationUseCase
 import auth.domain.use_case.CreateAccountUseCase
+import auth.domain.use_case.GetUserIdUseCase
+import auth.domain.use_case.IsUserAdminUseCase
 import auth.domain.use_case.LoginUseCase
 import auth.domain.use_case.LogoutUseCase
 import auth.presentation.create_account.CreateAccountViewModel
@@ -23,6 +25,8 @@ val authModule = module {
     factory { LoginUseCase(get()) }
     factory { CreateAccountUseCase(get()) }
     factory { LogoutUseCase(get()) }
+    factory { IsUserAdminUseCase(get()) }
+    factory { GetUserIdUseCase(get()) }
 
     factory { LoginViewModel(get(), get(), get()) }
     factory { CreateAccountViewModel(get(), get(), get(), get(), get()) }

@@ -1,5 +1,7 @@
 package auth.presentation.create_account
 
+import LocalSnackBarHostState
+import MainScreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -48,8 +51,6 @@ import onthewakelive.composeapp.generated.resources.sign_up
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import queue.presentation.list.QueueAssembly
-import queue.presentation.list.QueueTab
 
 class CreateAccountAssembly : Screen {
 
@@ -63,8 +64,8 @@ class CreateAccountAssembly : Screen {
             viewModel.actions.collect { action ->
                 when (action) {
                     NavigateToLoginScreen -> navigator?.push(LoginAssembly())
-                    NavigateToQueueScreen -> navigator?.push(QueueTab)
-                    is ShowError -> TODO()
+                    NavigateToQueueScreen -> navigator?.push(MainScreen)
+                    is ShowError -> {}
                 }
             }
         }
@@ -81,11 +82,13 @@ fun CreateAccountScreen(
     val focusManager = LocalFocusManager.current
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         bottomBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 24.dp)
+                    .navigationBarsPadding()
+                    .padding(bottom = 16.dp)
                     .clickable { onEvent(CreateAccountEvent.OnLoginClicked) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -107,8 +110,7 @@ fun CreateAccountScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(all = 24.dp)
-                .verticalScroll(rememberScrollState())
-                .imePadding(),
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center
         ) {
             Text(

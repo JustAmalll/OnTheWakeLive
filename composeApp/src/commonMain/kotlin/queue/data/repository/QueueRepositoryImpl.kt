@@ -1,10 +1,12 @@
 package queue.data.repository
 
+import com.benasher44.uuid.Uuid
 import kotlinx.coroutines.flow.Flow
 import queue.data.source.remote.QueueRemoteDataSource
-import queue.domain.module.Line
-import queue.domain.module.QueueItem
-import queue.domain.module.QueueSocketResponse
+import queue.domain.model.Line
+import queue.domain.model.QueueItem
+import queue.domain.model.QueueSocketResponse
+import queue.domain.model.ReorderedQueueItem
 import queue.domain.repository.QueueRepository
 import user_profile.domain.model.UserProfile
 
@@ -19,7 +21,7 @@ class QueueRepositoryImpl(
         queueRemoteDataSource.observeQueue()
 
     override suspend fun adminAddUserToTheQueue(
-        userId: String?,
+        userId: Uuid?,
         line: Line,
         fullName: String
     ): Result<Unit> = queueRemoteDataSource.adminAddUserToTheQueue(
@@ -31,17 +33,14 @@ class QueueRepositoryImpl(
     override suspend fun joinTheQueue(line: Line): Result<Unit> =
         queueRemoteDataSource.joinTheQueue(line = line)
 
-    override suspend fun leaveTheQueue(queueItemId: String): Result<Unit> =
+    override suspend fun leaveTheQueue(queueItemId: Uuid): Result<Unit> =
         queueRemoteDataSource.leaveTheQueue(queueItemId = queueItemId)
+
+    override suspend fun reorderQueue(reorderedQueueItems: List<ReorderedQueueItem>): Result<Unit> =
+        queueRemoteDataSource.reorderQueue(reorderedQueueItems = reorderedQueueItems)
 
     override suspend fun getQueue(): Result<List<QueueItem>> =
         queueRemoteDataSource.getQueue()
-
-    override suspend fun getQueueItemDetails(queueItemId: String): Result<UserProfile> =
-        queueRemoteDataSource.getQueueItemDetails(queueItemId = queueItemId)
-
-    override suspend fun adminSearchUsers(searchQuery: String): Result<List<UserProfile>> =
-        queueRemoteDataSource.adminSearchUsers(searchQuery = searchQuery)
 
     override suspend fun closeSession() {
         queueRemoteDataSource.closeSession()

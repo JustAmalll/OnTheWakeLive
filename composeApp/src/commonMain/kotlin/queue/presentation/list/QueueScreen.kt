@@ -1,20 +1,28 @@
 package queue.presentation.list
 
+import LocalIsUserAdmin
+import LocalUserId
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,14 +38,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.benasher44.uuid.Uuid
 import core.utils.filter
 import kotlinx.collections.immutable.ImmutableList
 import onthewakelive.composeapp.generated.resources.Res
@@ -45,26 +54,50 @@ import onthewakelive.composeapp.generated.resources.queue
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import queue.domain.module.Line
-import queue.domain.module.QueueItem
+import queue.domain.model.Line
+import queue.domain.model.QueueItem
+import queue.presentation.admin.QueueAdminAssembly
 import queue.presentation.details.QueueItemDetailsAssembly
 import queue.presentation.list.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
 import queue.presentation.list.QueueEvent.OnJoinClicked
 import queue.presentation.list.QueueEvent.OnLeaveQueueConfirmed
 import queue.presentation.list.QueueEvent.OnQueueItemClicked
 import queue.presentation.list.QueueEvent.OnQueueLeaved
+import queue.presentation.list.QueueEvent.OnQueueReordered
+import queue.presentation.list.QueueEvent.OnSaveReorderedQueueClicked
 import queue.presentation.list.QueueEvent.OnUserPhotoClicked
+import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 import queue.presentation.list.components.LeaveQueueConfirmationDialog
 import queue.presentation.list.components.QueueItem
 import queue.presentation.list.components.SwipeToDeleteContainer
 import queue.presentation.list.components.TabRow
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyColumnState
 
 object QueueTab : Tab {
 
     @Composable
     override fun Content() {
-        Navigator(QueueAssembly())
+        val viewModel: QueueViewModel = koinInject()
+        val state by viewModel.state.collectAsState()
+        val navigator = LocalNavigator.current?.parent
+
+        LaunchedEffect(key1 = Unit) {
+            viewModel.actions.collect { action ->
+                when (action) {
+                    is NavigateToQueueItemDetails -> navigator?.push(
+                        QueueItemDetailsAssembly(userId = action.userId)
+                    )
+
+                    is NavigateToQueueAdminScreen -> navigator?.push(
+                        QueueAdminAssembly(line = action.line)
+                    )
+                }
+            }
+        }
+
+        QueueScreen(state = state, onEvent = viewModel::onEvent)
     }
 
     @OptIn(ExperimentalResourceApi::class)
@@ -78,29 +111,6 @@ object QueueTab : Tab {
         }
 }
 
-class QueueAssembly : Screen {
-
-    @Composable
-    override fun Content() {
-        val viewModel: QueueViewModel = koinInject()
-        val state by viewModel.state.collectAsState()
-        val navigator = LocalNavigator.current
-
-        LaunchedEffect(key1 = Unit) {
-            viewModel.actions.collect { action ->
-                when (action) {
-                    is NavigateToQueueItemDetails -> navigator?.push(
-                        QueueItemDetailsAssembly(queueItemId = action.queueItemId)
-                    )
-                }
-            }
-        }
-
-        QueueScreen(state = state, onEvent = viewModel::onEvent)
-    }
-}
-
-
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalFoundationApi::class,
@@ -111,6 +121,7 @@ private fun QueueScreen(
     state: QueueState,
     onEvent: (QueueEvent) -> Unit
 ) {
+    val isUserAdmin = LocalIsUserAdmin.current
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 2 })
 
     if (state.showLeaveQueueConfirmationDialog) {
@@ -122,6 +133,7 @@ private fun QueueScreen(
     }
 
     Scaffold(
+        modifier = Modifier.padding(bottom = 80.dp),
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -137,23 +149,54 @@ private fun QueueScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    onEvent(OnJoinClicked(line = Line.entries[pagerState.currentPage]))
+            AnimatedContent(targetState = state.isQueueReordered) { isQueueReordered ->
+                if (isQueueReordered) {
+                    ExtendedFloatingActionButton(
+                        onClick = { onEvent(OnSaveReorderedQueueClicked) },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null
+                            )
+                        },
+                        text = { Text("Save") }
+                    )
+                } else {
+                    FloatingActionButton(
+                        onClick = {
+                            if (!state.isLoading) {
+                                onEvent(
+                                    OnJoinClicked(
+                                        line = Line.entries[pagerState.currentPage],
+                                        isUserAdmin = isUserAdmin
+                                    )
+                                )
+                            }
+                        }
+                    ) {
+                        AnimatedContent(state.isLoading) { isLoading ->
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    }
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = Color.White
-                )
             }
         }
-    ) { paddingValue ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValue)
+                .padding(paddingValues)
         ) {
             TabRow(pagerState = pagerState)
 
@@ -165,7 +208,10 @@ private fun QueueScreen(
                         },
                         onQueueItemClicked = { onEvent(OnQueueItemClicked(it)) },
                         onQueueLeaved = { onEvent(OnQueueLeaved(it)) },
-                        onUserPhotoClicked = { onEvent(OnUserPhotoClicked(it)) }
+                        onUserPhotoClicked = { onEvent(OnUserPhotoClicked(it)) },
+                        onQueueReordered = { from, to ->
+                            onEvent(OnQueueReordered(from = from, to = to))
+                        }
                     )
 
                     1 -> QueueContent(
@@ -174,7 +220,10 @@ private fun QueueScreen(
                         },
                         onQueueItemClicked = { onEvent(OnQueueItemClicked(it)) },
                         onQueueLeaved = { onEvent(OnQueueLeaved(it)) },
-                        onUserPhotoClicked = { onEvent(OnUserPhotoClicked(it)) }
+                        onUserPhotoClicked = { onEvent(OnUserPhotoClicked(it)) },
+                        onQueueReordered = { from, to ->
+                            onEvent(OnQueueReordered(from = from, to = to))
+                        }
                     )
                 }
             }
@@ -183,30 +232,49 @@ private fun QueueScreen(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun QueueContent(
     queue: ImmutableList<QueueItem>,
-    onQueueItemClicked: (String) -> Unit,
-    onQueueLeaved: (String) -> Unit,
-    onUserPhotoClicked: (ByteArray) -> Unit
+    onQueueItemClicked: (Uuid) -> Unit,
+    onQueueLeaved: (Uuid) -> Unit,
+    onUserPhotoClicked: (ByteArray) -> Unit,
+    onQueueReordered: (from: Int, to: Int) -> Unit
 ) {
+    val isUserAdmin = LocalIsUserAdmin.current
+    val userId = LocalUserId.current
+
+    val haptic = LocalHapticFeedback.current
+    val lazyListState = rememberLazyListState()
+
+    val reorderableLazyColumnState = rememberReorderableLazyColumnState(lazyListState) { from, to ->
+        onQueueReordered(from.index, to.index)
+        haptic.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
+        state = lazyListState,
         contentPadding = PaddingValues(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(key = { it.id }, items = queue) { item ->
-            SwipeToDeleteContainer(
-                swipeEnabled = true,
-                onDelete = { onQueueLeaved(item.id) }
-            ) {
-                QueueItem(
-                    firstName = item.firstName,
-                    lastName = item.lastName,
-                    photo = item.photo,
-                    onItemClicked = { onQueueItemClicked(item.id) },
-                    onPhotoClicked = { item.photo?.let(onUserPhotoClicked) }
-                )
+            ReorderableItem(reorderableLazyListState = reorderableLazyColumnState, key = item.id) {
+
+                SwipeToDeleteContainer(
+                    swipeEnabled = isUserAdmin || userId == item.userId,
+                    onDelete = { onQueueLeaved(item.id) }
+                ) {
+                    QueueItem(
+                        firstName = item.firstName,
+                        lastName = item.lastName,
+                        photo = null,
+                        onItemClicked = { onQueueItemClicked(item.userId) },
+                        onPhotoClicked = {
+//                            item.photo?.let(onUserPhotoClicked)
+                        }
+                    )
+                }
             }
         }
     }

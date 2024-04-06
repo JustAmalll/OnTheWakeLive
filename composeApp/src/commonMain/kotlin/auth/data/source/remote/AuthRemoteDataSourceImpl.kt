@@ -11,28 +11,39 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 
 class AuthRemoteDataSourceImpl(
     private val client: HttpClient
 ) : AuthRemoteDataSource {
 
-    override suspend fun authenticate(): Result<Unit, DataError.Network> = runCatchingNetwork {
-        client.get("/authenticate")
-    }
+    override suspend fun authenticate(): Result<Unit, DataError.Network> =
+        withContext(Dispatchers.IO) {
+            runCatchingNetwork {
+                client.get("/authenticate")
+                Unit
+            }
+        }
 
     override suspend fun login(
         loginRequest: LoginRequest
-    ): Result<AuthResponse, DataError.Network> = runCatchingNetwork {
-        client.post("/login") {
-            setBody(loginRequest)
-        }.body<AuthResponse>()
+    ): Result<AuthResponse, DataError.Network> = withContext(Dispatchers.IO) {
+        runCatchingNetwork {
+            client.post("/login") {
+                setBody(loginRequest)
+            }.body<AuthResponse>()
+        }
     }
 
     override suspend fun createAccount(
         createAccountRequest: CreateAccountRequest
-    ): Result<AuthResponse, DataError.Network> = runCatchingNetwork {
-        client.post("/create-account") {
-            setBody(createAccountRequest)
-        }.body<AuthResponse>()
+    ): Result<AuthResponse, DataError.Network> = withContext(Dispatchers.IO) {
+        runCatchingNetwork {
+            client.post("/create-account") {
+                setBody(createAccountRequest)
+            }.body<AuthResponse>()
+        }
     }
 }

@@ -1,24 +1,31 @@
 package core.presentation
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.AuthenticationUseCase
+import auth.domain.use_case.GetUserIdUseCase
+import auth.domain.use_case.IsUserAdminUseCase
 import core.domain.utils.DataError
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
+import core.presentation.MainEvent.OnMainScreenAppeared
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val authenticationUseCase: AuthenticationUseCase
+    private val authenticationUseCase: AuthenticationUseCase,
+    private val isUserAdminUseCase: IsUserAdminUseCase,
+    private val getUserIdUseCase: GetUserIdUseCase
 ) : ViewModel() {
 
-    var isLoading by mutableStateOf(false)
+    private val _state = MutableStateFlow(MainState())
+    val state: StateFlow<MainState> = _state.asStateFlow()
 
     private val _action = Channel<MainAction>()
     val actions: Flow<MainAction> = _action.receiveAsFlow()
@@ -27,9 +34,31 @@ class MainViewModel(
         authenticate()
     }
 
+    fun onEvent(event: MainEvent) {
+        when(event) {
+            OnMainScreenAppeared -> {
+                isUserAdmin()
+                getUserId()
+            }
+        }
+    }
+
+    private fun isUserAdmin() {
+        viewModelScope.launch {
+            _state.update { it.copy(isUserAdmin = isUserAdminUseCase()) }
+        }
+    }
+
+    private fun getUserId() {
+        viewModelScope.launch {
+            _state.update { it.copy(userId = getUserIdUseCase()) }
+            println("getUserId ${state.value.userId}")
+        }
+    }
+
     private fun authenticate() {
         viewModelScope.launch {
-            isLoading = true
+            _state.update { it.copy(isLoading = true) }
 
             authenticationUseCase().onSuccess {
                 _action.send(MainAction.NavigateToQueueScreen)
@@ -40,7 +69,7 @@ class MainViewModel(
                     _action.send(MainAction.NavigateToServerUnavailableScreen)
                 }
             }
-            isLoading = false
+            _state.update { it.copy(isLoading = false) }
         }
     }
 

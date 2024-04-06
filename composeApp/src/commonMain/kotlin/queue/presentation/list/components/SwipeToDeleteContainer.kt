@@ -2,6 +2,7 @@ package queue.presentation.list.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -23,7 +24,7 @@ import androidx.compose.ui.unit.dp
 fun SwipeToDeleteContainer(
     onDelete: () -> Unit,
     swipeEnabled: Boolean,
-    content: @Composable () -> Unit
+    content: @Composable RowScope.() -> Unit
 ) {
     val state = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
@@ -54,6 +55,6 @@ fun SwipeToDeleteContainer(
                 )
             }
         },
-        content = { content() }
+        content = content
     )
 }

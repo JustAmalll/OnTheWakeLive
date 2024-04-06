@@ -17,18 +17,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -102,6 +100,7 @@ fun EditUserProfileScreen(
     }
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(text = stringResource(resource = Res.string.edit_profile)) },
@@ -123,9 +122,7 @@ fun EditUserProfileScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 80.dp)
-                .verticalScroll(rememberScrollState())
-                .imePadding(),
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -195,7 +192,7 @@ fun EditUserProfileScreen(
             Button(
                 modifier = Modifier
                     .align(Alignment.End)
-                    .padding(top = 16.dp),
+                    .padding(vertical = 16.dp),
                 onClick = {
                     onEvent(OnEditProfileClicked)
                     focusManager.clearFocus()

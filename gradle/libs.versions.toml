@@ -1,4 +1,5 @@
 [versions]
+#noinspection AndroidGradlePluginVersion
 agp = "8.2.0"
 android-compileSdk = "34"
 android-minSdk = "24"
@@ -14,8 +15,10 @@ collection-immutable = "0.3.7"
 koin = "3.5.3"
 koin-compose = "1.1.2"
 coil-compose = "3.0.0-alpha06"
+uuid = "0.8.4"
 voyager = "1.0.0"
 multiplatform-settings = "1.1.1"
+reorderable = "1.4.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -36,6 +39,8 @@ lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", versi
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collection-immutable" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil-compose" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }

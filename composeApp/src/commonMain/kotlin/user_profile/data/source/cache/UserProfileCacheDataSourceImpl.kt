@@ -4,6 +4,9 @@ import com.russhwolf.settings.ObservableSettings
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import core.domain.utils.runCatchingLocal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import user_profile.domain.model.UserProfile
@@ -12,18 +15,23 @@ class UserProfileCacheDataSourceImpl(
     private val observableSettings: ObservableSettings
 ) : UserProfileCacheDataSource {
 
-    override suspend fun cacheUserProfile(userProfile: UserProfile) = runCatchingLocal {
-        observableSettings.putString(
-            key = USER_PROFILE,
-            value = Json.encodeToString(userProfile)
-        )
+    override suspend fun cacheUserProfile(userProfile: UserProfile) = withContext(Dispatchers.IO) {
+        runCatchingLocal {
+            observableSettings.putString(
+                key = USER_PROFILE,
+                value = Json.encodeToString(userProfile)
+            )
+        }
     }
 
     override suspend fun getUserProfile(): Result<UserProfile?, DataError.Local> =
-        runCatchingLocal {
-            observableSettings.getStringOrNull(key = USER_PROFILE)?.let {
-                Json.decodeFromString(string = it)
+        withContext(Dispatchers.IO) {
+            runCatchingLocal {
+                observableSettings.getStringOrNull(key = USER_PROFILE)?.let {
+                    Json.decodeFromString(string = it)
+                }
             }
+
         }
 
     companion object {

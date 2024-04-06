@@ -2,6 +2,8 @@
     <!-- Common-->
     <string name="queue">Queue</string>
     <string name="profile">Profile</string>
+    <string name="left">Left</string>
+    <string name="right">Right</string>
 
     <!-- Network Errors-->
     <string name="unknown_error">Oops! An unexpected error has occurred. Please try again later or contact support if the issue persists.</string>
@@ -42,6 +44,10 @@
     <string name="details">Details</string>
     <string name="not_specified">Not specified</string>
 
+    <!-- Queue Admin Screen -->
+    <string name="add_to_queue">Add to queue</string>
+    <string name="add">Add</string>
+
     <!-- Edit Profile Screen-->
     <string name="edit_profile">Edit Profile</string>
     <string name="telegram" translatable="false">Telegram</string>
@@ -49,7 +55,7 @@
     <string name="edit">Edit</string>
     <string name="successfully_updated_profile">Successfully updated profile!</string>
 
-    // Server Unavailable Screen
+    <!-- Server Unavailable Screen-->
     <string name="server_unavailable_title">Unable to connect to server</string>
     <string name="server_unavailable_subtitle">Please check your internet connection or try again later. If the problem persists, the server may be temporarily unavailable. We apologize for any inconvenience.</string>
 </resources>

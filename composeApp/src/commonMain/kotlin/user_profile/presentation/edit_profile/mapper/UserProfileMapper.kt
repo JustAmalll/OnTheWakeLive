@@ -9,5 +9,5 @@ fun UserProfile.toEditUserProfileState(state: EditUserProfileState) = state.copy
     phoneNumber = phoneNumber,
     instagram = instagram ?: "",
     telegram = telegram ?: "",
-    photo = photo
+    photo = null
 )

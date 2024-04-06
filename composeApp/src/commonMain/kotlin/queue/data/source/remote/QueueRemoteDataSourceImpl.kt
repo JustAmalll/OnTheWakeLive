@@ -6,7 +6,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.get
-import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
@@ -28,7 +27,6 @@ import queue.domain.model.Line
 import queue.domain.model.QueueItem
 import queue.domain.model.QueueSocketResponse
 import queue.domain.model.ReorderedQueueItem
-import user_profile.domain.model.UserProfile
 
 class QueueRemoteDataSourceImpl(
     private val client: HttpClient

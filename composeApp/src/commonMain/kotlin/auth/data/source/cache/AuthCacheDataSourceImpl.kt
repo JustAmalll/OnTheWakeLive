@@ -15,7 +15,10 @@ class AuthCacheDataSourceImpl(
     override suspend fun cacheAuthResponse(authResponse: AuthResponse) {
         withContext(Dispatchers.IO) {
             observableSettings.putString(key = PREFS_JWT_TOKEN, value = authResponse.token)
-            observableSettings.putString(key = PREFS_USER_ID, value = authResponse.userId.toString())
+            observableSettings.putString(
+                key = PREFS_USER_ID,
+                value = authResponse.userId.toString()
+            )
             observableSettings.putBoolean(key = PREFS_IS_ADMIN, value = authResponse.isAdmin)
         }
     }

@@ -35,7 +35,7 @@ class MainViewModel(
     }
 
     fun onEvent(event: MainEvent) {
-        when(event) {
+        when (event) {
             OnMainScreenAppeared -> {
                 isUserAdmin()
                 getUserId()

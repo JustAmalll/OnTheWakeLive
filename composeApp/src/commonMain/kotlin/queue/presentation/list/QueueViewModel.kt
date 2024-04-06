@@ -43,9 +43,9 @@ class QueueViewModel(
         when (event) {
             is QueueEvent.OnJoinClicked -> {
                 if (event.isUserAdmin) {
-                   viewModelScope.launch {
-                       _action.send(QueueAction.NavigateToQueueAdminScreen(line = event.line))
-                   }
+                    viewModelScope.launch {
+                        _action.send(QueueAction.NavigateToQueueAdminScreen(line = event.line))
+                    }
                 } else {
                     joinTheQueue(line = event.line)
                 }

@@ -1,6 +1,5 @@
 package auth.presentation.create_account
 
-import LocalSnackBarHostState
 import MainScreen
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

@@ -15,7 +15,7 @@ sealed interface Result<out D, out E : RootError> {
 }
 
 inline fun <Data, Error : RootError> Result<Data, Error>.getOrNull(): Data? =
-    when(this) {
+    when (this) {
         is Result.Error -> null
         is Result.Success -> data
     }

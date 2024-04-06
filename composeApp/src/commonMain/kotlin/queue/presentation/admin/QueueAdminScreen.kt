@@ -1,12 +1,9 @@
 package queue.presentation.admin
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -39,15 +36,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.StandardTextField
-import core.presentation.components.UserPhoto
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.add
 import onthewakelive.composeapp.generated.resources.add_to_queue
@@ -144,7 +137,7 @@ private fun QueueAdminScreen(
                     modifier = Modifier
                         .padding(top = 6.dp)
                         .align(Alignment.End),
-                    onClick = { onEvent(OnChangeSelectedUserClicked)}
+                    onClick = { onEvent(OnChangeSelectedUserClicked) }
                 ) {
                     Text(text = stringResource(resource = Res.string.edit))
                 }

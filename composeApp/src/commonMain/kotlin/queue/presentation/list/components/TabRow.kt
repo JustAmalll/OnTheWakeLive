@@ -19,11 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import onthewakelive.composeapp.generated.resources.Res
-import onthewakelive.composeapp.generated.resources.left
-import onthewakelive.composeapp.generated.resources.profile
-import onthewakelive.composeapp.generated.resources.queue
-import onthewakelive.composeapp.generated.resources.right
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import queue.domain.model.Line
@@ -49,7 +44,7 @@ fun TabRow(pagerState: PagerState) {
             Tab(
                 icon = {
                     Icon(
-                        imageVector = when(line) {
+                        imageVector = when (line) {
                             Line.LEFT -> Icons.AutoMirrored.Filled.ArrowBack
                             Line.RIGHT -> Icons.AutoMirrored.Filled.ArrowForward
                         },

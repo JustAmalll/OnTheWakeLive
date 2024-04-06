@@ -20,7 +20,6 @@ import user_profile.presentation.profile.UserProfileEvent.OnEditProfileClicked
 import user_profile.presentation.profile.UserProfileEvent.OnLogoutClicked
 import user_profile.presentation.profile.UserProfileEvent.OnUserPhotoClicked
 import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToEditProfileScreen
-import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToFullSizePhotoScreen
 
 class UserProfileViewModel(
     private val getUserProfileUseCase: GetUserProfileUseCase,

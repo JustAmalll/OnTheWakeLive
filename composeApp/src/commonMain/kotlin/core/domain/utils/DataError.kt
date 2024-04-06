@@ -9,8 +9,8 @@ import onthewakelive.composeapp.generated.resources.unknown_error
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getString
 
-sealed interface DataError: Error {
-    enum class Network: DataError {
+sealed interface DataError : Error {
+    enum class Network : DataError {
         UNAUTHORIZED,
         REQUEST_TIMEOUT,
         NO_INTERNET,
@@ -18,7 +18,8 @@ sealed interface DataError: Error {
         INCORRECT_DATA,
         UNKNOWN
     }
-    enum class Local: DataError {
+
+    enum class Local : DataError {
         UNKNOWN
     }
 }

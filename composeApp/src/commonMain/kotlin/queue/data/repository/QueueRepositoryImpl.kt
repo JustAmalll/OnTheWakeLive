@@ -8,7 +8,6 @@ import queue.domain.model.QueueItem
 import queue.domain.model.QueueSocketResponse
 import queue.domain.model.ReorderedQueueItem
 import queue.domain.repository.QueueRepository
-import user_profile.domain.model.UserProfile
 
 class QueueRepositoryImpl(
     private val queueRemoteDataSource: QueueRemoteDataSource

@@ -1,10 +1,15 @@
 package core.domain.utils
 
+import core.domain.utils.DataError.Network.INCORRECT_DATA
+import core.domain.utils.DataError.Network.NO_INTERNET
+import core.domain.utils.DataError.Network.REQUEST_TIMEOUT
+import core.domain.utils.DataError.Network.SERVER_ERROR
+import core.domain.utils.DataError.Network.UNAUTHORIZED
+import core.domain.utils.DataError.Network.UNKNOWN
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.http.HttpStatusCode
 import okio.IOException
-import core.domain.utils.DataError.Network.*
 
 inline fun <T, R> T.runCatchingNetwork(block: T.() -> R): Result<R, DataError.Network> = try {
     Result.Success(block())

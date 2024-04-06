@@ -6,7 +6,6 @@ import queue.domain.model.Line
 import queue.domain.model.QueueItem
 import queue.domain.model.QueueSocketResponse
 import queue.domain.model.ReorderedQueueItem
-import user_profile.domain.model.UserProfile
 
 interface QueueRepository {
     suspend fun initSession(): Result<Unit>

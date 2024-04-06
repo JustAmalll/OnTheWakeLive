@@ -22,6 +22,7 @@ actual fun OnTheWakeLiveTheme(content: @Composable () -> Unit) {
                 dynamicLightColorScheme(context)
             }
         }
+
         darkTheme -> DarkColors
         else -> LightColors
     }

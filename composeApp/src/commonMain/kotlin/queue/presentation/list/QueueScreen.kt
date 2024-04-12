@@ -27,6 +27,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
@@ -46,8 +50,10 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import coil3.compose.LocalPlatformContext
 import com.benasher44.uuid.Uuid
 import core.utils.filter
+import full_size_photo.presentation.FullSizePhotoAssembly
 import kotlinx.collections.immutable.ImmutableList
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.queue
@@ -66,8 +72,10 @@ import queue.presentation.list.QueueEvent.OnQueueLeaved
 import queue.presentation.list.QueueEvent.OnQueueReordered
 import queue.presentation.list.QueueEvent.OnSaveReorderedQueueClicked
 import queue.presentation.list.QueueEvent.OnUserPhotoClicked
+import queue.presentation.list.QueueViewModel.QueueAction.NavigateToFullSizePhotoScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
+import queue.presentation.list.QueueViewModel.QueueAction.ShowError
 import queue.presentation.list.components.EmptyQueueContent
 import queue.presentation.list.components.LeaveQueueConfirmationDialog
 import queue.presentation.list.components.QueueItem
@@ -83,6 +91,11 @@ object QueueTab : Tab {
         val viewModel: QueueViewModel = koinInject()
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.current?.parent
+        val snackBarHostState = remember { SnackbarHostState() }
+
+        LaunchedEffect(key1 = Unit) {
+            viewModel.onEvent(QueueEvent.OnViewAppeared)
+        }
 
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
@@ -94,11 +107,29 @@ object QueueTab : Tab {
                     is NavigateToQueueAdminScreen -> navigator?.push(
                         QueueAdminAssembly(line = action.line)
                     )
+
+                    is NavigateToFullSizePhotoScreen -> navigator?.push(
+                        FullSizePhotoAssembly(photo = action.photo)
+                    )
+
+                    is ShowError -> {
+                        val result = snackBarHostState.showSnackbar(
+                            message = action.errorMessage,
+                            actionLabel = action.actionLabel,
+                            duration = SnackbarDuration.Short
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel.onEvent(QueueEvent.OnReconnectClicked)
+                        }
+                    }
                 }
             }
         }
-
-        QueueScreen(state = state, onEvent = viewModel::onEvent)
+        QueueScreen(
+            state = state,
+            snackBarHostState = snackBarHostState,
+            onEvent = viewModel::onEvent
+        )
     }
 
     @OptIn(ExperimentalResourceApi::class)
@@ -120,6 +151,7 @@ object QueueTab : Tab {
 @Composable
 private fun QueueScreen(
     state: QueueState,
+    snackBarHostState: SnackbarHostState,
     onEvent: (QueueEvent) -> Unit
 ) {
     val isUserAdmin = LocalIsUserAdmin.current
@@ -134,7 +166,7 @@ private fun QueueScreen(
     }
 
     Scaffold(
-        modifier = Modifier.padding(bottom = 80.dp),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -165,7 +197,7 @@ private fun QueueScreen(
                 } else {
                     FloatingActionButton(
                         onClick = {
-                            if (!state.isLoading) {
+                            if (!state.isLoading && !state.isSessionStarting) {
                                 onEvent(
                                     OnJoinClicked(
                                         line = Line.entries[pagerState.currentPage],
@@ -175,7 +207,9 @@ private fun QueueScreen(
                             }
                         }
                     ) {
-                        AnimatedContent(state.isLoading) { isLoading ->
+                        AnimatedContent(
+                            targetState = state.isLoading || state.isSessionStarting
+                        ) { isLoading ->
                             if (isLoading) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(24.dp),
@@ -274,7 +308,8 @@ private fun QueueContent(
                         QueueItem(
                             firstName = item.firstName,
                             lastName = item.lastName,
-                            photo = null,
+                            photo = item.photo,
+                            showDraggableHandle = isUserAdmin,
                             onItemClicked = { item.userId?.let(onQueueItemClicked) },
                             onPhotoClicked = { item.photo?.let(onUserPhotoClicked) }
                         )

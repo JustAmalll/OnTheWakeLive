@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.AuthenticationUseCase
 import auth.domain.use_case.GetUserIdUseCase
 import auth.domain.use_case.IsUserAdminUseCase
+import com.mmk.kmpnotifier.notification.NotifierManager
 import core.domain.utils.DataError
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
@@ -17,11 +18,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import queue.domain.use_case.UpdateNotificationTokenUseCase
 
 class MainViewModel(
     private val authenticationUseCase: AuthenticationUseCase,
     private val isUserAdminUseCase: IsUserAdminUseCase,
-    private val getUserIdUseCase: GetUserIdUseCase
+    private val getUserIdUseCase: GetUserIdUseCase,
+    private val updateNotificationTokenUseCase: UpdateNotificationTokenUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainState())
@@ -52,7 +55,6 @@ class MainViewModel(
     private fun getUserId() {
         viewModelScope.launch {
             _state.update { it.copy(userId = getUserIdUseCase()) }
-            println("getUserId ${state.value.userId}")
         }
     }
 
@@ -62,6 +64,7 @@ class MainViewModel(
 
             authenticationUseCase().onSuccess {
                 _action.send(MainAction.NavigateToQueueScreen)
+                listenForNotificationTokenChange()
             }.onFailure { error ->
                 if (error == DataError.Network.UNAUTHORIZED) {
                     _action.send(MainAction.NavigateToLoginScreen)
@@ -71,6 +74,16 @@ class MainViewModel(
             }
             _state.update { it.copy(isLoading = false) }
         }
+    }
+
+    private fun listenForNotificationTokenChange() {
+        NotifierManager.addListener(object : NotifierManager.Listener {
+            override fun onNewToken(token: String) {
+                viewModelScope.launch {
+                    updateNotificationTokenUseCase(newToken = token)
+                }
+            }
+        })
     }
 
     sealed interface MainAction {

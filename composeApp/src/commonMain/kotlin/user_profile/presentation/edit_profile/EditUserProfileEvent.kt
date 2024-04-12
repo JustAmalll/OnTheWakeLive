@@ -10,5 +10,10 @@ sealed interface EditUserProfileEvent {
     @Suppress("ArrayInDataClass")
     data class OnUserPhotoSelected(val byteArray: ByteArray) : EditUserProfileEvent
 
+    @Suppress("ArrayInDataClass")
+    data class OnUserPhotoCropped(val byteArray: ByteArray) : EditUserProfileEvent
+
+    data object OnDeleteUserPhotoClicked: EditUserProfileEvent
+
     data object OnEditProfileClicked : EditUserProfileEvent
 }

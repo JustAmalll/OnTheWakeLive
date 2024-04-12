@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serialization.plugin)
+    alias(libs.plugins.google.services.plugin)
 }
 
 kotlin {
@@ -22,6 +23,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            export(libs.kmpnotifier)
         }
     }
 
@@ -34,6 +36,10 @@ kotlin {
             implementation(libs.lifecycle.compose)
 
             implementation(libs.koin.android)
+
+            implementation(libs.compose.image.cropper)
+
+            implementation(project.dependencies.platform(libs.firebase.bom))
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -56,10 +62,13 @@ kotlin {
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+            implementation(libs.stately.common)
+
             implementation(libs.ktor.content.negotiation)
             implementation(libs.ktor.serialization.json)
 
             implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
 
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.tabNavigator)
@@ -70,13 +79,14 @@ kotlin {
 
             implementation(libs.uuid)
 
-            implementation("io.github.alexzhirkevich:compottie:1.1.1")
+            implementation(libs.compottie)
+
+            api(libs.kmpnotifier)
         }
         iosMain.dependencies {
             implementation(libs.ktor.darwin)
         }
     }
-    task("testClasses")
 }
 
 android {

@@ -3,8 +3,14 @@ package queue.presentation.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benasher44.uuid.Uuid
+import com.mmk.kmpnotifier.notification.NotifierManager
+import core.domain.utils.DataError
+import core.domain.utils.asString
+import core.domain.utils.onFailure
+import core.domain.utils.onSuccess
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,20 +19,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.reconnect
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.getString
 import queue.domain.model.Line
-import queue.domain.model.QueueSocketResponse.Join
-import queue.domain.model.QueueSocketResponse.Remove
-import queue.domain.model.QueueSocketResponse.Update
 import queue.domain.model.ReorderedQueueItem
 import queue.domain.repository.QueueRepository
 import queue.presentation.list.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
 import queue.presentation.list.QueueEvent.OnQueueItemClicked
+import queue.presentation.list.QueueEvent.OnQueueReordered
+import queue.presentation.list.QueueEvent.OnReconnectClicked
 import queue.presentation.list.QueueEvent.OnSaveReorderedQueueClicked
+import queue.presentation.list.QueueEvent.OnViewAppeared
+import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
+import queue.presentation.list.QueueViewModel.QueueAction.ShowError
 
-class QueueViewModel(
-    private val queueRepository: QueueRepository
-) : ViewModel() {
+@OptIn(ExperimentalResourceApi::class)
+class QueueViewModel(private val queueRepository: QueueRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(QueueState())
     val state: StateFlow<QueueState> = _state.asStateFlow()
@@ -34,17 +45,26 @@ class QueueViewModel(
     private val _action = Channel<QueueAction>()
     val actions: Flow<QueueAction> = _action.receiveAsFlow()
 
-    init {
-        getQueue()
-        initSession()
-    }
+    private var queueObserverJob: Job? = null
 
     fun onEvent(event: QueueEvent) {
         when (event) {
+            OnViewAppeared -> {
+                if (!queueRepository.isSessionActive) {
+                    initSession()
+                }
+                getQueue()
+            }
+
+            OnReconnectClicked -> {
+                initSession()
+                getQueue()
+            }
+
             is QueueEvent.OnJoinClicked -> {
                 if (event.isUserAdmin) {
                     viewModelScope.launch {
-                        _action.send(QueueAction.NavigateToQueueAdminScreen(line = event.line))
+                        _action.send(NavigateToQueueAdminScreen(line = event.line))
                     }
                 } else {
                     joinTheQueue(line = event.line)
@@ -67,22 +87,22 @@ class QueueViewModel(
                 _action.send(NavigateToQueueItemDetails(userId = event.userId))
             }
 
-            is QueueEvent.OnUserPhotoClicked -> {}
+            is QueueEvent.OnUserPhotoClicked -> viewModelScope.launch {
+                _action.send(QueueAction.NavigateToFullSizePhotoScreen(photo = event.photo))
+            }
 
-            is QueueEvent.OnQueueReordered -> {
-                _state.update {
-                    it.copy(
-                        queue = it.queue
-                            .toMutableList()
-                            .apply { add(event.to, removeAt(event.from)) }
-                            .toImmutableList(),
-                        isQueueReordered = true
-                    )
-                }
+            is OnQueueReordered -> _state.update {
+                it.copy(
+                    queue = it.queue
+                        .toMutableList()
+                        .apply { add(event.to, removeAt(event.from)) }
+                        .toImmutableList(),
+                    isQueueReordered = true
+                )
             }
 
             OnSaveReorderedQueueClicked -> viewModelScope.launch {
-                val reorderedQueueItems: MutableList<ReorderedQueueItem> = mutableListOf()
+                val reorderedQueueItems = mutableListOf<ReorderedQueueItem>()
 
                 state.value.queue.map { item ->
                     val newPosition = state.value.queue.indexOf(item).toLong() + 1L
@@ -98,6 +118,8 @@ class QueueViewModel(
                 }
                 queueRepository.reorderQueue(reorderedQueueItems = reorderedQueueItems).onSuccess {
                     _state.update { it.copy(isQueueReordered = false) }
+                }.onFailure { error ->
+                    showSocketError(error = error)
                 }
             }
         }
@@ -105,31 +127,32 @@ class QueueViewModel(
 
     private fun initSession() {
         viewModelScope.launch {
+            _state.update { it.copy(isSessionStarting = true) }
+
             queueRepository.initSession().onSuccess {
                 observeQueue()
+            }.onFailure { error ->
+                _action.send(ShowError(errorMessage = error.asString()))
             }
+            _state.update { it.copy(isSessionStarting = false) }
         }
     }
 
     private fun observeQueue() {
-        viewModelScope.launch {
-            queueRepository.observeQueue().collect { response ->
-                _state.update { state ->
-                    state.copy(
-                        queue = state.queue.toMutableList().apply {
-                            when (response) {
-                                is Join -> add(response.queueItem)
-                                is Remove -> removeAll { it.id == response.queueItemId }
-                                is Update -> {
-                                    clear()
-                                    addAll(response.queue)
-                                }
-                            }
-                        }.toPersistentList(),
-                        isLoading = false
-                    )
+        queueObserverJob?.cancel()
+
+        queueObserverJob = viewModelScope.launch {
+            queueRepository.observeQueue(
+                updateQueue = { newQueue ->
+                    _state.update {
+                        it.copy(queue = newQueue.toPersistentList(), isLoading = false)
+                    }
+                },
+                onError = { error ->
+                    showSocketError(error = error)
+                    _state.update { it.copy(isLoading = false) }
                 }
-            }
+            )
         }
     }
 
@@ -139,6 +162,8 @@ class QueueViewModel(
 
             queueRepository.getQueue().onSuccess { queue ->
                 _state.update { it.copy(queue = queue.toPersistentList()) }
+            }.onFailure { error ->
+                _action.send(ShowError(errorMessage = error.asString()))
             }
             _state.update { it.copy(isLoading = false) }
         }
@@ -148,8 +173,12 @@ class QueueViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            queueRepository.joinTheQueue(line = line).onFailure { exception ->
-                exception.printStackTrace()
+            queueRepository.joinTheQueue(
+                line = line,
+                notificationToken = NotifierManager.getPushNotifier().getToken()
+            ).onFailure { error ->
+                showSocketError(error = error)
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -160,7 +189,10 @@ class QueueViewModel(
 
             queueRepository.leaveTheQueue(
                 queueItemId = state.value.queueItemIdToDelete ?: return@launch
-            )
+            ).onFailure { error ->
+                showSocketError(error = error)
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 
@@ -170,8 +202,25 @@ class QueueViewModel(
         }
     }
 
+    private suspend fun showSocketError(error: DataError.Socket) {
+        _action.send(
+            ShowError(
+                errorMessage = error.asString(),
+                actionLabel = getString(resource = Res.string.reconnect).takeIf {
+                    error == DataError.Socket.SERVER_CONNECTION_LOST
+                }
+            )
+        )
+    }
+
     sealed interface QueueAction {
         data class NavigateToQueueItemDetails(val userId: Uuid) : QueueAction
         data class NavigateToQueueAdminScreen(val line: Line) : QueueAction
+        data class NavigateToFullSizePhotoScreen(val photo: String) : QueueAction
+
+        data class ShowError(
+            val errorMessage: String,
+            val actionLabel: String? = null
+        ) : QueueAction
     }
 }

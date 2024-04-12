@@ -21,8 +21,8 @@ import core.presentation.components.UserPhoto
 fun UserItem(
     firstName: String,
     lastName: String?,
-    photo: ByteArray?,
-    onItemClicked: () -> Unit,
+    photo: String?,
+    onItemClicked: () -> Unit = {},
     onPhotoClicked: () -> Unit
 ) {
     Row(

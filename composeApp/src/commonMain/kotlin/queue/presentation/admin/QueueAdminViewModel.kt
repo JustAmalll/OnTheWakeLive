@@ -22,6 +22,7 @@ import queue.presentation.admin.QueueAdminEvent.OnChangeSelectedUserClicked
 import queue.presentation.admin.QueueAdminEvent.OnFirstNameChanged
 import queue.presentation.admin.QueueAdminEvent.OnLineSelected
 import queue.presentation.admin.QueueAdminEvent.OnUserSelected
+import queue.presentation.admin.QueueAdminViewModel.QueueAdminAction.NavigateToFullSizePhotoScreen
 import user_profile.domain.use_case.SearchUsersUseCase
 
 class QueueAdminViewModel(
@@ -49,7 +50,7 @@ class QueueAdminViewModel(
                 searchUser(searchQuery = event.value)
             }
 
-            is OnUserSelected -> _state.update { it.copy(selectedUser = event.userProfile) }
+            is OnUserSelected -> _state.update { it.copy(selectedUser = event.user) }
             is OnLineSelected -> _state.update { it.copy(line = event.line) }
 
             OnChangeSelectedUserClicked -> _state.update {
@@ -58,6 +59,10 @@ class QueueAdminViewModel(
 
             QueueAdminEvent.OnNavigateBackClicked -> viewModelScope.launch {
                 _action.send(QueueAdminAction.NavigateBack)
+            }
+
+            is QueueAdminEvent.OnUserPhotoClicked -> viewModelScope.launch {
+                _action.send(NavigateToFullSizePhotoScreen(photo = event.photo))
             }
 
             OnAddUserClicked -> addUser()
@@ -94,5 +99,6 @@ class QueueAdminViewModel(
 
     sealed interface QueueAdminAction {
         data object NavigateBack : QueueAdminAction
+        data class NavigateToFullSizePhotoScreen(val photo: String): QueueAdminAction
     }
 }

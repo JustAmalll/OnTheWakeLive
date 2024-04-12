@@ -1,6 +1,5 @@
 package core.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,11 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import core.presentation.utils.rememberBitmapFromBytes
+import coil3.compose.AsyncImage
+import core.utils.Constants
 
 @Composable
 fun UserPhoto(
-    photo: ByteArray?,
+    photo: String?,
     onClick: () -> Unit
 ) {
     Box(
@@ -35,19 +35,21 @@ fun UserPhoto(
             ),
         contentAlignment = Alignment.Center
     ) {
-        rememberBitmapFromBytes(bytes = photo)?.let { bitmap ->
-            Image(
+        if (photo != null) {
+            AsyncImage(
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable(onClick = onClick),
-                bitmap = bitmap,
+                model = "${Constants.BASE_URL}/storage/$photo",
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
-        } ?: Icon(
-            modifier = Modifier.size(20.dp),
-            imageVector = Icons.Default.Person,
-            contentDescription = null
-        )
+        } else {
+            Icon(
+                modifier = Modifier.size(20.dp),
+                imageVector = Icons.Default.Person,
+                contentDescription = null
+            )
+        }
     }
 }

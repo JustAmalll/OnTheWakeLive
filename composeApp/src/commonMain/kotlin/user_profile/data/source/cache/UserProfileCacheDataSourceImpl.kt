@@ -34,6 +34,14 @@ class UserProfileCacheDataSourceImpl(
 
         }
 
+    override suspend fun clearCachedUserProfile() {
+        withContext(Dispatchers.IO) {
+            runCatchingLocal {
+                observableSettings.remove(USER_PROFILE)
+            }
+        }
+    }
+
     companion object {
         private const val USER_PROFILE = "user_profile"
     }

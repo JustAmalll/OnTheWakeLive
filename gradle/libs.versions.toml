@@ -7,21 +7,28 @@ android-targetSdk = "34"
 androidx-activityCompose = "1.8.2"
 compose = "1.6.4"
 compose-plugin = "1.6.1"
+compose-cropper = "0.4.0"
+firebaseBom = "32.8.0"
+kmpnotifier = "0.4.0"
 kotlin = "1.9.23"
 ktor = "2.3.9"
 serialization = "1.6.3"
 lifecycle_version = "2.8.0-alpha03"
 collection-immutable = "0.3.7"
-koin = "3.5.3"
+koin = "3.5.4"
 koin-compose = "1.1.2"
 coil-compose = "3.0.0-alpha06"
+statelyCommon = "2.0.7"
 uuid = "0.8.4"
 voyager = "1.0.0"
 multiplatform-settings = "1.1.1"
 reorderable = "1.4.0"
+compottie = "1.1.1"
+google-services = "4.4.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+compose-image-cropper = { module = "com.github.SmartToolFactory:Compose-Cropper", version.ref = "compose-cropper" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 
@@ -37,14 +44,20 @@ kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-
 lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle_version" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle_version" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collection-immutable" }
-coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil-compose" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
+kmpnotifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "kmpnotifier" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil-compose" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil-compose" }
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
 
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-tabNavigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
@@ -55,3 +68,4 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization-plugin = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-services-plugin = { id = "com.google.gms.google-services", version.ref = "google-services" }

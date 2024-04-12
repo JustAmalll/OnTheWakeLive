@@ -1,6 +1,5 @@
 package user_profile.presentation.profile
 
-import LocalSnackBarHostState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +16,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -39,6 +40,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import core.presentation.components.SplashLoadingScreen
 import core.presentation.components.UserDataItem
 import core.presentation.components.UserPhoto
 import core.utils.Constants
@@ -67,7 +69,7 @@ object UserProfileTab : Tab {
         val viewModel: UserProfileViewModel = koinInject()
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.currentOrThrow.parent
-        val snackBarHostState = LocalSnackBarHostState.current
+        val snackBarHostState = remember { SnackbarHostState() }
 
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
@@ -79,12 +81,15 @@ object UserProfileTab : Tab {
                         FullSizePhotoAssembly(photo = action.photo)
                     )
 
-                    is ShowError -> snackBarHostState(action.message)
+                    is ShowError -> snackBarHostState.showSnackbar(action.message)
                 }
             }
         }
-
-        UserProfileScreen(state = state, onEvent = viewModel::onEvent)
+        UserProfileScreen(
+            state = state,
+            snackBarHostState = snackBarHostState,
+            onEvent = viewModel::onEvent
+        )
     }
 
     @OptIn(ExperimentalResourceApi::class)
@@ -102,13 +107,15 @@ object UserProfileTab : Tab {
 @Composable
 private fun UserProfileScreen(
     state: UserProfileState,
+    snackBarHostState: SnackbarHostState,
     onEvent: (UserProfileEvent) -> Unit
 ) {
     val uriHandler = LocalUriHandler.current
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 
-    state.userProfile?.let { userProfile ->
+    if (state.userProfile != null) {
         Scaffold(
+            snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
             topBar = {
                 Column(modifier = Modifier.background(color = surfaceColor)) {
                     TopAppBar(
@@ -133,7 +140,7 @@ private fun UserProfileScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         UserPhoto(
-                            photo = null,
+                            photo = state.userProfile.photo,
                             onClick = { onEvent(OnUserPhotoClicked) }
                         )
                         Column(
@@ -142,13 +149,13 @@ private fun UserProfileScreen(
                                 .weight(1f)
                         ) {
                             Text(
-                                text = userProfile.firstName,
+                                text = state.userProfile.firstName,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = userProfile.lastName,
+                                text = state.userProfile.lastName,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -171,7 +178,7 @@ private fun UserProfileScreen(
             ) {
                 UserDataItem(
                     title = stringResource(resource = Res.string.instagram),
-                    value = userProfile.instagram,
+                    value = state.userProfile.instagram,
                     onActionButtonClicked = {
                         uriHandler.openUri(
                             uri = "${Constants.INSTAGRAM_URL}/${state.userProfile.instagram}"
@@ -180,14 +187,16 @@ private fun UserProfileScreen(
                 )
                 UserDataItem(
                     title = stringResource(resource = Res.string.telegram),
-                    value = userProfile.telegram
+                    value = state.userProfile.telegram
                 )
                 UserDataItem(
                     title = stringResource(resource = Res.string.phone_number),
-                    value = "+${userProfile.phoneNumber}",
+                    value = "+${state.userProfile.phoneNumber}",
                     showDivider = false
                 )
             }
         }
+    } else {
+        SplashLoadingScreen()
     }
 }

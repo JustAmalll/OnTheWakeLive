@@ -9,6 +9,7 @@ import core.domain.utils.DataError.Network.UNKNOWN
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.http.HttpStatusCode
+import io.ktor.utils.io.CancellationException
 import okio.IOException
 
 inline fun <T, R> T.runCatchingNetwork(block: T.() -> R): Result<R, DataError.Network> = try {
@@ -26,6 +27,16 @@ inline fun <T, R> T.runCatchingNetwork(block: T.() -> R): Result<R, DataError.Ne
     Result.Error(error = SERVER_ERROR)
 } catch (exception: Exception) {
     Result.Error(error = UNKNOWN)
+}
+
+inline fun <T, R> T.runCatchingSocket(block: T.() -> R): Result<R, DataError.Socket> = try {
+    Result.Success(block())
+} catch (exception: IOException) {
+    Result.Error(error = DataError.Socket.INTERNET_CONNECTION_LOST)
+} catch (exception: CancellationException) {
+    Result.Error(error = DataError.Socket.SERVER_CONNECTION_LOST)
+} catch (exception: Exception) {
+    Result.Error(error = DataError.Socket.UNKNOWN)
 }
 
 inline fun <T, R> T.runCatchingLocal(block: T.() -> R): Result<R, DataError.Local> = try {

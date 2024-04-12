@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,29 +34,32 @@ class ServerUnavailableAssembly : Screen {
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun ServerUnavailableScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(resource = Res.drawable.server_unavailable),
-            contentDescription = null
-        )
-        Text(
-            text = stringResource(resource = Res.string.server_unavailable_title),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.error,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            modifier = Modifier.padding(top = 12.dp),
-            text = stringResource(resource = Res.string.server_unavailable_subtitle),
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.error.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center
-        )
+    Scaffold { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(resource = Res.drawable.server_unavailable),
+                contentDescription = null
+            )
+            Text(
+                text = stringResource(resource = Res.string.server_unavailable_title),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                modifier = Modifier.padding(top = 12.dp),
+                text = stringResource(resource = Res.string.server_unavailable_subtitle),
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.error.copy(alpha = 0.9f),
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

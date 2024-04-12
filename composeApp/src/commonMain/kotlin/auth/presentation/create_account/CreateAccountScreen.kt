@@ -14,14 +14,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -35,7 +37,6 @@ import auth.presentation.create_account.CreateAccountViewModel.CreateAccountActi
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.NavigateToQueueScreen
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.ShowError
 import auth.presentation.login.LoginAssembly
-import auth.presentation.login.LoginEvent
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.StandardButton
@@ -60,17 +61,22 @@ class CreateAccountAssembly : Screen {
         val viewModel: CreateAccountViewModel = koinInject()
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.current
+        val snackBarHostState = remember { SnackbarHostState() }
 
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
                 when (action) {
                     NavigateToLoginScreen -> navigator?.push(LoginAssembly())
                     NavigateToQueueScreen -> navigator?.push(MainScreen)
-                    is ShowError -> {}
+                    is ShowError -> snackBarHostState.showSnackbar(action.errorMessage)
                 }
             }
         }
-        CreateAccountScreen(state = state, onEvent = viewModel::onEvent)
+        CreateAccountScreen(
+            state = state,
+            snackBarHostState = snackBarHostState,
+            onEvent = viewModel::onEvent
+        )
     }
 }
 
@@ -78,12 +84,14 @@ class CreateAccountAssembly : Screen {
 @Composable
 fun CreateAccountScreen(
     state: CreateAccountState,
+    snackBarHostState: SnackbarHostState,
     onEvent: (CreateAccountEvent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
     Scaffold(
         modifier = Modifier.imePadding(),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         bottomBar = {
             Row(
                 modifier = Modifier

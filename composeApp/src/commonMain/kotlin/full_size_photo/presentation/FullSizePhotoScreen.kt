@@ -1,6 +1,5 @@
 package full_size_photo.presentation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,10 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import core.presentation.utils.rememberBitmapFromBytes
+import coil3.compose.AsyncImage
+import core.utils.Constants
 
-@Suppress("ArrayInDataClass")
-data class FullSizePhotoAssembly(val photo: ByteArray) : Screen {
+data class FullSizePhotoAssembly(val photo: String) : Screen {
 
     @Composable
     override fun Content() {
@@ -33,7 +32,7 @@ data class FullSizePhotoAssembly(val photo: ByteArray) : Screen {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FullSizePhotoScreen(
-    photo: ByteArray,
+    photo: String,
     onNavigateBackClicked: () -> Unit
 ) {
     Scaffold(
@@ -51,14 +50,12 @@ private fun FullSizePhotoScreen(
             )
         }
     ) { paddingValues ->
-        rememberBitmapFromBytes(bytes = photo)?.let { bitmap ->
-            Image(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                bitmap = bitmap,
-                contentDescription = null
-            )
-        }
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            model = "${Constants.BASE_URL}/storage/$photo",
+            contentDescription = null
+        )
     }
 }

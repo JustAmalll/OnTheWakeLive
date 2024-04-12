@@ -6,13 +6,18 @@ import core.domain.utils.Result
 import core.domain.utils.runCatchingNetwork
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
-import io.ktor.client.request.put
-import io.ktor.client.request.setBody
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import user_profile.domain.model.UpdateUserProfileRequest
 import user_profile.domain.model.UserProfile
 
 class UserProfileRemoteDataSourceImpl(
@@ -27,12 +32,30 @@ class UserProfileRemoteDataSourceImpl(
         }
 
     override suspend fun updateUserProfile(
-        userProfile: UserProfile
+        updateRequest: UpdateUserProfileRequest,
+        photo: ByteArray?
     ): Result<Unit, DataError.Network> = withContext(Dispatchers.IO) {
         runCatchingNetwork {
-            client.put("/update_profile") {
-                setBody(userProfile)
-            }
+            client.submitFormWithBinaryData(
+                url = "/update_profile",
+                formData = formData {
+                    append(
+                        key = "updateRequest",
+                        value = Json.encodeToString(updateRequest)
+                    )
+
+                    photo?.let {
+                        append(
+                            key = "photo",
+                            value = photo,
+                            headers = Headers.build {
+                                append(HttpHeaders.ContentType, "image/*")
+                                append(HttpHeaders.ContentDisposition, "filename=ktor_logo.png")
+                            }
+                        )
+                    }
+                }
+            )
             Unit
         }
     }

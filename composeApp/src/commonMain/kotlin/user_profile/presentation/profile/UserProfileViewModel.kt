@@ -20,6 +20,7 @@ import user_profile.presentation.profile.UserProfileEvent.OnEditProfileClicked
 import user_profile.presentation.profile.UserProfileEvent.OnLogoutClicked
 import user_profile.presentation.profile.UserProfileEvent.OnUserPhotoClicked
 import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToEditProfileScreen
+import user_profile.presentation.profile.UserProfileViewModel.UserProfileAction.NavigateToFullSizePhotoScreen
 
 class UserProfileViewModel(
     private val getUserProfileUseCase: GetUserProfileUseCase,
@@ -46,17 +47,15 @@ class UserProfileViewModel(
             }
 
             is OnUserPhotoClicked -> viewModelScope.launch {
-//                state.value.userProfile?.photo?.let { photo ->
-//                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
-//                }
+                state.value.userProfile?.photo?.let { photo ->
+                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
+                }
             }
         }
     }
 
     private fun getUserProfile() {
         viewModelScope.launch {
-            _action.send(UserProfileAction.ShowError("Test"))
-
             getUserProfileUseCase().onSuccess { userProfile ->
                 _state.update { it.copy(userProfile = userProfile) }
             }.onFailure { error ->
@@ -77,8 +76,6 @@ class UserProfileViewModel(
         data class ShowError(val message: String) : UserProfileAction
         data object NavigateToLoginScreen : UserProfileAction
         data object NavigateToEditProfileScreen : UserProfileAction
-
-        @Suppress("ArrayInDataClass")
-        data class NavigateToFullSizePhotoScreen(val photo: ByteArray) : UserProfileAction
+        data class NavigateToFullSizePhotoScreen(val photo: String) : UserProfileAction
     }
 }

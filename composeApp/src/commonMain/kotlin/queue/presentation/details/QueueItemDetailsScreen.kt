@@ -32,7 +32,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.benasher44.uuid.Uuid
+import core.presentation.components.SplashLoadingScreen
 import core.presentation.components.UserDataItem
+import core.presentation.components.UserPhoto
 import core.utils.Constants.INSTAGRAM_URL
 import full_size_photo.presentation.FullSizePhotoAssembly
 import onthewakelive.composeapp.generated.resources.Res
@@ -87,7 +89,7 @@ private fun QueueItemDetailsScreen(
     val uriHandler = LocalUriHandler.current
     val surfaceColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 
-    state.userProfile?.let { userProfile ->
+    if (state.userProfile != null) {
         Scaffold(
             topBar = {
                 Column(modifier = Modifier.background(color = surfaceColor)) {
@@ -112,19 +114,19 @@ private fun QueueItemDetailsScreen(
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-//                        UserPhoto(
-//                            photo = state.userProfile.photo,
-//                            onClick = { onEvent(OnPhotoClicked) }
-//                        )
+                        UserPhoto(
+                            photo = state.userProfile.photo,
+                            onClick = { onEvent(QueueItemDetailsEvent.OnPhotoClicked) }
+                        )
                         Column(modifier = Modifier.padding(start = 12.dp)) {
                             Text(
-                                text = userProfile.firstName,
+                                text = state.userProfile.firstName,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = userProfile.lastName,
+                                text = state.userProfile.lastName,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -140,7 +142,7 @@ private fun QueueItemDetailsScreen(
             ) {
                 UserDataItem(
                     title = stringResource(resource = Res.string.instagram),
-                    value = userProfile.instagram,
+                    value = state.userProfile.instagram,
                     onActionButtonClicked = {
                         uriHandler.openUri(
                             uri = "$INSTAGRAM_URL/${state.userProfile.instagram}"
@@ -149,17 +151,19 @@ private fun QueueItemDetailsScreen(
                 )
                 UserDataItem(
                     title = stringResource(resource = Res.string.telegram),
-                    value = userProfile.telegram,
+                    value = state.userProfile.telegram,
                     showDivider = isUserAdmin
                 )
                 if (isUserAdmin) {
                     UserDataItem(
                         title = stringResource(resource = Res.string.phone_number),
-                        value = "+${userProfile.phoneNumber}",
+                        value = "+${state.userProfile.phoneNumber}",
                         showDivider = false
                     )
                 }
             }
         }
+    } else {
+        SplashLoadingScreen()
     }
 }

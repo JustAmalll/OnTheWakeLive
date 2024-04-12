@@ -27,16 +27,17 @@ import sh.calvin.reorderable.ReorderableItemScope
 fun ReorderableItemScope.QueueItem(
     firstName: String,
     lastName: String?,
-    photo: ByteArray?,
+    photo: String?,
+    showDraggableHandle: Boolean,
     onItemClicked: () -> Unit,
     onPhotoClicked: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onItemClicked)
             .clip(shape = MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable(onClick = onItemClicked)
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -56,13 +57,15 @@ fun ReorderableItemScope.QueueItem(
                 )
             }
         }
-        Spacer(modifier = Modifier.weight(1f))
+        if (showDraggableHandle) {
+            Spacer(modifier = Modifier.weight(1f))
 
-        IconButton(modifier = Modifier.draggableHandle(), onClick = {}) {
-            Icon(
-                imageVector = Icons.Rounded.DragHandle,
-                contentDescription = null
-            )
+            IconButton(modifier = Modifier.draggableHandle(), onClick = {}) {
+                Icon(
+                    imageVector = Icons.Rounded.DragHandle,
+                    contentDescription = null
+                )
+            }
         }
     }
 }

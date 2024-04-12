@@ -4,10 +4,12 @@
     <string name="profile">Profile</string>
     <string name="left">Left</string>
     <string name="right">Right</string>
+    <string name="reconnect">Reconnect</string>
 
     <!-- Network Errors-->
     <string name="unknown_error">Oops! An unexpected error has occurred. Please try again later or contact support if the issue persists.</string>
     <string name="no_internet_error">Oops! Couldn't reach server. Please check your network connection and try again.</string>
+    <string name="server_connection_lost">Oops! Connection to the server was lost</string>
     <string name="server_error">Oops! A server error has occurred. We apologize for the inconvenience. Please try again later or contact support.</string>
     <string name="request_timeout_error">Request timed out. Please check your internet connection and try again.</string>
     <string name="incorrect_data_error">Oops! It looks like you've entered invalid data. Please double-check your input and try again.</string>

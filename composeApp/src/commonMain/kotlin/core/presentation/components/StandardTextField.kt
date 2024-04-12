@@ -33,7 +33,8 @@ fun StandardTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     isPasswordTextField: Boolean = false,
-    isPhoneNumberTextField: Boolean = false
+    isPhoneNumberTextField: Boolean = false,
+    enabled: Boolean = true
 ) {
     var showPassword by remember { mutableStateOf(false) }
 
@@ -43,6 +44,7 @@ fun StandardTextField(
         onValueChange = onValueChange,
         label = { Text(text = label) },
         singleLine = true,
+        enabled = enabled,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         visualTransformation = if (!showPassword && isPasswordTextField) {

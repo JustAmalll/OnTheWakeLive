@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import queue.presentation.details.QueueItemDetailsEvent.OnNavigateBackClicked
 import queue.presentation.details.QueueItemDetailsViewModel.QueueItemDetailsAction.NavigateBack
+import queue.presentation.details.QueueItemDetailsViewModel.QueueItemDetailsAction.NavigateToFullSizePhotoScreen
 import user_profile.domain.use_case.GetQueueItemDetailsUseCase
 
 class QueueItemDetailsViewModel(
@@ -38,9 +39,9 @@ class QueueItemDetailsViewModel(
             }
 
             QueueItemDetailsEvent.OnPhotoClicked -> viewModelScope.launch {
-//                state.value.userProfile?.photo?.let { photo ->
-//                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
-//                }
+                state.value.userProfile?.photo?.let { photo ->
+                    _action.send(NavigateToFullSizePhotoScreen(photo = photo))
+                }
             }
         }
     }
@@ -58,8 +59,6 @@ class QueueItemDetailsViewModel(
 
     sealed interface QueueItemDetailsAction {
         data object NavigateBack : QueueItemDetailsAction
-
-        @Suppress("ArrayInDataClass")
-        data class NavigateToFullSizePhotoScreen(val photo: ByteArray) : QueueItemDetailsAction
+        data class NavigateToFullSizePhotoScreen(val photo: String) : QueueItemDetailsAction
     }
 }

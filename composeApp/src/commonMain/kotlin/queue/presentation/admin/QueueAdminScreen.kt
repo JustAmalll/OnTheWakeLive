@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,6 +37,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.StandardButton
 import core.presentation.components.StandardTextField
+import full_size_photo.presentation.FullSizePhotoAssembly
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.add
 import onthewakelive.composeapp.generated.resources.add_to_queue
@@ -50,7 +50,10 @@ import org.koin.core.parameter.parametersOf
 import queue.domain.model.Line
 import queue.presentation.admin.QueueAdminEvent.OnChangeSelectedUserClicked
 import queue.presentation.admin.QueueAdminEvent.OnFirstNameChanged
+import queue.presentation.admin.QueueAdminEvent.OnUserPhotoClicked
+import queue.presentation.admin.QueueAdminEvent.OnUserSelected
 import queue.presentation.admin.QueueAdminViewModel.QueueAdminAction.NavigateBack
+import queue.presentation.admin.QueueAdminViewModel.QueueAdminAction.NavigateToFullSizePhotoScreen
 import queue.presentation.admin.components.UserItem
 
 data class QueueAdminAssembly(val line: Line) : Screen {
@@ -67,6 +70,10 @@ data class QueueAdminAssembly(val line: Line) : Screen {
             viewModel.actions.collect { action ->
                 when (action) {
                     NavigateBack -> navigator?.pop()
+
+                    is NavigateToFullSizePhotoScreen -> navigator?.push(
+                        FullSizePhotoAssembly(photo = action.photo)
+                    )
                 }
             }
         }
@@ -126,9 +133,10 @@ private fun QueueAdminScreen(
                 UserItem(
                     firstName = state.selectedUser.firstName,
                     lastName = state.selectedUser.lastName,
-                    photo = null,
-                    onPhotoClicked = {},
-                    onItemClicked = {}
+                    photo = state.selectedUser.photo,
+                    onPhotoClicked = {
+                        state.selectedUser.photo?.let { onEvent(OnUserPhotoClicked(photo = it)) }
+                    }
                 )
                 TextButton(
                     modifier = Modifier
@@ -156,9 +164,11 @@ private fun QueueAdminScreen(
                         UserItem(
                             firstName = user.firstName,
                             lastName = user.lastName,
-                            photo = null,
-                            onPhotoClicked = {},
-                            onItemClicked = { onEvent(QueueAdminEvent.OnUserSelected(user)) }
+                            photo = user.photo,
+                            onPhotoClicked = {
+                                user.photo?.let { onEvent(OnUserPhotoClicked(photo = it)) }
+                            },
+                            onItemClicked = { onEvent(OnUserSelected(user = user)) }
                         )
                     }
                 }

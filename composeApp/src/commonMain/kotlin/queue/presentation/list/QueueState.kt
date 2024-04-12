@@ -9,6 +9,8 @@ import queue.domain.model.QueueItem
 @Stable
 data class QueueState(
     val isLoading: Boolean = false,
+    val isSessionStarting: Boolean = false,
+
     val isUserAdmin: Boolean = false,
     val queue: ImmutableList<QueueItem> = persistentListOf(),
     val showLeaveQueueConfirmationDialog: Boolean = false,

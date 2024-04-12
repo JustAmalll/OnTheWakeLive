@@ -13,7 +13,10 @@ sealed interface QueueSocketAction {
 
     @Serializable
     @SerialName("Join")
-    data class Join(@SerialName("line") val line: Line) : QueueSocketAction
+    data class Join(
+        @SerialName("line") val line: Line,
+        @SerialName("notificationToken") val notificationToken: String?
+    ) : QueueSocketAction
 
     @Serializable
     @SerialName("Leave")

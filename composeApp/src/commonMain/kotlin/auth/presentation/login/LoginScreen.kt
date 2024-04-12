@@ -1,8 +1,6 @@
 package auth.presentation.login
 
 import MainScreen
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,14 +12,16 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -57,18 +57,22 @@ class LoginAssembly : Screen {
         val viewModel: LoginViewModel = koinInject()
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.current
+        val snackBarHostState = remember { SnackbarHostState() }
 
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
                 when (action) {
                     NavigateToCreateAccountScreen -> navigator?.push(CreateAccountAssembly())
                     NavigateToQueueScreen -> navigator?.push(MainScreen)
-                    is ShowError -> {}
+                    is ShowError -> snackBarHostState.showSnackbar(action.errorMessage)
                 }
             }
         }
-
-        LoginScreen(state = state, onEvent = viewModel::onEvent)
+        LoginScreen(
+            state = state,
+            snackBarHostState = snackBarHostState,
+            onEvent = viewModel::onEvent
+        )
     }
 }
 
@@ -76,12 +80,14 @@ class LoginAssembly : Screen {
 @Composable
 private fun LoginScreen(
     state: LoginState,
+    snackBarHostState: SnackbarHostState,
     onEvent: (LoginEvent) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
 
     Scaffold(
         modifier = Modifier.imePadding(),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         bottomBar = {
             Row(
                 modifier = Modifier

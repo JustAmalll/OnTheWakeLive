@@ -6,7 +6,7 @@ import queue.domain.model.Line
 sealed interface QueueEvent {
     data object OnViewAppeared: QueueEvent
     data object OnReconnectClicked: QueueEvent
-    data class OnJoinClicked(val line: Line, val isUserAdmin: Boolean) : QueueEvent
+    data class OnJoinClicked(val userId: Uuid, val line: Line, val isUserAdmin: Boolean) : QueueEvent
     data class OnQueueLeaved(val queueItemId: Uuid) : QueueEvent
     data object OnLeaveQueueConfirmed : QueueEvent
     data object LeaveQueueConfirmationDialogDismissRequest : QueueEvent

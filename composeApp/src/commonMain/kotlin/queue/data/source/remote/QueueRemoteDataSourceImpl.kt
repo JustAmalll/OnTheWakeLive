@@ -100,6 +100,7 @@ class QueueRemoteDataSourceImpl(
     }
 
     override suspend fun joinTheQueue(
+        userId: Uuid,
         line: Line,
         notificationToken: String?
     ): Result<Unit, DataError.Socket> = withContext(Dispatchers.IO) {
@@ -109,6 +110,7 @@ class QueueRemoteDataSourceImpl(
             )
             session.sendQueueSocketAction(
                 action = QueueSocketAction.Join(
+                    userId = userId,
                     line = line,
                     notificationToken = notificationToken
                 )

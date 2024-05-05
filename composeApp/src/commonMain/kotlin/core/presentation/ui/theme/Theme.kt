@@ -3,6 +3,16 @@ package core.presentation.ui.theme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.stolzl_bold
+import onthewakelive.composeapp.generated.resources.stolzl_book
+import onthewakelive.composeapp.generated.resources.stolzl_light
+import onthewakelive.composeapp.generated.resources.stolzl_medium
+import onthewakelive.composeapp.generated.resources.stolzl_regular
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.Font
 
 val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -66,6 +76,16 @@ val DarkColors = darkColorScheme(
     surfaceTint = md_theme_dark_surfaceTint,
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
+)
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+fun StolzlFontFamily() = FontFamily(
+    Font(Res.font.stolzl_light, weight = FontWeight.Light),
+    Font(Res.font.stolzl_book, weight = FontWeight.Normal),
+    Font(Res.font.stolzl_regular, weight = FontWeight.Medium),
+    Font(Res.font.stolzl_medium, weight = FontWeight.SemiBold),
+    Font(Res.font.stolzl_bold, weight = FontWeight.Bold)
 )
 
 @Composable

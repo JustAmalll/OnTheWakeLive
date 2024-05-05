@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import coil3.compose.LocalPlatformContext
 import com.benasher44.uuid.Uuid
 import core.utils.filter
 import full_size_photo.presentation.FullSizePhotoAssembly
@@ -60,6 +59,7 @@ import onthewakelive.composeapp.generated.resources.queue
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import paywall.presentation.PaywallAssembly
 import queue.domain.model.Line
 import queue.domain.model.QueueItem
 import queue.presentation.admin.QueueAdminAssembly
@@ -73,6 +73,7 @@ import queue.presentation.list.QueueEvent.OnQueueReordered
 import queue.presentation.list.QueueEvent.OnSaveReorderedQueueClicked
 import queue.presentation.list.QueueEvent.OnUserPhotoClicked
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToFullSizePhotoScreen
+import queue.presentation.list.QueueViewModel.QueueAction.NavigateToPaywallScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 import queue.presentation.list.QueueViewModel.QueueAction.ShowError
@@ -122,6 +123,8 @@ object QueueTab : Tab {
                             viewModel.onEvent(QueueEvent.OnReconnectClicked)
                         }
                     }
+
+                    NavigateToPaywallScreen -> navigator?.push(PaywallAssembly())
                 }
             }
         }
@@ -154,6 +157,7 @@ private fun QueueScreen(
     snackBarHostState: SnackbarHostState,
     onEvent: (QueueEvent) -> Unit
 ) {
+    val userId = LocalUserId.current
     val isUserAdmin = LocalIsUserAdmin.current
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 2 })
 
@@ -198,12 +202,15 @@ private fun QueueScreen(
                     FloatingActionButton(
                         onClick = {
                             if (!state.isLoading && !state.isSessionStarting) {
-                                onEvent(
-                                    OnJoinClicked(
-                                        line = Line.entries[pagerState.currentPage],
-                                        isUserAdmin = isUserAdmin
+                                userId?.let {
+                                    onEvent(
+                                        OnJoinClicked(
+                                            userId = userId,
+                                            line = Line.entries[pagerState.currentPage],
+                                            isUserAdmin = isUserAdmin
+                                        )
                                     )
-                                )
+                                }
                             }
                         }
                     ) {
@@ -265,7 +272,6 @@ private fun QueueScreen(
         }
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

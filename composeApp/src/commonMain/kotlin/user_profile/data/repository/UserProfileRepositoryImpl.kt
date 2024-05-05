@@ -16,11 +16,11 @@ class UserProfileRepositoryImpl(
 ) : UserProfileRepository {
 
     override suspend fun getUserProfile(): Result<UserProfile, DataError.Network> {
-//        val cachedResult = userProfileCacheDataSource.getUserProfile()
-//
-//        if (cachedResult is Result.Success && cachedResult.data != null) {
-//            return Result.Success(cachedResult.data)
-//        }
+        val cachedResult = userProfileCacheDataSource.getUserProfile()
+
+        if (cachedResult is Result.Success && cachedResult.data != null) {
+            return Result.Success(cachedResult.data)
+        }
 
         return userProfileRemoteDataSource.getUserProfile().onSuccess {
             userProfileCacheDataSource.cacheUserProfile(userProfile = it)
@@ -44,4 +44,10 @@ class UserProfileRepositoryImpl(
     ): Result<List<UserProfile>, DataError.Network> = userProfileRemoteDataSource.searchUsers(
         searchQuery = searchQuery
     )
+
+    override suspend fun isUserSubscribed(userId: Uuid): Result<Boolean, DataError.Network> =
+        userProfileRemoteDataSource.isUserSubscribed(userId = userId)
+
+    override suspend fun activateUserSubscription(userId: Uuid): Result<Unit, DataError.Network> =
+        userProfileRemoteDataSource.activateSubscription(userId = userId)
 }

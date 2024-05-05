@@ -27,6 +27,7 @@ interface QueueRemoteDataSource {
     ): Result<Unit, DataError.Socket>
 
     suspend fun joinTheQueue(
+        userId: Uuid,
         line: Line,
         notificationToken: String?
     ): Result<Unit, DataError.Socket>

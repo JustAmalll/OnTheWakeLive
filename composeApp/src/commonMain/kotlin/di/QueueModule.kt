@@ -16,7 +16,7 @@ import queue.presentation.list.QueueViewModel
 val queueModule = module {
     single<QueueRemoteDataSource> { QueueRemoteDataSourceImpl(get()) }
     single<QueueRepository> { QueueRepositoryImpl(get()) }
-    single { QueueViewModel(get()) }
+    single { QueueViewModel(get(), get()) }
 
     factory { CloseSessionUseCase(get()) }
     factory { UpdateNotificationTokenUseCase(get()) }

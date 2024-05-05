@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.benasher44.uuid.Uuid
 import com.mmk.kmpnotifier.notification.NotifierManager
 import core.domain.utils.DataError
+import core.domain.utils.Result
 import core.domain.utils.asString
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
@@ -35,9 +36,13 @@ import queue.presentation.list.QueueEvent.OnViewAppeared
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 import queue.presentation.list.QueueViewModel.QueueAction.ShowError
+import user_profile.domain.use_case.IsUserSubscribedUseCase
 
 @OptIn(ExperimentalResourceApi::class)
-class QueueViewModel(private val queueRepository: QueueRepository) : ViewModel() {
+class QueueViewModel(
+    private val queueRepository: QueueRepository,
+    private val isUserSubscribed: IsUserSubscribedUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow(QueueState())
     val state: StateFlow<QueueState> = _state.asStateFlow()
@@ -67,7 +72,7 @@ class QueueViewModel(private val queueRepository: QueueRepository) : ViewModel()
                         _action.send(NavigateToQueueAdminScreen(line = event.line))
                     }
                 } else {
-                    joinTheQueue(line = event.line)
+                    joinTheQueue(userId = event.userId, line = event.line)
                 }
             }
 
@@ -169,15 +174,27 @@ class QueueViewModel(private val queueRepository: QueueRepository) : ViewModel()
         }
     }
 
-    private fun joinTheQueue(line: Line) {
+    private fun joinTheQueue(userId: Uuid, line: Line) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
-            queueRepository.joinTheQueue(
-                line = line,
-                notificationToken = NotifierManager.getPushNotifier().getToken()
-            ).onFailure { error ->
-                showSocketError(error = error)
+            val isUserSubscribed = isUserSubscribed(userId = userId).getOrNull() ?: false
+
+            if (!isUserSubscribed) {
+                _action.send(QueueAction.NavigateToPaywallScreen)
+                return@launch
+            }
+            canJoinTheQueue(userId = userId, line = line).onSuccess {
+                queueRepository.joinTheQueue(
+                    userId = userId,
+                    line = line,
+                    notificationToken = NotifierManager.getPushNotifier().getToken()
+                ).onFailure { error ->
+                    showSocketError(error = error)
+                    _state.update { it.copy(isLoading = false) }
+                }
+            }.onFailure { queueError ->
+                _action.send(ShowError(errorMessage = queueError.asString()))
                 _state.update { it.copy(isLoading = false) }
             }
         }
@@ -213,10 +230,38 @@ class QueueViewModel(private val queueRepository: QueueRepository) : ViewModel()
         )
     }
 
+    private fun canJoinTheQueue(userId: Uuid, line: Line): Result<Unit, JoinQueueError> {
+        val (leftQueue, rightQueue) = state.value.queue.partition { it.line == Line.LEFT }
+
+        val isUserAlreadyInQueue = state.value.queue.find { it.userId == userId } != null
+        if (!isUserAlreadyInQueue) return Result.Success(Unit)
+
+        val userItemInLeftQueue = leftQueue.find { it.userId == userId }
+        val userItemInRightQueue = rightQueue.find { it.userId == userId }
+
+        val userPositionInLeftQueue = leftQueue.indexOf(userItemInLeftQueue)
+        val userPositionInRightQueue = rightQueue.indexOf(userItemInRightQueue)
+
+        return if (line == Line.LEFT && userItemInLeftQueue != null)
+            Result.Error(JoinQueueError.ALREADY_IN_QUEUE_ERROR)
+        else if (line == Line.RIGHT && userItemInRightQueue != null)
+            Result.Error(JoinQueueError.ALREADY_IN_QUEUE_ERROR)
+        else if (line == Line.LEFT && userItemInRightQueue != null) {
+            if (leftQueue.size - userPositionInRightQueue >= 4) Result.Success(Unit)
+            else if (userPositionInRightQueue - leftQueue.size >= 4) Result.Success(Unit)
+            else Result.Error(JoinQueueError.INTERVAL_ERROR)
+        } else if (line == Line.RIGHT && userItemInLeftQueue != null) {
+            if (rightQueue.size - userPositionInLeftQueue >= 4) Result.Success(Unit)
+            else if (userPositionInLeftQueue - rightQueue.size >= 4) Result.Success(Unit)
+            else Result.Error(JoinQueueError.INTERVAL_ERROR)
+        } else Result.Error(JoinQueueError.UNKNOWN_ERROR)
+    }
+
     sealed interface QueueAction {
         data class NavigateToQueueItemDetails(val userId: Uuid) : QueueAction
         data class NavigateToQueueAdminScreen(val line: Line) : QueueAction
         data class NavigateToFullSizePhotoScreen(val photo: String) : QueueAction
+        data object NavigateToPaywallScreen : QueueAction
 
         data class ShowError(
             val errorMessage: String,

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serialization.plugin)
     alias(libs.plugins.google.services.plugin)
+    alias(libs.plugins.crashlytics.plugin)
 }
 
 kotlin {
@@ -40,6 +41,8 @@ kotlin {
             implementation(libs.compose.image.cropper)
 
             implementation(project.dependencies.platform(libs.firebase.bom))
+//            implementation(libs.firebase.crashlytics)
+//            implementation(libs.firebase.analytics)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -122,4 +125,3 @@ android {
         debugImplementation(libs.compose.ui.tooling)
     }
 }
-

@@ -15,4 +15,6 @@ interface UserProfileRemoteDataSource {
 
     suspend fun getQueueItemDetails(userId: Uuid): Result<UserProfile, DataError.Network>
     suspend fun searchUsers(searchQuery: String): Result<List<UserProfile>, DataError.Network>
+    suspend fun isUserSubscribed(userId: Uuid): Result<Boolean, DataError.Network>
+    suspend fun activateSubscription(userId: Uuid): Result<Unit, DataError.Network>
 }

@@ -1,3 +1,4 @@
+import admin_panel.AdminPanelAssembly
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -14,7 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import core.presentation.MainViewModel.MainAction.NavigateToQueueScreen
 import core.presentation.MainViewModel.MainAction.NavigateToServerUnavailableScreen
 import core.presentation.components.SplashLoadingScreen
 import core.presentation.ui.theme.OnTheWakeLiveTheme
+import core.presentation.utils.isPortraitOrientation
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import queue.presentation.list.QueueTab
@@ -69,7 +71,7 @@ fun App() {
     OnTheWakeLiveTheme {
         val viewModel: MainViewModel = koinInject()
         val state by viewModel.state.collectAsState()
-        var startScreen by remember { mutableStateOf<Screen?>(null) }
+        var startScreen by rememberSaveable { mutableStateOf<Screen?>(null) }
 
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
@@ -82,7 +84,7 @@ fun App() {
         }
 
         CompositionLocalProvider(
-            LocalIsUserAdmin provides state.isUserAdmin,
+            LocalIsUserAdmin provides true,
             LocalUserId provides state.userId
         ) {
             Surface {
@@ -101,7 +103,8 @@ object MainScreen : Screen {
     @Composable
     override fun Content() {
         val viewModel: MainViewModel = koinInject()
-        val isAdmin = LocalIsUserAdmin.current
+        val isPortraitOrientation = isPortraitOrientation()
+        val isUserAdmin = LocalIsUserAdmin.current
 
         LaunchedEffect(key1 = true) {
             viewModel.onEvent(OnMainScreenAppeared)
@@ -112,17 +115,22 @@ object MainScreen : Screen {
                 content = {
                     Box(
                         modifier = Modifier.padding(
-                            bottom = if (isAdmin) 0.dp else 80.dp
+                            bottom = if (isPortraitOrientation) 80.dp else 0.dp
                         )
                     ) {
                         CurrentTab()
                     }
                 },
                 bottomBar = {
-                    if (!isAdmin) {
+                    if (isPortraitOrientation) {
                         NavigationBar {
                             TabNavigationItem(tab = QueueTab)
-                            TabNavigationItem(tab = UserProfileTab)
+
+                            if (isUserAdmin) {
+                                TabNavigationItem(tab = AdminPanelAssembly)
+                            } else {
+                                TabNavigationItem(tab = UserProfileTab)
+                            }
                         }
                     }
                 }

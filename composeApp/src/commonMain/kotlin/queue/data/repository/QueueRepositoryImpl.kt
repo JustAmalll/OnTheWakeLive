@@ -44,9 +44,11 @@ class QueueRepositoryImpl(
     )
 
     override suspend fun joinTheQueue(
+        userId: Uuid,
         line: Line,
         notificationToken: String?
     ): Result<Unit, DataError.Socket> = queueRemoteDataSource.joinTheQueue(
+        userId = userId,
         line = line,
         notificationToken = notificationToken
     )

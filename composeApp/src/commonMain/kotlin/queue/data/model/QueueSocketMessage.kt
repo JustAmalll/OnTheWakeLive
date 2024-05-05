@@ -14,6 +14,8 @@ sealed interface QueueSocketAction {
     @Serializable
     @SerialName("Join")
     data class Join(
+        @Serializable(with = UuidSerializer::class)
+        @SerialName("userId") val userId: Uuid,
         @SerialName("line") val line: Line,
         @SerialName("notificationToken") val notificationToken: String?
     ) : QueueSocketAction

@@ -14,5 +14,6 @@ data class UserProfile(
     @SerialName("photo") val photo: String?,
     @SerialName("phoneNumber") val phoneNumber: String,
     @SerialName("telegram") val telegram: String?,
-    @SerialName("instagram") val instagram: String?
+    @SerialName("instagram") val instagram: String?,
+    @SerialName("subscribed") val subscribed: Boolean
 )

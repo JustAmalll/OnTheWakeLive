@@ -79,4 +79,20 @@ class UserProfileRemoteDataSourceImpl(
             }.body<List<UserProfile>>()
         }
     }
+
+    override suspend fun isUserSubscribed(
+        userId: Uuid
+    ): Result<Boolean, DataError.Network> = runCatchingNetwork {
+        client.get("/is_subscribed") {
+            parameter("userId", userId)
+        }.body<Boolean>()
+    }
+
+    override suspend fun activateSubscription(
+        userId: Uuid
+    ): Result<Unit, DataError.Network> = runCatchingNetwork {
+        client.get("/activate_subscription") {
+            parameter("userId", userId)
+        }
+    }
 }

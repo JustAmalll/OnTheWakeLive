@@ -28,6 +28,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.activate_subscription
 import onthewakelive.composeapp.generated.resources.admin_panel
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
@@ -56,13 +57,15 @@ object AdminPanelAssembly : Tab {
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 private fun AdminPanelScreen(onActivateSubscriptionClicked: () -> Unit) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Admin Panel") })
+            TopAppBar(
+                title = { Text(text = stringResource(Res.string.admin_panel)) }
+            )
         }
     ) { paddingValues ->
 
@@ -81,7 +84,7 @@ private fun AdminPanelScreen(onActivateSubscriptionClicked: () -> Unit) {
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "Активировать подписку")
+                Text(text = stringResource(Res.string.activate_subscription))
 
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

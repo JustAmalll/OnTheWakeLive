@@ -69,7 +69,6 @@
     <string name="activate_subscription">Activate Subscription</string>
     <string name="activate">Activate</string>
 
-
     <!-- Server Unavailable Screen-->
     <string name="server_unavailable_title">Unable to connect to server</string>
     <string name="server_unavailable_subtitle">Please check your internet connection or try again later. If the problem persists, the server may be temporarily unavailable. We apologize for any inconvenience.</string>

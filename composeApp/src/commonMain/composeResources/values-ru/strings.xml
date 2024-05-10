@@ -1,0 +1,75 @@
+﻿<resources>
+    <!-- Common-->
+    <string name="queue">Очередь</string>
+    <string name="profile">Профиль</string>
+    <string name="admin_panel">Панель админа</string>
+    <string name="left">Левая</string>
+    <string name="right">Правая</string>
+    <string name="reconnect">Подключиться заново</string>
+
+    <!-- Network Errors-->
+    <string name="unknown_error">Упс! Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз позже или свяжитесь с поддержкой, если проблема сохраняется.</string>
+    <string name="no_internet_error">Упс! Не удалось связаться с сервером. Пожалуйста, проверьте ваше интернет-соединение и попробуйте еще раз.</string>
+    <string name="server_connection_lost">Упс! Соединение с сервером было потеряно.</string>
+    <string name="server_error">Упс! Произошла ошибка сервера. Приносим извинения за неудобства. Пожалуйста, попробуйте еще раз позже или обратитесь в службу поддержки.</string>
+    <string name="request_timeout_error">Время запроса истекло. Пожалуйста, проверьте ваше интернет-соединение и попробуйте еще раз.</string>
+    <string name="incorrect_data_error">Упс! Похоже, вы ввели неверные данные. Пожалуйста, проверьте введенные данные и попробуйте еще раз.</string>
+    <string name="user_already_exists">Упс! Пользователь с таким номером телефона уже существует. Пожалуйста, используйте другой номер или свяжитесь с поддержкой.</string>
+
+    <!-- Validation Errors-->
+    <string name="empty_field_error">Это поле обязательно для заполнения. Пожалуйста, заполните его, чтобы продолжить.</string>
+    <string name="validate_password_length_error">Пароль должен состоять как минимум из 6 символов.</string>
+
+    <!-- Join Queue Errors-->
+    <string name="already_in_queue_error">Упс! Вы уже в очереди!</string>
+    <string name="interval_error">Упс! Вам нужно как минимум 4 человека впереди!</string>
+
+    <!-- Login Screen-->
+    <string name="sign_in">Войти</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="password">Пароль</string>
+    <string name="dont_have_an_account_yet">Еще нет аккаунта?</string>
+    <string name="create">Создать!</string>
+
+    <!-- Register Screen-->
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="first_name">Имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="create_account">Создать аккаунт</string>
+    <string name="already_have_an_account">Уже есть аккаунт?</string>
+
+    <!-- Leave Queue Confirmation Dialog-->
+    <string name="confirm_action">Подтвердить действие</string>
+    <string name="leave_queue_confirmation">Вы уверены, что хотите покинуть очередь? Это действие нельзя отменить.</string>
+    <string name="admin_remove_user_from_queue_confirmation">Вы уверены, что хотите удалить человека из очереди? Это действие нельзя отменить.</string>
+    <string name="leave">Покинуть</string>
+    <string name="remove">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="stay">Остаться</string>
+
+    <!-- Empty Queue Content-->
+    <string name="empty_queue">В очереди никого нет</string>
+
+    <!-- Queue Item Details Screen-->
+    <string name="details">Подробности</string>
+    <string name="not_specified">Не указано</string>
+
+    <!-- Queue Admin Screen -->
+    <string name="add_to_queue">Добавить в очередь</string>
+    <string name="add">Добавить</string>
+
+    <!-- Edit Profile Screen-->
+    <string name="edit_profile">Редактировать профиль</string>
+    <string name="telegram" translatable="false">Telegram</string>
+    <string name="instagram" translatable="false">Instagram</string>
+    <string name="edit">Редактировать</string>
+    <string name="successfully_updated_profile">Профиль успешно обновлен!</string>
+
+    <!-- Activate Subscription Screen -->
+    <string name="activate_subscription">Активировать подписку</string>
+    <string name="activate">Активировать</string>
+
+    <!-- Server Unavailable Screen-->
+    <string name="server_unavailable_title">Невозможно подключиться к серверу</string>
+    <string name="server_unavailable_subtitle">Пожалуйста, проверьте ваше интернет-соединение или попробуйте позже. Если проблема сохраняется, сервер временно недоступен. Приносим извинения за любые неудобства.</string>
+</resources>

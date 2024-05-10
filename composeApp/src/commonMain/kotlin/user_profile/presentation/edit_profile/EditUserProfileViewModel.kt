@@ -2,7 +2,7 @@ package user_profile.presentation.edit_profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benasher44.uuid.Uuid
+
 import core.domain.utils.asString
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
@@ -41,7 +41,7 @@ class EditUserProfileViewModel(
     private val _action = Channel<EditUserProfileAction>()
     val actions: Flow<EditUserProfileAction> = _action.receiveAsFlow()
 
-    private var userId: Uuid? = null
+    private var userId: Int? = null
 
     init {
         getUserProfile()

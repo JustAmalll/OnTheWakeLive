@@ -1,6 +1,6 @@
 package queue.data.repository
 
-import com.benasher44.uuid.Uuid
+
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import queue.data.source.remote.QueueRemoteDataSource
@@ -34,7 +34,7 @@ class QueueRepositoryImpl(
     }
 
     override suspend fun adminAddUserToTheQueue(
-        userId: Uuid?,
+        userId: Int?,
         line: Line,
         fullName: String
     ): Result<Unit, DataError.Socket> = queueRemoteDataSource.adminAddUserToTheQueue(
@@ -44,7 +44,7 @@ class QueueRepositoryImpl(
     )
 
     override suspend fun joinTheQueue(
-        userId: Uuid,
+        userId: Int,
         line: Line,
         notificationToken: String?
     ): Result<Unit, DataError.Socket> = queueRemoteDataSource.joinTheQueue(
@@ -53,7 +53,7 @@ class QueueRepositoryImpl(
         notificationToken = notificationToken
     )
 
-    override suspend fun leaveTheQueue(queueItemId: Uuid): Result<Unit, DataError.Socket> =
+    override suspend fun leaveTheQueue(queueItemId: Int): Result<Unit, DataError.Socket> =
         queueRemoteDataSource.leaveTheQueue(queueItemId = queueItemId)
 
     override suspend fun reorderQueue(

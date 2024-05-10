@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import com.benasher44.uuid.Uuid
+
 import core.presentation.components.SplashLoadingScreen
 import core.presentation.components.UserDataItem
 import core.presentation.components.UserPhoto
@@ -50,7 +50,7 @@ import queue.presentation.details.QueueItemDetailsEvent.OnNavigateBackClicked
 import queue.presentation.details.QueueItemDetailsViewModel.QueueItemDetailsAction.NavigateBack
 import queue.presentation.details.QueueItemDetailsViewModel.QueueItemDetailsAction.NavigateToFullSizePhotoScreen
 
-data class QueueItemDetailsAssembly(val userId: Uuid) : Screen {
+data class QueueItemDetailsAssembly(val userId: Int) : Screen {
 
     @Composable
     override fun Content() {

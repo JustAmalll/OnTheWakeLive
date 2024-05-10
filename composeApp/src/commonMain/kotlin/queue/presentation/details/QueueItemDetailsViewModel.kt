@@ -2,7 +2,7 @@ package queue.presentation.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benasher44.uuid.Uuid
+
 import core.domain.utils.onSuccess
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +19,7 @@ import user_profile.domain.use_case.GetQueueItemDetailsUseCase
 
 class QueueItemDetailsViewModel(
     private val getQueueItemDetails: GetQueueItemDetailsUseCase,
-    private val userId: Uuid
+    private val userId: Int
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(QueueItemDetailsState())

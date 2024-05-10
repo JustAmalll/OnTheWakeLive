@@ -1,6 +1,6 @@
 package user_profile.data.repository
 
-import com.benasher44.uuid.Uuid
+
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import core.domain.utils.onSuccess
@@ -36,7 +36,7 @@ class UserProfileRepositoryImpl(
         userProfileCacheDataSource.clearCachedUserProfile()
     }
 
-    override suspend fun getQueueItemDetails(userId: Uuid): Result<UserProfile, DataError.Network> =
+    override suspend fun getQueueItemDetails(userId: Int): Result<UserProfile, DataError.Network> =
         userProfileRemoteDataSource.getQueueItemDetails(userId = userId)
 
     override suspend fun searchUsers(
@@ -45,9 +45,9 @@ class UserProfileRepositoryImpl(
         searchQuery = searchQuery
     )
 
-    override suspend fun isUserSubscribed(userId: Uuid): Result<Boolean, DataError.Network> =
+    override suspend fun isUserSubscribed(userId: Int): Result<Boolean, DataError.Network> =
         userProfileRemoteDataSource.isUserSubscribed(userId = userId)
 
-    override suspend fun activateUserSubscription(userId: Uuid): Result<Unit, DataError.Network> =
+    override suspend fun activateUserSubscription(userId: Int): Result<Unit, DataError.Network> =
         userProfileRemoteDataSource.activateSubscription(userId = userId)
 }

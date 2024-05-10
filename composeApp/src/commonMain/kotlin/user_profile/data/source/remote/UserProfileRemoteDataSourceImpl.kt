@@ -1,6 +1,5 @@
 package user_profile.data.source.remote
 
-import com.benasher44.uuid.Uuid
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import core.domain.utils.runCatchingNetwork
@@ -61,7 +60,7 @@ class UserProfileRemoteDataSourceImpl(
     }
 
     override suspend fun getQueueItemDetails(
-        userId: Uuid
+        userId: Int
     ): Result<UserProfile, DataError.Network> = withContext(Dispatchers.IO) {
         runCatchingNetwork {
             client.get("/queue_item_details") {
@@ -81,7 +80,7 @@ class UserProfileRemoteDataSourceImpl(
     }
 
     override suspend fun isUserSubscribed(
-        userId: Uuid
+        userId: Int
     ): Result<Boolean, DataError.Network> = runCatchingNetwork {
         client.get("/is_subscribed") {
             parameter("userId", userId)
@@ -89,7 +88,7 @@ class UserProfileRemoteDataSourceImpl(
     }
 
     override suspend fun activateSubscription(
-        userId: Uuid
+        userId: Int
     ): Result<Unit, DataError.Network> = runCatchingNetwork {
         client.get("/activate_subscription") {
             parameter("userId", userId)

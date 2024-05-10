@@ -6,7 +6,7 @@ import auth.domain.model.AuthResponse
 import auth.domain.model.CreateAccountRequest
 import auth.domain.model.LoginRequest
 import auth.domain.repository.AuthRepository
-import com.benasher44.uuid.Uuid
+
 import core.domain.utils.DataError
 import core.domain.utils.Result
 
@@ -33,10 +33,16 @@ class AuthRepositoryImpl(
     override suspend fun cacheAuthResponse(authResponse: AuthResponse) =
         authCacheDataSource.cacheAuthResponse(authResponse = authResponse)
 
+    override suspend fun isUserAlreadyExists(
+        phoneNumber: String
+    ): Result<Boolean, DataError.Network> = authRemoteDataSource.isUserAlreadyExists(
+        phoneNumber = phoneNumber
+    )
+
     override suspend fun isUserAdmin(): Boolean =
         authCacheDataSource.isUserAdmin()
 
-    override suspend fun getUserId(): Uuid? =
+    override suspend fun getUserId(): Int? =
         authCacheDataSource.getUserId()
 
     override suspend fun logout() =

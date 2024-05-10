@@ -2,7 +2,7 @@ package queue.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benasher44.uuid.Uuid
+
 import com.mmk.kmpnotifier.notification.NotifierManager
 import core.domain.utils.DataError
 import core.domain.utils.Result
@@ -174,13 +174,13 @@ class QueueViewModel(
         }
     }
 
-    private fun joinTheQueue(userId: Uuid, line: Line) {
+    private fun joinTheQueue(userId: Int, line: Line) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
 
             val isUserSubscribed = isUserSubscribed(userId = userId).getOrNull() ?: false
 
-            if (!isUserSubscribed) {
+            if (true) {
                 _action.send(QueueAction.NavigateToPaywallScreen)
                 return@launch
             }
@@ -230,7 +230,7 @@ class QueueViewModel(
         )
     }
 
-    private fun canJoinTheQueue(userId: Uuid, line: Line): Result<Unit, JoinQueueError> {
+    private fun canJoinTheQueue(userId: Int, line: Line): Result<Unit, JoinQueueError> {
         val (leftQueue, rightQueue) = state.value.queue.partition { it.line == Line.LEFT }
 
         val isUserAlreadyInQueue = state.value.queue.find { it.userId == userId } != null
@@ -258,7 +258,7 @@ class QueueViewModel(
     }
 
     sealed interface QueueAction {
-        data class NavigateToQueueItemDetails(val userId: Uuid) : QueueAction
+        data class NavigateToQueueItemDetails(val userId: Int) : QueueAction
         data class NavigateToQueueAdminScreen(val line: Line) : QueueAction
         data class NavigateToFullSizePhotoScreen(val photo: String) : QueueAction
         data object NavigateToPaywallScreen : QueueAction

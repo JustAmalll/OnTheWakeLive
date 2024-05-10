@@ -1,6 +1,5 @@
 package user_profile.domain.repository
 
-import com.benasher44.uuid.Uuid
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import user_profile.domain.model.UpdateUserProfileRequest
@@ -14,9 +13,9 @@ interface UserProfileRepository {
         newPhotoBytes: ByteArray?
     ): Result<Unit, DataError.Network>
 
-    suspend fun getQueueItemDetails(userId: Uuid): Result<UserProfile, DataError.Network>
+    suspend fun getQueueItemDetails(userId: Int): Result<UserProfile, DataError.Network>
     suspend fun searchUsers(searchQuery: String): Result<List<UserProfile>, DataError.Network>
 
-    suspend fun isUserSubscribed(userId: Uuid): Result<Boolean, DataError.Network>
-    suspend fun activateUserSubscription(userId: Uuid): Result<Unit, DataError.Network>
+    suspend fun isUserSubscribed(userId: Int): Result<Boolean, DataError.Network>
+    suspend fun activateUserSubscription(userId: Int): Result<Unit, DataError.Network>
 }

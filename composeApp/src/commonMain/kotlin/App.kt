@@ -32,7 +32,7 @@ import coil3.compose.setSingletonImageLoaderFactory
 import coil3.memory.MemoryCache
 import coil3.request.CachePolicy
 import coil3.util.DebugLogger
-import com.benasher44.uuid.Uuid
+
 import core.presentation.MainEvent.OnMainScreenAppeared
 import core.presentation.MainViewModel
 import core.presentation.MainViewModel.MainAction.NavigateToLoginScreen
@@ -48,7 +48,7 @@ import server_unavailable.ServerUnavailableAssembly
 import user_profile.presentation.profile.UserProfileTab
 
 val LocalIsUserAdmin = compositionLocalOf { false }
-val LocalUserId = compositionLocalOf<Uuid?> { null }
+val LocalUserId = compositionLocalOf<Int?> { null }
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
@@ -84,7 +84,7 @@ fun App() {
         }
 
         CompositionLocalProvider(
-            LocalIsUserAdmin provides true,
+            LocalIsUserAdmin provides state.isUserAdmin,
             LocalUserId provides state.userId
         ) {
             Surface {

@@ -1,6 +1,6 @@
 package queue.data.source.remote
 
-import com.benasher44.uuid.Uuid
+
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import core.domain.utils.onFailure
@@ -81,7 +81,7 @@ class QueueRemoteDataSourceImpl(
     }
 
     override suspend fun adminAddUserToTheQueue(
-        userId: Uuid?,
+        userId: Int?,
         line: Line,
         fullName: String
     ): Result<Unit, DataError.Socket> = withContext(Dispatchers.IO) {
@@ -100,7 +100,7 @@ class QueueRemoteDataSourceImpl(
     }
 
     override suspend fun joinTheQueue(
-        userId: Uuid,
+        userId: Int,
         line: Line,
         notificationToken: String?
     ): Result<Unit, DataError.Socket> = withContext(Dispatchers.IO) {
@@ -119,7 +119,7 @@ class QueueRemoteDataSourceImpl(
     }
 
     override suspend fun leaveTheQueue(
-        queueItemId: Uuid
+        queueItemId: Int
     ): Result<Unit, DataError.Socket> = withContext(Dispatchers.IO) {
         runCatchingSocket {
             val session = session ?: return@withContext Result.Error(

@@ -1,8 +1,7 @@
 package auth.data.source.cache
 
 import auth.domain.model.AuthResponse
-import com.benasher44.uuid.Uuid
-import com.benasher44.uuid.uuidFrom
+
 import com.russhwolf.settings.ObservableSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -15,16 +14,13 @@ class AuthCacheDataSourceImpl(
     override suspend fun cacheAuthResponse(authResponse: AuthResponse) {
         withContext(Dispatchers.IO) {
             observableSettings.putString(key = PREFS_JWT_TOKEN, value = authResponse.token)
-            observableSettings.putString(
-                key = PREFS_USER_ID,
-                value = authResponse.userId.toString()
-            )
+            observableSettings.putInt(key = PREFS_USER_ID, value = authResponse.userId)
             observableSettings.putBoolean(key = PREFS_IS_ADMIN, value = authResponse.isAdmin)
         }
     }
 
-    override suspend fun getUserId(): Uuid? = withContext(Dispatchers.IO) {
-        observableSettings.getStringOrNull(PREFS_USER_ID)?.let { uuidFrom(it) }
+    override suspend fun getUserId(): Int? = withContext(Dispatchers.IO) {
+        observableSettings.getIntOrNull(PREFS_USER_ID)
     }
 
     override suspend fun isUserAdmin(): Boolean = withContext(Dispatchers.IO) {

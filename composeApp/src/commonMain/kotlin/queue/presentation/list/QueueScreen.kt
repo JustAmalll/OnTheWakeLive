@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import com.benasher44.uuid.Uuid
+
 import core.utils.filter
 import full_size_photo.presentation.FullSizePhotoAssembly
 import kotlinx.collections.immutable.ImmutableList
@@ -277,8 +277,8 @@ private fun QueueScreen(
 @Composable
 private fun QueueContent(
     queue: ImmutableList<QueueItem>,
-    onQueueItemClicked: (Uuid) -> Unit,
-    onQueueLeaved: (Uuid) -> Unit,
+    onQueueItemClicked: (Int) -> Unit,
+    onQueueLeaved: (Int) -> Unit,
     onUserPhotoClicked: (String) -> Unit,
     onQueueReordered: (from: Int, to: Int) -> Unit
 ) {

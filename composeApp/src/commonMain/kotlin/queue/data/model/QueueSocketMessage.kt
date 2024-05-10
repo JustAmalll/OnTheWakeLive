@@ -1,7 +1,6 @@
 package queue.data.model
 
-import com.benasher44.uuid.Uuid
-import core.domain.utils.UuidSerializer
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import queue.domain.model.Line
@@ -14,8 +13,7 @@ sealed interface QueueSocketAction {
     @Serializable
     @SerialName("Join")
     data class Join(
-        @Serializable(with = UuidSerializer::class)
-        @SerialName("userId") val userId: Uuid,
+        @SerialName("userId") val userId: Int,
         @SerialName("line") val line: Line,
         @SerialName("notificationToken") val notificationToken: String?
     ) : QueueSocketAction
@@ -23,17 +21,14 @@ sealed interface QueueSocketAction {
     @Serializable
     @SerialName("Leave")
     data class Leave(
-        @Serializable(with = UuidSerializer::class)
-        @SerialName("queueItemId")
-        val queueItemId: Uuid
+        @SerialName("queueItemId") val queueItemId: Int
     ) : QueueSocketAction
 
     @Serializable
     @SerialName("AdminAddUser")
     data class AdminAddUser(
         @SerialName("line") val line: Line,
-        @Serializable(with = UuidSerializer::class)
-        @SerialName("userId") val userId: Uuid?,
+        @SerialName("userId") val userId: Int?,
         @SerialName("fullName") val fullName: String
     ) : QueueSocketAction
 

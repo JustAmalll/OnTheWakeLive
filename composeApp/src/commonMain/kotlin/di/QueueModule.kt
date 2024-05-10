@@ -1,6 +1,6 @@
 package di
 
-import com.benasher44.uuid.Uuid
+
 import org.koin.dsl.module
 import queue.data.repository.QueueRepositoryImpl
 import queue.data.source.remote.QueueRemoteDataSource
@@ -21,7 +21,7 @@ val queueModule = module {
     factory { CloseSessionUseCase(get()) }
     factory { UpdateNotificationTokenUseCase(get()) }
 
-    factory { (userId: Uuid) ->
+    factory { (userId: Int) ->
         QueueItemDetailsViewModel(get(), userId)
     }
 

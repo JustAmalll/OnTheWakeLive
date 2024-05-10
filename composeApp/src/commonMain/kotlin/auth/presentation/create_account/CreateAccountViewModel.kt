@@ -3,6 +3,7 @@ package auth.presentation.create_account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.CreateAccountUseCase
+import auth.domain.use_case.IsUserAlreadyExistsUseCase
 import auth.presentation.create_account.CreateAccountEvent.OnCreateAccountClicked
 import auth.presentation.create_account.CreateAccountEvent.OnFirstNameChanged
 import auth.presentation.create_account.CreateAccountEvent.OnLastNameChanged
@@ -28,13 +29,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.user_already_exists
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.getString
 
 class CreateAccountViewModel(
     private val createAccount: CreateAccountUseCase,
     private val validateFirstName: ValidateFirstNameUseCase,
     private val validateLastName: ValidateLastNameUseCase,
     private val validatePhoneNumber: ValidatePhoneNumberUseCase,
-    private val validatePassword: ValidatePasswordUseCase
+    private val validatePassword: ValidatePasswordUseCase,
+    private val isUserAlreadyExists: IsUserAlreadyExistsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateAccountState())
@@ -56,6 +62,7 @@ class CreateAccountViewModel(
         }
     }
 
+    @OptIn(ExperimentalResourceApi::class)
     private fun createAccount() {
         viewModelScope.launch {
             val firstNameError = validateFirstName(state.value.firstName).errorOrNull()
@@ -83,16 +90,27 @@ class CreateAccountViewModel(
             }
             _state.update { it.copy(isLoading = true) }
 
-            createAccount(
-                firstName = state.value.firstName,
-                lastName = state.value.lastName,
-                phoneNumber = state.value.phoneNumber,
-                password = state.value.password
-            ).onSuccess {
-                _action.send(NavigateToQueueScreen)
+            isUserAlreadyExists(phoneNumber = state.value.phoneNumber).onSuccess { exists ->
+                if (exists) {
+                    _action.send(ShowError(getString(resource = Res.string.user_already_exists)))
+                    _state.update { it.copy(isLoading = false) }
+                    return@launch
+                }
+
+                createAccount(
+                    firstName = state.value.firstName,
+                    lastName = state.value.lastName,
+                    phoneNumber = state.value.phoneNumber,
+                    password = state.value.password
+                ).onSuccess {
+                    _action.send(NavigateToQueueScreen)
+                }.onFailure { error ->
+                    _action.send(ShowError(errorMessage = error.asString()))
+                }
             }.onFailure { error ->
                 _action.send(ShowError(errorMessage = error.asString()))
             }
+
             _state.update { it.copy(isLoading = false) }
         }
     }

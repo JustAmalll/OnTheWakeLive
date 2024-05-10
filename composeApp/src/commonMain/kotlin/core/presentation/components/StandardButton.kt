@@ -27,7 +27,11 @@ fun StandardButton(
     onClick: () -> Unit
 ) {
     Button(
-        onClick = onClick,
+        onClick = {
+            if (!isLoading) {
+                onClick()
+            }
+        },
         modifier = modifier,
         enabled = enabled,
         colors = colors

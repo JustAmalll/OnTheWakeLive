@@ -10,6 +10,7 @@ import auth.domain.use_case.AuthenticationUseCase
 import auth.domain.use_case.CreateAccountUseCase
 import auth.domain.use_case.GetUserIdUseCase
 import auth.domain.use_case.IsUserAdminUseCase
+import auth.domain.use_case.IsUserAlreadyExistsUseCase
 import auth.domain.use_case.LoginUseCase
 import auth.domain.use_case.LogoutUseCase
 import auth.presentation.create_account.CreateAccountViewModel
@@ -27,7 +28,8 @@ val authModule = module {
     factory { LogoutUseCase(get()) }
     factory { IsUserAdminUseCase(get()) }
     factory { GetUserIdUseCase(get()) }
+    factory { IsUserAlreadyExistsUseCase(get()) }
 
     factory { LoginViewModel(get(), get(), get()) }
-    factory { CreateAccountViewModel(get(), get(), get(), get(), get()) }
+    factory { CreateAccountViewModel(get(), get(), get(), get(), get(), get()) }
 }

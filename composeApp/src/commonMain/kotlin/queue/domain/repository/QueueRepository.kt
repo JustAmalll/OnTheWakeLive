@@ -1,6 +1,6 @@
 package queue.domain.repository
 
-import com.benasher44.uuid.Uuid
+
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import queue.domain.model.Line
@@ -21,18 +21,18 @@ interface QueueRepository {
     suspend fun updateNotificationToken(newToken: String)
 
     suspend fun adminAddUserToTheQueue(
-        userId: Uuid?,
+        userId: Int?,
         line: Line,
         fullName: String
     ): Result<Unit, DataError.Socket>
 
     suspend fun joinTheQueue(
-        userId: Uuid,
+        userId: Int,
         line: Line,
         notificationToken: String?
     ): Result<Unit, DataError.Socket>
 
-    suspend fun leaveTheQueue(queueItemId: Uuid): Result<Unit, DataError.Socket>
+    suspend fun leaveTheQueue(queueItemId: Int): Result<Unit, DataError.Socket>
 
     suspend fun reorderQueue(
         reorderedQueueItems: List<ReorderedQueueItem>

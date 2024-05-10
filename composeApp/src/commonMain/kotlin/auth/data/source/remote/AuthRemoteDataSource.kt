@@ -9,6 +9,7 @@ import core.domain.utils.Result
 interface AuthRemoteDataSource {
     suspend fun authenticate(): Result<Unit, DataError.Network>
     suspend fun login(loginRequest: LoginRequest): Result<AuthResponse, DataError.Network>
+    suspend fun isUserAlreadyExists(phoneNumber: String): Result<Boolean, DataError.Network>
 
     suspend fun createAccount(
         createAccountRequest: CreateAccountRequest

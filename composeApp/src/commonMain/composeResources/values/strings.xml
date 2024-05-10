@@ -69,6 +69,15 @@
     <string name="activate_subscription">Activate Subscription</string>
     <string name="activate">Activate</string>
 
+    <!-- Paywall Screen -->
+    <string name="subscription_required">To join the queue, you need to subscribe</string>
+    <string name="subscription_benefit_1">With the subscription, you can easily join the queue online, avoiding the need for physical presence until the start of your riding time. Organize your visits without long waits.</string>
+    <string name="subscription_benefit_2">Subscribe once and enjoy unlimited access for the entire riding season without additional payments.</string>
+    <string name="one_time_seasonal_subscription">One-time seasonal subscription, no renewal required</string>
+    <string name="upload_receipt">Upload receipt</string>
+    <string name="ready">Ready</string>
+    <string name="send">Send</string>
+
     <!-- Server Unavailable Screen-->
     <string name="server_unavailable_title">Unable to connect to server</string>
     <string name="server_unavailable_subtitle">Please check your internet connection or try again later. If the problem persists, the server may be temporarily unavailable. We apologize for any inconvenience.</string>

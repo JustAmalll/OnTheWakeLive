@@ -2,6 +2,9 @@ package paywall.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import core.domain.utils.asString
+import core.domain.utils.onFailure
+import core.domain.utils.onSuccess
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,10 +28,6 @@ class PaywallViewModel(
 
     fun onEvent(event: PaywallEvent) {
         when (event) {
-            PaywallEvent.OnSelectReceiptClicked -> viewModelScope.launch {
-                _action.send(PaywallAction.OpenFilePicker)
-            }
-
             is OnReceiptSelected -> _state.update { it.copy(receipt = event.receipt) }
             PaywallEvent.OnSubmitClicked -> sendReceipt()
         }
@@ -37,13 +36,19 @@ class PaywallViewModel(
     private fun sendReceipt() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
+            val receipt = state.value.receipt ?: return@launch
 
-            paywallRepository.sentReceipt(receipt = state.value.receipt ?: return@launch)
+            paywallRepository.sentReceipt(receipt = receipt).onSuccess {
+                _action.send(PaywallAction.NavigateToPaywallSuccessScreen)
+            }.onFailure { error ->
+                _action.send(PaywallAction.ShowError(errorMessage = error.asString()))
+            }
             _state.update { it.copy(isLoading = false) }
         }
     }
 
     sealed interface PaywallAction {
-        data object OpenFilePicker : PaywallAction
+        data object NavigateToPaywallSuccessScreen: PaywallAction
+        data class ShowError(val errorMessage: String) : PaywallAction
     }
 }

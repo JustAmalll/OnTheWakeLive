@@ -65,6 +65,15 @@
     <string name="edit">Редактировать</string>
     <string name="successfully_updated_profile">Профиль успешно обновлен!</string>
 
+    <!-- Paywall Screen -->
+    <string name="subscription_required">Чтобы добавиться в очередь необходимо оформить подписку</string>
+    <string name="subscription_benefit_1">С подпиской вы можете легко добавиться в очередь онлайн, избегая необходимости физического присутствия до начала вашего времени катания. Организуйте свои посещения без длительных ожиданий.</string>
+    <string name="subscription_benefit_2">Оформите подписку один раз и наслаждайтесь неограниченным доступом на весь сезон катания без дополнительных платежей.</string>
+    <string name="one_time_seasonal_subscription">Единоразовая подписка на сезон, не требующая продления</string>
+    <string name="upload_receipt">Загрузите квитанцию</string>
+    <string name="ready">Готово</string>
+    <string name="send">Отправить</string>
+
     <!-- Activate Subscription Screen -->
     <string name="activate_subscription">Активировать подписку</string>
     <string name="activate">Активировать</string>

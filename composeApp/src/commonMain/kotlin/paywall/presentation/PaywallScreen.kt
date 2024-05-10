@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,16 +20,18 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Upload
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -45,10 +48,24 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import core.presentation.components.StandardButton
 import core.presentation.ui.theme.StolzlFontFamily
 import core.presentation.utils.rememberImagePickerLauncher
+import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.one_time_seasonal_subscription
+import onthewakelive.composeapp.generated.resources.ready
+import onthewakelive.composeapp.generated.resources.send
+import onthewakelive.composeapp.generated.resources.subscription_benefit_1
+import onthewakelive.composeapp.generated.resources.subscription_benefit_2
+import onthewakelive.composeapp.generated.resources.subscription_required
+import onthewakelive.composeapp.generated.resources.upload_receipt
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import paywall.presentation.PaywallViewModel.PaywallAction.NavigateToPaywallSuccessScreen
+import paywall.presentation.PaywallViewModel.PaywallAction.ShowError
+import paywall.presentation.success.PaywallSuccessAssembly
 
 class PaywallAssembly : Screen {
 
@@ -56,8 +73,23 @@ class PaywallAssembly : Screen {
     override fun Content() {
         val viewModel: PaywallViewModel = koinInject()
         val state by viewModel.state.collectAsState()
+        val navigator = LocalNavigator.current
+        val snackBarHostState = remember { SnackbarHostState() }
 
-        PaywallScreen(state = state, onEvent = viewModel::onEvent)
+        LaunchedEffect(key1 = true) {
+            viewModel.actions.collect { action ->
+                when(action) {
+                    NavigateToPaywallSuccessScreen -> navigator?.push(PaywallSuccessAssembly())
+                    is ShowError -> snackBarHostState.showSnackbar(message = action.errorMessage)
+                }
+            }
+        }
+
+        PaywallScreen(
+            state = state,
+            snackBarHostState = snackBarHostState,
+            onEvent = viewModel::onEvent
+        )
     }
 }
 
@@ -65,13 +97,16 @@ class PaywallAssembly : Screen {
 @Composable
 private fun PaywallScreen(
     state: PaywallState,
+    snackBarHostState: SnackbarHostState,
     onEvent: (PaywallEvent) -> Unit
 ) {
     val imagePicker = rememberImagePickerLauncher {
         onEvent(PaywallEvent.OnReceiptSelected(receipt = it))
     }
 
-    Scaffold { paddingValues ->
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -92,7 +127,7 @@ private fun PaywallScreen(
                 )
                 Text(
                     modifier = Modifier.padding(start = 20.dp),
-                    text = "Чтобы добавиться в очередь необходимо оформить подписку",
+                    text = stringResource(Res.string.subscription_required),
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -121,17 +156,17 @@ private fun PaywallScreen(
 
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
-                            text = "С подпиской вы можете легко добавиться в очередь онлайн, избегая необходимости физического присутствия до начала вашего времени катания. Организуйте свои посещения без длительных ожиданий.",
+                            text = stringResource(Res.string.subscription_benefit_1),
                             fontWeight = FontWeight.Normal,
                             fontSize = 14.sp
                         )
                     }
                     Row(modifier = Modifier.padding(top = 20.dp)) {
-                        Text(text = "🌊", fontSize = 18.sp)
+                        Text(text = "🌊", fontSize = 20.sp)
 
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
-                            text = "Оформите подписку один раз и наслаждайтесь неограниченным доступом на весь сезон катания без дополнительных платежей. ",
+                            text = stringResource(Res.string.subscription_benefit_2),
                             fontWeight = FontWeight.Normal,
                             fontSize = 14.sp
                         )
@@ -153,7 +188,7 @@ private fun PaywallScreen(
                 )
                 Text(
                     modifier = Modifier.padding(start = 20.dp),
-                    text = "Единоразовая подписка на сезон, не требующая продления",
+                    text = stringResource(Res.string.one_time_seasonal_subscription),
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -246,11 +281,13 @@ private fun PaywallScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = if (state.receipt == null) {
-                            "Загрузите квитанцию"
-                        } else {
-                            "Готово"
-                        },
+                        text = stringResource(
+                            if (state.receipt == null) {
+                                Res.string.upload_receipt
+                            } else {
+                                Res.string.ready
+                            }
+                        ),
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Light,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -271,21 +308,22 @@ private fun PaywallScreen(
                     )
                 }
             }
-            Button(
+            StandardButton(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 24.dp),
                 onClick = { onEvent(PaywallEvent.OnSubmitClicked) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7AD3))
-            ) {
-                Text(
-                    modifier = Modifier.padding(vertical = 6.dp),
-                    text = "Отправить",
-                    fontFamily = StolzlFontFamily(),
-                    fontWeight = FontWeight.Normal,
-                    color = Color.White
-                )
-            }
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2E7AD3),
+                    contentColor = Color.White
+                ),
+                enabled = state.receipt != null,
+                isLoading = state.isLoading,
+                text = stringResource(Res.string.send),
+                fontFamily = StolzlFontFamily(),
+                fontWeight = FontWeight.Normal,
+                innerPaddingValues = PaddingValues(vertical = 6.dp)
+            )
         }
     }
 }

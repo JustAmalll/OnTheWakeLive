@@ -85,6 +85,7 @@ kotlin {
             implementation(libs.compottie)
 
             api(libs.kmpnotifier)
+            api(libs.permissions.compose)
         }
         iosMain.dependencies {
             implementation(libs.ktor.darwin)
@@ -114,7 +115,7 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
         }
     }
     compileOptions {

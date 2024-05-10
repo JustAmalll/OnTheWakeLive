@@ -2,13 +2,17 @@ package queue.presentation.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
 import com.mmk.kmpnotifier.notification.NotifierManager
 import core.domain.utils.DataError
 import core.domain.utils.Result
 import core.domain.utils.asString
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
+import dev.icerock.moko.permissions.DeniedAlwaysException
+import dev.icerock.moko.permissions.DeniedException
+import dev.icerock.moko.permissions.Permission.REMOTE_NOTIFICATION
+import dev.icerock.moko.permissions.PermissionState
+import dev.icerock.moko.permissions.PermissionsController
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
@@ -21,6 +25,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.notification_permission_error
 import onthewakelive.composeapp.generated.resources.reconnect
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getString
@@ -36,12 +41,14 @@ import queue.presentation.list.QueueEvent.OnViewAppeared
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 import queue.presentation.list.QueueViewModel.QueueAction.ShowError
+import queue.presentation.list.QueueViewModel.QueueAction.ShowPermissionError
 import user_profile.domain.use_case.IsUserSubscribedUseCase
 
 @OptIn(ExperimentalResourceApi::class)
 class QueueViewModel(
     private val queueRepository: QueueRepository,
-    private val isUserSubscribed: IsUserSubscribedUseCase
+    private val isUserSubscribed: IsUserSubscribedUseCase,
+    val permissionsController: PermissionsController
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(QueueState())
@@ -174,13 +181,42 @@ class QueueViewModel(
         }
     }
 
+    private fun requestNotificationPermission(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                permissionsController.providePermission(REMOTE_NOTIFICATION)
+                onSuccess()
+            } catch (deniedAlwaysException: DeniedAlwaysException) {
+                _action.send(
+                    ShowPermissionError(
+                        errorMessage = getString(Res.string.notification_permission_error)
+                    )
+                )
+            } catch (deniedException: DeniedException) {
+                _action.send(
+                    ShowPermissionError(
+                        errorMessage = getString(Res.string.notification_permission_error)
+                    )
+                )
+            }
+        }
+    }
+
     private fun joinTheQueue(userId: Int, line: Line) {
         viewModelScope.launch {
+            val permissionState = permissionsController.getPermissionState(REMOTE_NOTIFICATION)
+
+            if (permissionState != PermissionState.Granted) {
+                requestNotificationPermission(
+                    onSuccess = { joinTheQueue(userId = userId, line = line) }
+                )
+                return@launch
+            }
             _state.update { it.copy(isLoading = true) }
 
             val isUserSubscribed = isUserSubscribed(userId = userId).getOrNull() ?: false
 
-            if (true) {
+            if (!isUserSubscribed) {
                 _action.send(QueueAction.NavigateToPaywallScreen)
                 return@launch
             }
@@ -267,5 +303,7 @@ class QueueViewModel(
             val errorMessage: String,
             val actionLabel: String? = null
         ) : QueueAction
+
+        data class ShowPermissionError(val errorMessage: String) : QueueAction
     }
 }

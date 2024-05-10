@@ -50,15 +50,19 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-
 import core.utils.filter
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import full_size_photo.presentation.FullSizePhotoAssembly
 import kotlinx.collections.immutable.ImmutableList
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.queue
+import onthewakelive.composeapp.generated.resources.settings
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 import paywall.presentation.PaywallAssembly
 import queue.domain.model.Line
 import queue.domain.model.QueueItem
@@ -77,6 +81,7 @@ import queue.presentation.list.QueueViewModel.QueueAction.NavigateToPaywallScree
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 import queue.presentation.list.QueueViewModel.QueueAction.ShowError
+import queue.presentation.list.QueueViewModel.QueueAction.ShowPermissionError
 import queue.presentation.list.components.EmptyQueueContent
 import queue.presentation.list.components.LeaveQueueConfirmationDialog
 import queue.presentation.list.components.QueueItem
@@ -87,9 +92,14 @@ import sh.calvin.reorderable.rememberReorderableLazyColumnState
 
 object QueueTab : Tab {
 
+    @OptIn(ExperimentalResourceApi::class)
     @Composable
     override fun Content() {
-        val viewModel: QueueViewModel = koinInject()
+        val factory = rememberPermissionsControllerFactory()
+
+        val viewModel: QueueViewModel = koinInject(
+            parameters = { parametersOf(factory.createPermissionsController()) }
+        )
         val state by viewModel.state.collectAsState()
         val navigator = LocalNavigator.current?.parent
         val snackBarHostState = remember { SnackbarHostState() }
@@ -125,9 +135,21 @@ object QueueTab : Tab {
                     }
 
                     NavigateToPaywallScreen -> navigator?.push(PaywallAssembly())
+                    is ShowPermissionError -> {
+                        val result = snackBarHostState.showSnackbar(
+                            message = action.errorMessage,
+                            actionLabel = getString(Res.string.settings),
+                            duration = SnackbarDuration.Short
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel.permissionsController.openAppSettings()
+                        }
+                    }
                 }
             }
         }
+        BindEffect(permissionsController = viewModel.permissionsController)
+
         QueueScreen(
             state = state,
             snackBarHostState = snackBarHostState,

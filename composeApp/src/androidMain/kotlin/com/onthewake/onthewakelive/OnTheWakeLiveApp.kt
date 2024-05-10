@@ -20,7 +20,7 @@ class OnTheWakeLiveApp : Application() {
         }
         NotifierManager.initialize(
             configuration = NotificationPlatformConfiguration.Android(
-                notificationIconResId = R.drawable.ic_launcher_foreground
+                notificationIconResId = R.mipmap.ic_launcher_foreground
             )
         )
     }

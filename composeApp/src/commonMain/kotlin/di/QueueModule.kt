@@ -1,6 +1,7 @@
 package di
 
 
+import dev.icerock.moko.permissions.PermissionsController
 import org.koin.dsl.module
 import queue.data.repository.QueueRepositoryImpl
 import queue.data.source.remote.QueueRemoteDataSource
@@ -16,7 +17,9 @@ import queue.presentation.list.QueueViewModel
 val queueModule = module {
     single<QueueRemoteDataSource> { QueueRemoteDataSourceImpl(get()) }
     single<QueueRepository> { QueueRepositoryImpl(get()) }
-    single { QueueViewModel(get(), get()) }
+    single { (permissionsController: PermissionsController) ->
+        QueueViewModel(get(), get(), permissionsController = permissionsController)
+    }
 
     factory { CloseSessionUseCase(get()) }
     factory { UpdateNotificationTokenUseCase(get()) }

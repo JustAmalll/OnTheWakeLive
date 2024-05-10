@@ -6,6 +6,7 @@
     <string name="left">Left</string>
     <string name="right">Right</string>
     <string name="reconnect">Reconnect</string>
+    <string name="settings">Settings</string>
 
     <!-- Network Errors-->
     <string name="unknown_error">Oops! An unexpected error has occurred. Please try again later or contact support if the issue persists.</string>
@@ -19,6 +20,7 @@
     <!-- Validation Errors-->
     <string name="empty_field_error">This field is required. Please fill it in to proceed.</string>
     <string name="validate_password_length_error">The password needs to consist of at least 6 characters.</string>
+    <string name="notification_permission_error">To notify you about your approaching queue, we need permission to show notifications.</string>
 
     <!-- Join Queue Errors-->
     <string name="already_in_queue_error">Oops! You are already in queue!</string>

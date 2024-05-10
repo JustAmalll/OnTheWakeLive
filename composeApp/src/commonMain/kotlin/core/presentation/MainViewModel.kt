@@ -1,24 +1,24 @@
 package core.presentation
 
+import MainScreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.AuthenticationUseCase
 import auth.domain.use_case.GetUserIdUseCase
 import auth.domain.use_case.IsUserAdminUseCase
+import auth.presentation.login.LoginAssembly
 import com.mmk.kmpnotifier.notification.NotifierManager
 import core.domain.utils.DataError
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
 import core.presentation.MainEvent.OnMainScreenAppeared
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import queue.domain.use_case.UpdateNotificationTokenUseCase
+import server_unavailable.ServerUnavailableAssembly
 
 class MainViewModel(
     private val authenticationUseCase: AuthenticationUseCase,
@@ -29,9 +29,6 @@ class MainViewModel(
 
     private val _state = MutableStateFlow(MainState())
     val state: StateFlow<MainState> = _state.asStateFlow()
-
-    private val _action = Channel<MainAction>()
-    val actions: Flow<MainAction> = _action.receiveAsFlow()
 
     init {
         authenticate()
@@ -63,13 +60,13 @@ class MainViewModel(
             _state.update { it.copy(isLoading = true) }
 
             authenticationUseCase().onSuccess {
-                _action.send(MainAction.NavigateToQueueScreen)
+                _state.update { it.copy(startScreen = MainScreen) }
                 listenForNotificationTokenChange()
             }.onFailure { error ->
                 if (error == DataError.Network.UNAUTHORIZED) {
-                    _action.send(MainAction.NavigateToLoginScreen)
+                    _state.update { it.copy(startScreen = LoginAssembly()) }
                 } else {
-                    _action.send(MainAction.NavigateToServerUnavailableScreen)
+                    _state.update { it.copy(startScreen = ServerUnavailableAssembly()) }
                 }
             }
             _state.update { it.copy(isLoading = false) }
@@ -84,11 +81,5 @@ class MainViewModel(
                 }
             }
         })
-    }
-
-    sealed interface MainAction {
-        data object NavigateToQueueScreen : MainAction
-        data object NavigateToLoginScreen : MainAction
-        data object NavigateToServerUnavailableScreen : MainAction
     }
 }

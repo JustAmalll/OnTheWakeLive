@@ -12,6 +12,7 @@ firebaseBom = "32.8.1"
 kmpnotifier = "0.4.0"
 kotlin = "1.9.23"
 ktor = "2.3.9"
+moko-permissions = "0.18.0"
 serialization = "1.6.3"
 lifecycle_version = "2.8.0-beta01"
 collection-immutable = "0.3.7"
@@ -46,6 +47,7 @@ lifecycle-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", v
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle_version" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collection-immutable" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+permissions-compose = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko-permissions" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }

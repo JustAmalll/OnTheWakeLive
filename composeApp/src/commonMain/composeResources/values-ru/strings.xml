@@ -6,6 +6,7 @@
     <string name="left">Левая</string>
     <string name="right">Правая</string>
     <string name="reconnect">Подключиться заново</string>
+    <string name="settings">Настройки</string>
 
     <!-- Network Errors-->
     <string name="unknown_error">Упс! Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз позже или свяжитесь с поддержкой, если проблема сохраняется.</string>
@@ -19,6 +20,7 @@
     <!-- Validation Errors-->
     <string name="empty_field_error">Это поле обязательно для заполнения. Пожалуйста, заполните его, чтобы продолжить.</string>
     <string name="validate_password_length_error">Пароль должен состоять как минимум из 6 символов.</string>
+    <string name="notification_permission_error">Для оповещения о приближении вашей очереди необходимо разрешение на показ уведомлений.</string>
 
     <!-- Join Queue Errors-->
     <string name="already_in_queue_error">Упс! Вы уже в очереди!</string>

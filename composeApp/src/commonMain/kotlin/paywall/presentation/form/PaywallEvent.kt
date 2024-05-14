@@ -1,4 +1,4 @@
-package paywall.presentation
+package paywall.presentation.form
 
 sealed interface PaywallEvent {
     @Suppress("ArrayInDataClass")

@@ -3,6 +3,7 @@ package queue.data.repository
 
 import core.domain.utils.DataError
 import core.domain.utils.Result
+import kotlinx.coroutines.flow.MutableStateFlow
 import queue.data.source.remote.QueueRemoteDataSource
 import queue.domain.model.Line
 import queue.domain.model.QueueItem
@@ -15,6 +16,9 @@ class QueueRepositoryImpl(
 
     override val isSessionActive: Boolean
         get() = queueRemoteDataSource.isSessionActive
+
+    override val connectionStatus: MutableStateFlow<Boolean>
+        get() = queueRemoteDataSource.connectionStatus
 
     override suspend fun initSession(): Result<Unit, DataError.Network> =
         queueRemoteDataSource.initSession()

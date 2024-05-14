@@ -1,4 +1,4 @@
-package paywall.presentation
+package paywall.presentation.form
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import paywall.domain.repository.PaywallRepository
-import paywall.presentation.PaywallEvent.OnReceiptSelected
+import paywall.presentation.form.PaywallEvent.OnReceiptSelected
 
 class PaywallViewModel(
     private val paywallRepository: PaywallRepository
@@ -39,7 +39,7 @@ class PaywallViewModel(
             val receipt = state.value.receipt ?: return@launch
 
             paywallRepository.sentReceipt(receipt = receipt).onSuccess {
-                _action.send(PaywallAction.NavigateToPaywallSuccessScreen)
+                _action.send(PaywallAction.NavigateToPaywallInProcessScreen)
             }.onFailure { error ->
                 _action.send(PaywallAction.ShowError(errorMessage = error.asString()))
             }
@@ -48,7 +48,7 @@ class PaywallViewModel(
     }
 
     sealed interface PaywallAction {
-        data object NavigateToPaywallSuccessScreen: PaywallAction
+        data object NavigateToPaywallInProcessScreen: PaywallAction
         data class ShowError(val errorMessage: String) : PaywallAction
     }
 }

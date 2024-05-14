@@ -86,6 +86,7 @@ kotlin {
 
             api(libs.kmpnotifier)
             api(libs.permissions.compose)
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.7.0-alpha03")
         }
         iosMain.dependencies {
             implementation(libs.ktor.darwin)

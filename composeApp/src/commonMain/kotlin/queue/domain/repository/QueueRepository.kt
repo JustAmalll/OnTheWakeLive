@@ -3,12 +3,14 @@ package queue.domain.repository
 
 import core.domain.utils.DataError
 import core.domain.utils.Result
+import kotlinx.coroutines.flow.MutableStateFlow
 import queue.domain.model.Line
 import queue.domain.model.QueueItem
 import queue.domain.model.ReorderedQueueItem
 
 interface QueueRepository {
     val isSessionActive: Boolean
+    val connectionStatus: MutableStateFlow<Boolean>
 
     suspend fun initSession(): Result<Unit, DataError.Network>
     suspend fun getQueue(): Result<List<QueueItem>, DataError.Network>

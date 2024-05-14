@@ -17,10 +17,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import paywall.domain.repository.PaywallRepository
+import paywall.presentation.in_processing.PaywallInProcessingAssembly
 import queue.domain.use_case.UpdateNotificationTokenUseCase
 import server_unavailable.ServerUnavailableAssembly
 
 class MainViewModel(
+    private val paywallRepository: PaywallRepository,
     private val authenticationUseCase: AuthenticationUseCase,
     private val isUserAdminUseCase: IsUserAdminUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
@@ -60,7 +63,15 @@ class MainViewModel(
             _state.update { it.copy(isLoading = true) }
 
             authenticationUseCase().onSuccess {
-                _state.update { it.copy(startScreen = MainScreen) }
+                _state.update {
+                    it.copy(
+                        startScreen = if (paywallRepository.isPaymentInProcessing()) {
+                            PaywallInProcessingAssembly()
+                        } else {
+                            MainScreen
+                        }
+                    )
+                }
                 listenForNotificationTokenChange()
             }.onFailure { error ->
                 if (error == DataError.Network.UNAUTHORIZED) {

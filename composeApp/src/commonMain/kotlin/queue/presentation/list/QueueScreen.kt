@@ -19,12 +19,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.SyncProblem
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -50,11 +53,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import core.utils.filter
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import full_size_photo.presentation.FullSizePhotoAssembly
-import kotlinx.collections.immutable.ImmutableList
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.queue
 import onthewakelive.composeapp.generated.resources.settings
@@ -63,9 +64,8 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
-import paywall.presentation.PaywallAssembly
+import paywall.presentation.form.PaywallAssembly
 import queue.domain.model.Line
-import queue.domain.model.QueueItem
 import queue.presentation.admin.QueueAdminAssembly
 import queue.presentation.details.QueueItemDetailsAssembly
 import queue.presentation.list.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
@@ -105,7 +105,7 @@ object QueueTab : Tab {
         val snackBarHostState = remember { SnackbarHostState() }
 
         LaunchedEffect(key1 = Unit) {
-            viewModel.onEvent(QueueEvent.OnViewAppeared)
+            viewModel.onEvent(QueueEvent.ConnectToSession)
         }
 
         LaunchedEffect(key1 = Unit) {
@@ -130,7 +130,7 @@ object QueueTab : Tab {
                             duration = SnackbarDuration.Short
                         )
                         if (result == SnackbarResult.ActionPerformed) {
-                            viewModel.onEvent(QueueEvent.OnReconnectClicked)
+                            viewModel.onEvent(QueueEvent.ConnectToSession)
                         }
                     }
 
@@ -181,7 +181,21 @@ private fun QueueScreen(
 ) {
     val userId = LocalUserId.current
     val isUserAdmin = LocalIsUserAdmin.current
+    val haptic = LocalHapticFeedback.current
+
+    val lazyListState = rememberLazyListState()
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 2 })
+
+    val reorderableLazyListState = rememberReorderableLazyColumnState(lazyListState) { from, to ->
+        onEvent(
+            OnQueueReordered(
+                line = if (pagerState.currentPage == 0) Line.LEFT else Line.RIGHT,
+                from = from.index,
+                to = to.index
+            )
+        )
+        haptic.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
+    }
 
     if (state.showLeaveQueueConfirmationDialog) {
         LeaveQueueConfirmationDialog(
@@ -204,7 +218,30 @@ private fun QueueScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-                )
+                ),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (!state.isConnected) {
+                                onEvent(QueueEvent.ConnectToSession)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (state.isConnected) {
+                                Icons.Default.Sync
+                            } else {
+                                Icons.Default.SyncProblem
+                            },
+                            tint = if (state.isConnected) {
+                                Color.Green
+                            } else {
+                                MaterialTheme.colorScheme.error
+                            },
+                            contentDescription = null
+                        )
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -257,6 +294,7 @@ private fun QueueScreen(
             }
         }
     ) { paddingValues ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -265,82 +303,48 @@ private fun QueueScreen(
             TabRow(pagerState = pagerState)
 
             HorizontalPager(state = pagerState) { page ->
-                when (page) {
-                    0 -> QueueContent(
-                        queue = remember(state.queue) {
-                            state.queue.filter { it.line == Line.LEFT }
-                        },
-                        onQueueItemClicked = { onEvent(OnQueueItemClicked(it)) },
-                        onQueueLeaved = { onEvent(OnQueueLeaved(it)) },
-                        onUserPhotoClicked = { onEvent(OnUserPhotoClicked(it)) },
-                        onQueueReordered = { from, to ->
-                            onEvent(OnQueueReordered(from = from, to = to))
-                        }
-                    )
-
-                    1 -> QueueContent(
-                        queue = remember(state.queue) {
-                            state.queue.filter { it.line == Line.RIGHT }
-                        },
-                        onQueueItemClicked = { onEvent(OnQueueItemClicked(it)) },
-                        onQueueLeaved = { onEvent(OnQueueLeaved(it)) },
-                        onUserPhotoClicked = { onEvent(OnUserPhotoClicked(it)) },
-                        onQueueReordered = { from, to ->
-                            onEvent(OnQueueReordered(from = from, to = to))
-                        }
-                    )
+                val queue = remember(state.leftQueue, state.rightQueue) {
+                    if (page == 0) state.leftQueue else state.rightQueue
                 }
-            }
-        }
-    }
-}
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun QueueContent(
-    queue: ImmutableList<QueueItem>,
-    onQueueItemClicked: (Int) -> Unit,
-    onQueueLeaved: (Int) -> Unit,
-    onUserPhotoClicked: (String) -> Unit,
-    onQueueReordered: (from: Int, to: Int) -> Unit
-) {
-    val isUserAdmin = LocalIsUserAdmin.current
-    val userId = LocalUserId.current
-
-    val haptic = LocalHapticFeedback.current
-    val lazyListState = rememberLazyListState()
-
-    val reorderableLazyColumnState = rememberReorderableLazyColumnState(lazyListState) { from, to ->
-        onQueueReordered(from.index, to.index)
-        haptic.performHapticFeedback(hapticFeedbackType = HapticFeedbackType.LongPress)
-    }
-
-    if (queue.isEmpty()) {
-        EmptyQueueContent()
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            state = lazyListState,
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(key = { it.id }, items = queue) { item ->
-                ReorderableItem(
-                    reorderableLazyListState = reorderableLazyColumnState,
-                    key = item.id
-                ) {
-                    SwipeToDeleteContainer(
-                        swipeEnabled = isUserAdmin || userId == item.userId,
-                        onDelete = { onQueueLeaved(item.id) }
+                if (queue.isEmpty()) {
+                    EmptyQueueContent()
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        state = lazyListState,
+                        contentPadding = PaddingValues(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        QueueItem(
-                            firstName = item.firstName,
-                            lastName = item.lastName,
-                            photo = item.photo,
-                            showDraggableHandle = isUserAdmin,
-                            onItemClicked = { item.userId?.let(onQueueItemClicked) },
-                            onPhotoClicked = { item.photo?.let(onUserPhotoClicked) }
-                        )
+                        items(key = { it.id }, items = queue) { item ->
+                            ReorderableItem(
+                                reorderableLazyListState = reorderableLazyListState,
+                                key = item.id
+                            ) {
+                                SwipeToDeleteContainer(
+                                    swipeEnabled = (isUserAdmin || userId == item.userId)
+                                            && !state.isLoading && state.isConnected,
+                                    onDelete = { onEvent(OnQueueLeaved(item.id)) }
+                                ) {
+                                    QueueItem(
+                                        firstName = item.firstName,
+                                        lastName = item.lastName,
+                                        photo = item.photo,
+                                        showDraggableHandle = isUserAdmin,
+                                        onItemClicked = {
+                                            item.userId?.let {
+                                                onEvent(OnQueueItemClicked(it))
+                                            }
+                                        },
+                                        onPhotoClicked = {
+                                            item.photo?.let {
+                                                onEvent(OnUserPhotoClicked(it))
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

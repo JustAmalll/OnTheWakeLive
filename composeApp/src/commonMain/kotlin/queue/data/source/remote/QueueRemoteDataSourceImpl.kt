@@ -21,6 +21,8 @@ import io.ktor.websocket.readText
 import io.ktor.websocket.send
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -37,6 +39,8 @@ class QueueRemoteDataSourceImpl(
 
     private var session: WebSocketSession? = null
 
+    override val connectionStatus = MutableStateFlow(false)
+
     override val isSessionActive: Boolean
         get() = session?.isActive == true
 
@@ -44,6 +48,7 @@ class QueueRemoteDataSourceImpl(
         withContext(Dispatchers.IO) {
             runCatchingNetwork {
                 session = client.webSocketSession { url(urlString = WS_BASE_URL) }
+                connectionStatus.update { true }
             }
         }
 
@@ -55,14 +60,17 @@ class QueueRemoteDataSourceImpl(
             runCatchingSocket {
                 val session = session ?: run {
                     onError(DataError.Socket.SERVER_CONNECTION_LOST)
+                    connectionStatus.update { false }
                     return@withContext
                 }
                 for (frame in session.incoming) {
                     frame as? Frame.Text ?: continue
                     updateQueue(Json.decodeFromString(frame.readText()))
                 }
+                connectionStatus.update { false }
             }.onFailure { error ->
                 onError(error)
+                connectionStatus.update { false }
             }
         }
     }

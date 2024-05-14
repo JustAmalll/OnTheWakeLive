@@ -1,4 +1,4 @@
-package paywall.presentation
+package paywall.presentation.form
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -63,9 +64,9 @@ import onthewakelive.composeapp.generated.resources.upload_receipt
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import paywall.presentation.PaywallViewModel.PaywallAction.NavigateToPaywallSuccessScreen
-import paywall.presentation.PaywallViewModel.PaywallAction.ShowError
-import paywall.presentation.success.PaywallSuccessAssembly
+import paywall.presentation.form.PaywallViewModel.PaywallAction.NavigateToPaywallInProcessScreen
+import paywall.presentation.form.PaywallViewModel.PaywallAction.ShowError
+import paywall.presentation.in_processing.PaywallInProcessingAssembly
 
 class PaywallAssembly : Screen {
 
@@ -78,8 +79,11 @@ class PaywallAssembly : Screen {
 
         LaunchedEffect(key1 = true) {
             viewModel.actions.collect { action ->
-                when(action) {
-                    NavigateToPaywallSuccessScreen -> navigator?.push(PaywallSuccessAssembly())
+                when (action) {
+                    NavigateToPaywallInProcessScreen -> navigator?.replaceAll(
+                        PaywallInProcessingAssembly()
+                    )
+
                     is ShowError -> snackBarHostState.showSnackbar(message = action.errorMessage)
                 }
             }
@@ -105,7 +109,8 @@ private fun PaywallScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        containerColor = Color(0xFF1D1B20)
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -130,7 +135,7 @@ private fun PaywallScreen(
                     text = stringResource(Res.string.subscription_required),
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = Color.White,
                     fontSize = 19.sp
                 )
             }
@@ -158,7 +163,8 @@ private fun PaywallScreen(
                             modifier = Modifier.padding(start = 8.dp),
                             text = stringResource(Res.string.subscription_benefit_1),
                             fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp
+                            fontSize = 14.sp,
+                            color = Color.White
                         )
                     }
                     Row(modifier = Modifier.padding(top = 20.dp)) {
@@ -168,7 +174,8 @@ private fun PaywallScreen(
                             modifier = Modifier.padding(start = 8.dp),
                             text = stringResource(Res.string.subscription_benefit_2),
                             fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp
+                            fontSize = 14.sp,
+                            color = Color.White
                         )
                     }
                 }
@@ -191,7 +198,7 @@ private fun PaywallScreen(
                     text = stringResource(Res.string.one_time_seasonal_subscription),
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = Color.White,
                     fontSize = 19.sp
                 )
             }
@@ -213,7 +220,7 @@ private fun PaywallScreen(
                         text = "Mbank",
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = Color.White,
                         fontSize = 20.sp
                     )
                     Text(
@@ -244,7 +251,7 @@ private fun PaywallScreen(
                         text = "+996 555 92 44 99",
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = Color.White,
                         fontSize = 18.sp
                     )
                     Text(
@@ -252,7 +259,7 @@ private fun PaywallScreen(
                         text = "Амаль Н.",
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Light,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = Color.White,
                         fontSize = 14.sp
                     )
                 }
@@ -267,7 +274,11 @@ private fun PaywallScreen(
                         Color(0xFF019C4E)
                     }
                 ),
-                shape = RoundedCornerShape(size = 30.dp)
+                shape = RoundedCornerShape(size = 30.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.White
+                )
             ) {
                 Row(
                     modifier = Modifier
@@ -290,7 +301,6 @@ private fun PaywallScreen(
                         ),
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Light,
-                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp
                     )
                     Icon(
@@ -311,7 +321,7 @@ private fun PaywallScreen(
             StandardButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 24.dp),
+                    .padding(top = 16.dp),
                 onClick = { onEvent(PaywallEvent.OnSubmitClicked) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E7AD3),
@@ -322,7 +332,7 @@ private fun PaywallScreen(
                 text = stringResource(Res.string.send),
                 fontFamily = StolzlFontFamily(),
                 fontWeight = FontWeight.Normal,
-                innerPaddingValues = PaddingValues(vertical = 6.dp)
+                innerPaddingValues = PaddingValues(vertical = 8.dp)
             )
         }
     }

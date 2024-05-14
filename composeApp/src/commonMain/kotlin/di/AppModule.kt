@@ -24,7 +24,7 @@ expect fun Scope.provideObservableSettings(): ObservableSettings
 
 val appModule = module {
     single { provideObservableSettings() }
-    single { MainViewModel(get(), get(), get(), get()) }
+    single { MainViewModel(get(), get(), get(), get(), get()) }
 
     single {
         HttpClient {

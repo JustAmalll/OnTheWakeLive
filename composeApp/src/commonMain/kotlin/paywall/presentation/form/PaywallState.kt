@@ -1,4 +1,4 @@
-package paywall.presentation
+package paywall.presentation.form
 
 import androidx.compose.runtime.Stable
 

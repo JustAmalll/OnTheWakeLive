@@ -1,6 +1,5 @@
-package paywall.presentation.success
+package paywall.presentation.failure
 
-import MainScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,36 +20,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.StandardButton
 import core.presentation.ui.theme.StolzlFontFamily
 import onthewakelive.composeapp.generated.resources.Res
-import onthewakelive.composeapp.generated.resources.ic_success
+import onthewakelive.composeapp.generated.resources.ic_failure
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-class PaywallSuccessAssembly : Screen {
+class PaywallFailureAssembly : Screen {
 
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.current
-        PaywallSuccessScreen(onJoinToQueueClicked = { navigator?.replaceAll(MainScreen) })
+        PaywallFailureScreen()
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun PaywallSuccessScreen(onJoinToQueueClicked: () -> Unit) {
+private fun PaywallFailureScreen() {
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Ваша подписка успешно оформлена!",
+                        text = "Ошибка оплаты!",
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp,
@@ -71,7 +69,7 @@ private fun PaywallSuccessScreen(onJoinToQueueClicked: () -> Unit) {
                     .padding(bottom = 40.dp)
             ) {
                 Text(
-                    text = "Поздравляем, теперь вы можете записаться в очередь!",
+                    text = "Возникла проблема с оплатой. Проверьте данные и попробуйте еще раз.",
                     color = Color.White,
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Medium,
@@ -79,20 +77,43 @@ private fun PaywallSuccessScreen(onJoinToQueueClicked: () -> Unit) {
                     textAlign = TextAlign.Center,
                     lineHeight = 32.sp
                 )
+                Text(
+                    modifier = Modifier
+                        .padding(top = 34.dp)
+                        .padding(horizontal = 32.dp),
+                    text = "Если проблема сохраняется, обратитесь в службу поддержки.",
+                    color = Color.White,
+                    fontFamily = StolzlFontFamily(),
+                    fontWeight = FontWeight.Light,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 20.sp
+                )
                 StandardButton(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 70.dp),
-                    onClick = onJoinToQueueClicked,
+                        .padding(top = 24.dp),
+                    onClick = {},
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF2E7AD3),
                         contentColor = Color.White
                     ),
-                    text = "Записаться в очередь",
+                    text = "Попробовать еще раз",
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Medium,
                     innerPaddingValues = PaddingValues(vertical = 8.dp),
                     fontSize = 16.sp
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(top = 18.dp)
+                        .align(Alignment.CenterHorizontally),
+                    text = "Сообщить о проблеме",
+                    textDecoration = TextDecoration.Underline,
+                    fontFamily = StolzlFontFamily(),
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White,
+                    fontSize = 17.sp
                 )
             }
         },
@@ -106,7 +127,7 @@ private fun PaywallSuccessScreen(onJoinToQueueClicked: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(resource = Res.drawable.ic_success),
+                painter = painterResource(resource = Res.drawable.ic_failure),
                 contentDescription = null
             )
         }

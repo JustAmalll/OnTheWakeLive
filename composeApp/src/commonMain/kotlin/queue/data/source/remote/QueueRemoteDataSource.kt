@@ -2,12 +2,14 @@ package queue.data.source.remote
 
 import core.domain.utils.DataError
 import core.domain.utils.Result
+import kotlinx.coroutines.flow.MutableStateFlow
 import queue.domain.model.Line
 import queue.domain.model.QueueItem
 import queue.domain.model.ReorderedQueueItem
 
 interface QueueRemoteDataSource {
     val isSessionActive: Boolean
+    val connectionStatus: MutableStateFlow<Boolean>
 
     suspend fun initSession(): Result<Unit, DataError.Network>
 

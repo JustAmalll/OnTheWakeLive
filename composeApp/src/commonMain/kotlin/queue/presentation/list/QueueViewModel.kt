@@ -32,12 +32,11 @@ import org.jetbrains.compose.resources.getString
 import queue.domain.model.Line
 import queue.domain.model.ReorderedQueueItem
 import queue.domain.repository.QueueRepository
+import queue.presentation.list.QueueEvent.ConnectToSession
 import queue.presentation.list.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
 import queue.presentation.list.QueueEvent.OnQueueItemClicked
 import queue.presentation.list.QueueEvent.OnQueueReordered
-import queue.presentation.list.QueueEvent.OnReconnectClicked
 import queue.presentation.list.QueueEvent.OnSaveReorderedQueueClicked
-import queue.presentation.list.QueueEvent.OnViewAppeared
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 import queue.presentation.list.QueueViewModel.QueueAction.ShowError
@@ -59,17 +58,19 @@ class QueueViewModel(
 
     private var queueObserverJob: Job? = null
 
+    init {
+        viewModelScope.launch {
+            queueRepository.connectionStatus.collect { isConnected ->
+                _state.update { it.copy(isConnected = isConnected) }
+            }
+        }
+    }
+
     fun onEvent(event: QueueEvent) {
         when (event) {
-            OnViewAppeared -> {
-                if (!queueRepository.isSessionActive) {
-                    initSession()
-                }
-                getQueue()
-            }
-
-            OnReconnectClicked -> {
+            ConnectToSession -> if (!queueRepository.isSessionActive) {
                 initSession()
+            } else {
                 getQueue()
             }
 
@@ -103,21 +104,45 @@ class QueueViewModel(
                 _action.send(QueueAction.NavigateToFullSizePhotoScreen(photo = event.photo))
             }
 
-            is OnQueueReordered -> _state.update {
-                it.copy(
-                    queue = it.queue
-                        .toMutableList()
-                        .apply { add(event.to, removeAt(event.from)) }
-                        .toImmutableList(),
-                    isQueueReordered = true
-                )
+            is OnQueueReordered -> when (event.line) {
+                Line.LEFT -> _state.update {
+                    it.copy(
+                        leftQueue = it.leftQueue
+                            .toMutableList()
+                            .apply { add(event.to, removeAt(event.from)) }
+                            .toImmutableList(),
+                        isQueueReordered = true
+                    )
+                }
+
+                Line.RIGHT -> _state.update {
+                    it.copy(
+                        rightQueue = it.rightQueue
+                            .toMutableList()
+                            .apply { add(event.to, removeAt(event.from)) }
+                            .toImmutableList(),
+                        isQueueReordered = true
+                    )
+                }
             }
 
             OnSaveReorderedQueueClicked -> viewModelScope.launch {
                 val reorderedQueueItems = mutableListOf<ReorderedQueueItem>()
 
-                state.value.queue.map { item ->
-                    val newPosition = state.value.queue.indexOf(item).toLong() + 1L
+                state.value.leftQueue.forEach { item ->
+                    val newPosition = state.value.leftQueue.indexOf(item).toLong() + 1L
+
+                    if (item.position != newPosition) {
+                        reorderedQueueItems.add(
+                            ReorderedQueueItem(
+                                queueItemId = item.id,
+                                newPosition = newPosition
+                            )
+                        )
+                    }
+                }
+                state.value.rightQueue.forEach { item ->
+                    val newPosition = state.value.rightQueue.indexOf(item).toLong() + 1L
 
                     if (item.position != newPosition) {
                         reorderedQueueItems.add(
@@ -142,6 +167,7 @@ class QueueViewModel(
             _state.update { it.copy(isSessionStarting = true) }
 
             queueRepository.initSession().onSuccess {
+                getQueue()
                 observeQueue()
             }.onFailure { error ->
                 _action.send(ShowError(errorMessage = error.asString()))
@@ -156,8 +182,13 @@ class QueueViewModel(
         queueObserverJob = viewModelScope.launch {
             queueRepository.observeQueue(
                 updateQueue = { newQueue ->
+                    val (leftQueue, rightQueue) = newQueue.partition { it.line == Line.LEFT }
+
                     _state.update {
-                        it.copy(queue = newQueue.toPersistentList(), isLoading = false)
+                        it.copy(
+                            leftQueue = leftQueue.toPersistentList(),
+                            rightQueue = rightQueue.toPersistentList()
+                        )
                     }
                 },
                 onError = { error ->
@@ -173,7 +204,14 @@ class QueueViewModel(
             _state.update { it.copy(isLoading = true) }
 
             queueRepository.getQueue().onSuccess { queue ->
-                _state.update { it.copy(queue = queue.toPersistentList()) }
+                val (leftQueue, rightQueue) = queue.partition { it.line == Line.LEFT }
+
+                _state.update {
+                    it.copy(
+                        leftQueue = leftQueue.toPersistentList(),
+                        rightQueue = rightQueue.toPersistentList()
+                    )
+                }
             }.onFailure { error ->
                 _action.send(ShowError(errorMessage = error.asString()))
             }
@@ -267,14 +305,15 @@ class QueueViewModel(
     }
 
     private fun canJoinTheQueue(userId: Int, line: Line): Result<Unit, JoinQueueError> {
-        val (leftQueue, rightQueue) = state.value.queue.partition { it.line == Line.LEFT }
-
-        val isUserAlreadyInQueue = state.value.queue.find { it.userId == userId } != null
-        if (!isUserAlreadyInQueue) return Result.Success(Unit)
+        val leftQueue = state.value.leftQueue
+        val rightQueue = state.value.rightQueue
 
         val userItemInLeftQueue = leftQueue.find { it.userId == userId }
         val userItemInRightQueue = rightQueue.find { it.userId == userId }
 
+        if (userItemInLeftQueue == null && userItemInRightQueue == null) {
+            return Result.Success(Unit)
+        }
         val userPositionInLeftQueue = leftQueue.indexOf(userItemInLeftQueue)
         val userPositionInRightQueue = rightQueue.indexOf(userItemInRightQueue)
 

@@ -36,7 +36,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -217,7 +216,7 @@ private fun QueueScreen(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                    containerColor = Color(0xFF1D1B20)
                 ),
                 actions = {
                     IconButton(
@@ -271,7 +270,8 @@ private fun QueueScreen(
                                     )
                                 }
                             }
-                        }
+                        },
+                        containerColor = MaterialTheme.colorScheme.primary
                     ) {
                         AnimatedContent(
                             targetState = state.isLoading || state.isSessionStarting
@@ -292,7 +292,8 @@ private fun QueueScreen(
                     }
                 }
             }
-        }
+        },
+        containerColor = Color(0xFF1D1B20)
     ) { paddingValues ->
 
         Column(
@@ -302,7 +303,10 @@ private fun QueueScreen(
         ) {
             TabRow(pagerState = pagerState)
 
-            HorizontalPager(state = pagerState) { page ->
+            HorizontalPager(
+                modifier = Modifier.padding(top = 22.dp),
+                state = pagerState
+            ) { page ->
                 val queue = remember(state.leftQueue, state.rightQueue) {
                     if (page == 0) state.leftQueue else state.rightQueue
                 }
@@ -317,13 +321,22 @@ private fun QueueScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(key = { it.id }, items = queue) { item ->
+                            val swipeEnabled = remember(
+                                state.isLoading,
+                                state.isConnected,
+                                userId,
+                                isUserAdmin
+                            ) {
+                                (isUserAdmin || userId == item.userId)
+                                        && !state.isLoading && state.isConnected
+                            }
+
                             ReorderableItem(
                                 reorderableLazyListState = reorderableLazyListState,
                                 key = item.id
                             ) {
                                 SwipeToDeleteContainer(
-                                    swipeEnabled = (isUserAdmin || userId == item.userId)
-                                            && !state.isLoading && state.isConnected,
+                                    swipeEnabled = swipeEnabled,
                                     onDelete = { onEvent(OnQueueLeaved(item.id)) }
                                 ) {
                                     QueueItem(

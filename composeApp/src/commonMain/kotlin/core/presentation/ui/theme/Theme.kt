@@ -1,5 +1,7 @@
 package core.presentation.ui.theme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
@@ -56,4 +58,23 @@ fun StolzlFontFamily() = FontFamily(
 )
 
 @Composable
-expect fun OnTheWakeLiveTheme(content: @Composable () -> Unit)
+expect fun OnTheWakeLiveTheme(
+    typography: Typography = Typography(
+        displayLarge = MaterialTheme.typography.displayLarge.copy(fontFamily = StolzlFontFamily()),
+        displayMedium = MaterialTheme.typography.displayMedium.copy(fontFamily = StolzlFontFamily()),
+        displaySmall = MaterialTheme.typography.displaySmall.copy(fontFamily = StolzlFontFamily()),
+        headlineLarge = MaterialTheme.typography.headlineLarge.copy(fontFamily = StolzlFontFamily()),
+        headlineMedium = MaterialTheme.typography.headlineMedium.copy(fontFamily = StolzlFontFamily()),
+        headlineSmall = MaterialTheme.typography.headlineSmall.copy(fontFamily = StolzlFontFamily()),
+        titleLarge = MaterialTheme.typography.titleLarge.copy(fontFamily = StolzlFontFamily()),
+        titleMedium = MaterialTheme.typography.titleMedium.copy(fontFamily = StolzlFontFamily()),
+        titleSmall = MaterialTheme.typography.titleSmall.copy(fontFamily = StolzlFontFamily()),
+        bodyLarge = MaterialTheme.typography.bodyLarge.copy(fontFamily = StolzlFontFamily()),
+        bodyMedium = MaterialTheme.typography.bodyMedium.copy(fontFamily = StolzlFontFamily()),
+        bodySmall = MaterialTheme.typography.bodySmall.copy(fontFamily = StolzlFontFamily()),
+        labelLarge = MaterialTheme.typography.labelLarge.copy(fontFamily = StolzlFontFamily()),
+        labelMedium = MaterialTheme.typography.labelMedium.copy(fontFamily = StolzlFontFamily()),
+        labelSmall = MaterialTheme.typography.labelSmall.copy(fontFamily = StolzlFontFamily())
+    ),
+    content: @Composable () -> Unit
+)

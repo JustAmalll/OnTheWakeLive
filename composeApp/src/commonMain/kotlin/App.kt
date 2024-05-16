@@ -1,9 +1,6 @@
-import admin_panel.AdminPanelAssembly
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -14,8 +11,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.CurrentTab
@@ -36,7 +31,6 @@ import core.presentation.utils.isPortraitOrientation
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import queue.presentation.list.QueueTab
-import user_profile.presentation.profile.UserProfileTab
 
 val LocalIsUserAdmin = compositionLocalOf { false }
 val LocalUserId = compositionLocalOf<Int?> { null }
@@ -94,26 +88,26 @@ object MainScreen : Screen {
             Scaffold(
                 content = {
                     Box(
-                        modifier = Modifier.padding(
-                            bottom = if (isPortraitOrientation) 80.dp else 0.dp
-                        )
+//                        modifier = Modifier.padding(
+//                            bottom = if (isPortraitOrientation) 80.dp else 0.dp
+//                        )
                     ) {
                         CurrentTab()
                     }
                 },
-                bottomBar = {
-                    if (isPortraitOrientation) {
-                        NavigationBar {
-                            TabNavigationItem(tab = QueueTab)
-
-                            if (isUserAdmin) {
-                                TabNavigationItem(tab = AdminPanelAssembly)
-                            } else {
-                                TabNavigationItem(tab = UserProfileTab)
-                            }
-                        }
-                    }
-                }
+//                bottomBar = {
+//                    if (isPortraitOrientation) {
+//                        NavigationBar {
+//                            TabNavigationItem(tab = QueueTab)
+//
+//                            if (isUserAdmin) {
+//                                TabNavigationItem(tab = AdminPanelAssembly)
+//                            } else {
+//                                TabNavigationItem(tab = UserProfileTab)
+//                            }
+//                        }
+//                    }
+//                }
             )
         }
     }

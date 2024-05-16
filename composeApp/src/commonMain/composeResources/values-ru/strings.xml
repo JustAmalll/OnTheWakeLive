@@ -3,8 +3,8 @@
     <string name="queue">Очередь</string>
     <string name="profile">Профиль</string>
     <string name="admin_panel">Панель админа</string>
-    <string name="left">Левая</string>
-    <string name="right">Правая</string>
+    <string name="left">Левая Лебедка</string>
+    <string name="right">Правая Лебедка</string>
     <string name="reconnect">Подключиться заново</string>
     <string name="settings">Настройки</string>
     <string name="join_queue">Записаться в очередь</string>

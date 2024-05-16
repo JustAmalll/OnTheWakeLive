@@ -1,23 +1,24 @@
 package queue.presentation.list.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import core.presentation.utils.clickableWithoutIndication
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
@@ -33,41 +34,30 @@ fun TabRow(pagerState: PagerState) {
         contentColor = Color.White,
         indicator = { tabPositions ->
             TabRowDefaults.SecondaryIndicator(
-                modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                modifier = Modifier
+                    .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                    .padding(horizontal = 20.dp)
+                    .clip(RoundedCornerShape(size = 6.dp)),
                 height = 2.dp,
-                color = MaterialTheme.colorScheme.secondaryContainer
+                color = Color(0xFF2E7AD3)
             )
         },
-        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+        containerColor = Color(0xFF1D1B20),
+        divider = {}
     ) {
         Line.entries.forEachIndexed { index, line ->
-            Tab(
-                icon = {
-                    Icon(
-                        imageVector = when (line) {
-                            Line.LEFT -> Icons.AutoMirrored.Filled.ArrowBack
-                            Line.RIGHT -> Icons.AutoMirrored.Filled.ArrowForward
-                        },
-                        contentDescription = null,
-                        tint = if (pagerState.currentPage == index) {
-                            MaterialTheme.colorScheme.onSecondaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-                    )
-                },
-                text = {
-                    Text(
-                        text = stringResource(resource = line.displayName),
-                        color = if (pagerState.currentPage == index) {
-                            MaterialTheme.colorScheme.onSurface
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-                    )
-                },
-                selected = pagerState.currentPage == index,
-                onClick = { scope.launch { pagerState.animateScrollToPage(index) } }
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickableWithoutIndication {
+                        scope.launch { pagerState.animateScrollToPage(index) }
+                    }
+                    .padding(vertical = 12.dp),
+                text = stringResource(resource = line.displayName),
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal
             )
         }
     }

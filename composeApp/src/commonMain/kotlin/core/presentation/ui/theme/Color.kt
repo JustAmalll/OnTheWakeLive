@@ -2,7 +2,7 @@ package core.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val md_theme_dark_primary = Color(0xFF83D995)
+val md_theme_dark_primary = Color(0xFF2E7AD3)
 val md_theme_dark_onPrimary = Color(0xFF003918)
 val md_theme_dark_primaryContainer = Color(0xFF005225)
 val md_theme_dark_onPrimaryContainer = Color(0xFF9EF6AF)
@@ -18,9 +18,9 @@ val md_theme_dark_error = Color(0xFFFFB4AB)
 val md_theme_dark_errorContainer = Color(0xFF93000A)
 val md_theme_dark_onError = Color(0xFF690005)
 val md_theme_dark_onErrorContainer = Color(0xFFFFDAD6)
-val md_theme_dark_background = Color(0xFF191C19)
+val md_theme_dark_background = Color(0xFF1D1B20)
 val md_theme_dark_onBackground = Color(0xFFE2E3DE)
-val md_theme_dark_surface = Color(0xFF191C19)
+val md_theme_dark_surface = Color(0xFF1D1B20)
 val md_theme_dark_onSurface = Color(0xFFE2E3DE)
 val md_theme_dark_surfaceVariant = Color(0xFF414941)
 val md_theme_dark_onSurfaceVariant = Color(0xFFC1C9BE)

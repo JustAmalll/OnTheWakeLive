@@ -1,6 +1,8 @@
 package paywall.presentation.failure
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,29 +29,40 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import core.presentation.components.StandardButton
 import core.presentation.ui.theme.StolzlFontFamily
+import core.presentation.utils.OpenTelegramUtil
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.ic_failure
+import onthewakelive.composeapp.generated.resources.payment_contact_support
+import onthewakelive.composeapp.generated.resources.payment_error
+import onthewakelive.composeapp.generated.resources.payment_issue
+import onthewakelive.composeapp.generated.resources.payment_report_issue
+import onthewakelive.composeapp.generated.resources.payment_retry
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 class PaywallFailureAssembly : Screen {
 
     @Composable
     override fun Content() {
-        PaywallFailureScreen()
+        val openTelegramUtil: OpenTelegramUtil = koinInject()
+        PaywallFailureScreen(onFeedbackClicked = openTelegramUtil::open)
     }
 }
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun PaywallFailureScreen() {
+private fun PaywallFailureScreen(
+    onFeedbackClicked: () -> Unit
+) {
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Ошибка оплаты!",
+                        text = stringResource(Res.string.payment_error),
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp,
@@ -69,7 +83,7 @@ private fun PaywallFailureScreen() {
                     .padding(bottom = 40.dp)
             ) {
                 Text(
-                    text = "Возникла проблема с оплатой. Проверьте данные и попробуйте еще раз.",
+                    text = stringResource(Res.string.payment_issue),
                     color = Color.White,
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Medium,
@@ -81,7 +95,7 @@ private fun PaywallFailureScreen() {
                     modifier = Modifier
                         .padding(top = 34.dp)
                         .padding(horizontal = 32.dp),
-                    text = "Если проблема сохраняется, обратитесь в службу поддержки.",
+                    text = stringResource(Res.string.payment_contact_support),
                     color = Color.White,
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Light,
@@ -98,7 +112,7 @@ private fun PaywallFailureScreen() {
                         containerColor = Color(0xFF2E7AD3),
                         contentColor = Color.White
                     ),
-                    text = "Попробовать еще раз",
+                    text = stringResource(Res.string.payment_retry),
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Medium,
                     innerPaddingValues = PaddingValues(vertical = 8.dp),
@@ -107,8 +121,13 @@ private fun PaywallFailureScreen() {
                 Text(
                     modifier = Modifier
                         .padding(top = 18.dp)
-                        .align(Alignment.CenterHorizontally),
-                    text = "Сообщить о проблеме",
+                        .align(Alignment.CenterHorizontally)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onFeedbackClicked
+                        ),
+                    text = stringResource(Res.string.payment_report_issue),
                     textDecoration = TextDecoration.Underline,
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Medium,

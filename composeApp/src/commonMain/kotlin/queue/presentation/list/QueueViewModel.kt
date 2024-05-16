@@ -187,7 +187,8 @@ class QueueViewModel(
                     _state.update {
                         it.copy(
                             leftQueue = leftQueue.toPersistentList(),
-                            rightQueue = rightQueue.toPersistentList()
+                            rightQueue = rightQueue.toPersistentList(),
+                            isLoading = false
                         )
                     }
                 },

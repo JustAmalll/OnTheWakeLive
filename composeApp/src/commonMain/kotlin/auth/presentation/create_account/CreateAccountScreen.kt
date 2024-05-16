@@ -67,7 +67,7 @@ class CreateAccountAssembly : Screen {
             viewModel.actions.collect { action ->
                 when (action) {
                     NavigateToLoginScreen -> navigator?.push(LoginAssembly())
-                    NavigateToQueueScreen -> navigator?.push(MainScreen)
+                    NavigateToQueueScreen -> navigator?.replaceAll(MainScreen)
                     is ShowError -> snackBarHostState.showSnackbar(action.errorMessage)
                 }
             }

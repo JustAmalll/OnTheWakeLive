@@ -29,8 +29,12 @@ import core.presentation.components.StandardButton
 import core.presentation.ui.theme.StolzlFontFamily
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.ic_success
+import onthewakelive.composeapp.generated.resources.join_queue
+import onthewakelive.composeapp.generated.resources.subscription_congrats
+import onthewakelive.composeapp.generated.resources.subscription_success
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 class PaywallSuccessAssembly : Screen {
 
@@ -50,7 +54,7 @@ private fun PaywallSuccessScreen(onJoinToQueueClicked: () -> Unit) {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Ваша подписка успешно оформлена!",
+                        text = stringResource(Res.string.subscription_success),
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp,
@@ -71,7 +75,7 @@ private fun PaywallSuccessScreen(onJoinToQueueClicked: () -> Unit) {
                     .padding(bottom = 40.dp)
             ) {
                 Text(
-                    text = "Поздравляем, теперь вы можете записаться в очередь!",
+                    text = stringResource(Res.string.subscription_congrats),
                     color = Color.White,
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Medium,
@@ -88,7 +92,7 @@ private fun PaywallSuccessScreen(onJoinToQueueClicked: () -> Unit) {
                         containerColor = Color(0xFF2E7AD3),
                         contentColor = Color.White
                     ),
-                    text = "Записаться в очередь",
+                    text = stringResource(Res.string.join_queue),
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Medium,
                     innerPaddingValues = PaddingValues(vertical = 8.dp),

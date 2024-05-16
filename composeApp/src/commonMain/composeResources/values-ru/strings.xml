@@ -7,6 +7,7 @@
     <string name="right">Правая</string>
     <string name="reconnect">Подключиться заново</string>
     <string name="settings">Настройки</string>
+    <string name="join_queue">Записаться в очередь</string>
 
     <!-- Network Errors-->
     <string name="unknown_error">Упс! Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз позже или свяжитесь с поддержкой, если проблема сохраняется.</string>
@@ -75,6 +76,17 @@
     <string name="upload_receipt">Загрузите квитанцию</string>
     <string name="ready">Готово</string>
     <string name="send">Отправить</string>
+
+    <!-- Paywall Failure Screen -->
+    <string name="payment_error">Ошибка оплаты!</string>
+    <string name="payment_issue">Возникла проблема с оплатой. Проверьте данные и попробуйте еще раз.</string>
+    <string name="payment_contact_support">Если проблема сохраняется, обратитесь в службу поддержки.</string>
+    <string name="payment_retry">Попробовать еще раз</string>
+    <string name="payment_report_issue">Сообщить о проблеме</string>
+
+    <!-- Paywall Success Screen -->
+    <string name="subscription_success">Ваша подписка успешно оформлена!</string>
+    <string name="subscription_congrats">Поздравляем, теперь вы можете записаться в очередь!</string>
 
     <!-- Activate Subscription Screen -->
     <string name="activate_subscription">Активировать подписку</string>

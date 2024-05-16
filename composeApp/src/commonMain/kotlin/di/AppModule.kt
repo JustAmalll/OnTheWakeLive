@@ -3,6 +3,7 @@ package di
 import auth.data.source.cache.AuthCacheDataSourceImpl.Companion.PREFS_JWT_TOKEN
 import com.russhwolf.settings.ObservableSettings
 import core.presentation.MainViewModel
+import core.presentation.utils.OpenTelegramUtil
 import core.utils.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -21,9 +22,11 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 
 expect fun Scope.provideObservableSettings(): ObservableSettings
+expect fun Scope.provideOpenTelegramUtil(): OpenTelegramUtil
 
 val appModule = module {
     single { provideObservableSettings() }
+    factory { provideOpenTelegramUtil() }
     single { MainViewModel(get(), get(), get(), get(), get()) }
 
     single {

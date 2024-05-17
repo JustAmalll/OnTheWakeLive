@@ -35,17 +35,19 @@ import queue.domain.repository.QueueRepository
 import queue.presentation.list.QueueEvent.ConnectToSession
 import queue.presentation.list.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
 import queue.presentation.list.QueueEvent.OnQueueItemClicked
+import queue.presentation.list.QueueEvent.OnQueueItemDetailsDialogDismissRequest
 import queue.presentation.list.QueueEvent.OnQueueReordered
 import queue.presentation.list.QueueEvent.OnSaveReorderedQueueClicked
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
-import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 import queue.presentation.list.QueueViewModel.QueueAction.ShowError
 import queue.presentation.list.QueueViewModel.QueueAction.ShowPermissionError
+import user_profile.domain.use_case.GetQueueItemDetailsUseCase
 import user_profile.domain.use_case.IsUserSubscribedUseCase
 
 @OptIn(ExperimentalResourceApi::class)
 class QueueViewModel(
     private val queueRepository: QueueRepository,
+    private val getQueueItemDetailsUseCase: GetQueueItemDetailsUseCase,
     private val isUserSubscribed: IsUserSubscribedUseCase,
     val permissionsController: PermissionsController
 ) : ViewModel() {
@@ -96,9 +98,7 @@ class QueueViewModel(
                 leaveTheQueue()
             }
 
-            is OnQueueItemClicked -> viewModelScope.launch {
-                _action.send(NavigateToQueueItemDetails(userId = event.userId))
-            }
+            is OnQueueItemClicked -> getQueueItemDetails(userId = event.userId)
 
             is QueueEvent.OnUserPhotoClicked -> viewModelScope.launch {
                 _action.send(QueueAction.NavigateToFullSizePhotoScreen(photo = event.photo))
@@ -159,6 +159,8 @@ class QueueViewModel(
                     showSocketError(error = error)
                 }
             }
+
+            OnQueueItemDetailsDialogDismissRequest -> _state.update { it.copy(userProfile = null) }
         }
     }
 
@@ -288,6 +290,16 @@ class QueueViewModel(
         }
     }
 
+    private fun getQueueItemDetails(userId: Int) {
+        viewModelScope.launch {
+            getQueueItemDetailsUseCase(userId = userId).onSuccess { userProfile ->
+                _state.update { it.copy(userProfile = userProfile) }
+            }.onFailure { error ->
+                _action.send(ShowError(errorMessage = error.asString()))
+            }
+        }
+    }
+
     private fun toggleLeaveQueueConfirmationDialog() {
         _state.update {
             it.copy(showLeaveQueueConfirmationDialog = !it.showLeaveQueueConfirmationDialog)
@@ -334,7 +346,6 @@ class QueueViewModel(
     }
 
     sealed interface QueueAction {
-        data class NavigateToQueueItemDetails(val userId: Int) : QueueAction
         data class NavigateToQueueAdminScreen(val line: Line) : QueueAction
         data class NavigateToFullSizePhotoScreen(val photo: String) : QueueAction
         data object NavigateToPaywallScreen : QueueAction

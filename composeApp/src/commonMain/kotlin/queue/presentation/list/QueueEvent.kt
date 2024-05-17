@@ -13,4 +13,5 @@ sealed interface QueueEvent {
     data class OnUserPhotoClicked(val photo: String) : QueueEvent
     data class OnQueueReordered(val line: Line, val from: Int, val to: Int) : QueueEvent
     data object OnSaveReorderedQueueClicked : QueueEvent
+    data object OnQueueItemDetailsDialogDismissRequest : QueueEvent
 }

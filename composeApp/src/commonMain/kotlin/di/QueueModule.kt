@@ -18,7 +18,7 @@ val queueModule = module {
     single<QueueRemoteDataSource> { QueueRemoteDataSourceImpl(get()) }
     single<QueueRepository> { QueueRepositoryImpl(get()) }
     single { (permissionsController: PermissionsController) ->
-        QueueViewModel(get(), get(), permissionsController = permissionsController)
+        QueueViewModel(get(), get(), get(), permissionsController = permissionsController)
     }
 
     factory { CloseSessionUseCase(get()) }

@@ -52,6 +52,8 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.haze
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import full_size_photo.presentation.FullSizePhotoAssembly
@@ -66,11 +68,11 @@ import org.koin.core.parameter.parametersOf
 import paywall.presentation.form.PaywallAssembly
 import queue.domain.model.Line
 import queue.presentation.admin.QueueAdminAssembly
-import queue.presentation.details.QueueItemDetailsAssembly
 import queue.presentation.list.QueueEvent.LeaveQueueConfirmationDialogDismissRequest
 import queue.presentation.list.QueueEvent.OnJoinClicked
 import queue.presentation.list.QueueEvent.OnLeaveQueueConfirmed
 import queue.presentation.list.QueueEvent.OnQueueItemClicked
+import queue.presentation.list.QueueEvent.OnQueueItemDetailsDialogDismissRequest
 import queue.presentation.list.QueueEvent.OnQueueLeaved
 import queue.presentation.list.QueueEvent.OnQueueReordered
 import queue.presentation.list.QueueEvent.OnSaveReorderedQueueClicked
@@ -78,12 +80,12 @@ import queue.presentation.list.QueueEvent.OnUserPhotoClicked
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToFullSizePhotoScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToPaywallScreen
 import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueAdminScreen
-import queue.presentation.list.QueueViewModel.QueueAction.NavigateToQueueItemDetails
 import queue.presentation.list.QueueViewModel.QueueAction.ShowError
 import queue.presentation.list.QueueViewModel.QueueAction.ShowPermissionError
 import queue.presentation.list.components.EmptyQueueContent
 import queue.presentation.list.components.LeaveQueueConfirmationDialog
 import queue.presentation.list.components.QueueItem
+import queue.presentation.list.components.QueueItemDetailsDialog
 import queue.presentation.list.components.SwipeToDeleteContainer
 import queue.presentation.list.components.TabRow
 import sh.calvin.reorderable.ReorderableItem
@@ -110,10 +112,6 @@ object QueueTab : Tab {
         LaunchedEffect(key1 = Unit) {
             viewModel.actions.collect { action ->
                 when (action) {
-                    is NavigateToQueueItemDetails -> navigator?.push(
-                        QueueItemDetailsAssembly(userId = action.userId)
-                    )
-
                     is NavigateToQueueAdminScreen -> navigator?.push(
                         QueueAdminAssembly(line = action.line)
                     )
@@ -185,6 +183,16 @@ private fun QueueScreen(
     val lazyListState = rememberLazyListState()
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 2 })
 
+    val hazeState = remember { HazeState() }
+
+    state.userProfile?.let {
+        QueueItemDetailsDialog(
+            hazeState = hazeState,
+            userProfile = state.userProfile,
+            onDismissRequest = { onEvent(OnQueueItemDetailsDialogDismissRequest) }
+        )
+    }
+
     val reorderableLazyListState = rememberReorderableLazyColumnState(lazyListState) { from, to ->
         onEvent(
             OnQueueReordered(
@@ -205,6 +213,7 @@ private fun QueueScreen(
     }
 
     Scaffold(
+        modifier = Modifier.haze(state = hazeState),
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
@@ -295,7 +304,6 @@ private fun QueueScreen(
         },
         containerColor = Color(0xFF1D1B20)
     ) { paddingValues ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()

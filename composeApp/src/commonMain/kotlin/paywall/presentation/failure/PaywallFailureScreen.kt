@@ -30,6 +30,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import core.presentation.components.StandardButton
 import core.presentation.ui.theme.StolzlFontFamily
 import core.presentation.utils.OpenTelegramUtil
+import core.utils.Constants.TELEGRAM_SUPPORT_ID
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.ic_failure
 import onthewakelive.composeapp.generated.resources.payment_contact_support
@@ -47,7 +48,10 @@ class PaywallFailureAssembly : Screen {
     @Composable
     override fun Content() {
         val openTelegramUtil: OpenTelegramUtil = koinInject()
-        PaywallFailureScreen(onFeedbackClicked = openTelegramUtil::open)
+
+        PaywallFailureScreen(
+            onFeedbackClicked = { openTelegramUtil.open(telegramId = TELEGRAM_SUPPORT_ID) }
+        )
     }
 }
 

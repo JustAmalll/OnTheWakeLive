@@ -1,0 +1,172 @@
+package queue.presentation.list.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import coil3.compose.AsyncImage
+import core.presentation.utils.OpenTelegramUtil
+import core.utils.Constants
+import core.utils.Constants.INSTAGRAM_URL
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeChild
+import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.ic_profile_outlined
+import onthewakelive.composeapp.generated.resources.instagram
+import onthewakelive.composeapp.generated.resources.telegram
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import user_profile.domain.model.UserProfile
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+fun QueueItemDetailsDialog(
+    userProfile: UserProfile,
+    hazeState: HazeState,
+    onDismissRequest: () -> Unit
+) {
+    val openTelegramUtil: OpenTelegramUtil = koinInject()
+    val uriHandler = LocalUriHandler.current
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .hazeChild(state = hazeState)
+    )
+
+    Dialog(onDismissRequest = onDismissRequest) {
+        Box(
+            modifier = Modifier
+                .clip(shape = RoundedCornerShape(size = 16.dp))
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(Color(0xFF27252A), Color(0xFF302E33)),
+                        start = Offset(0f, Float.POSITIVE_INFINITY),
+                        end = Offset(Float.POSITIVE_INFINITY, 0f)
+                    ),
+                )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF1D1B20)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    userProfile.photo?.let { photo ->
+                        AsyncImage(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable(onClick = {}),
+                            model = "${Constants.BASE_URL}/storage/$photo",
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
+                        )
+                    } ?: Icon(
+                        painter = painterResource(Res.drawable.ic_profile_outlined),
+                        contentDescription = null
+                    )
+                }
+                Text(
+                    modifier = Modifier.padding(top = 12.dp),
+                    text = userProfile.firstName,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 20.sp
+                )
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = userProfile.lastName,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 20.sp
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(space = 16.dp)
+                ) {
+                    userProfile.instagram?.let { instagram ->
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = { uriHandler.openUri(uri = "$INSTAGRAM_URL/$instagram") },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF1D3E65),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(resource = Res.string.instagram),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                    userProfile.telegram?.let { telegramId ->
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = { openTelegramUtil.open(telegramId = telegramId) },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF1D3E65),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(resource = Res.string.telegram),
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+            }
+            IconButton(
+                modifier = Modifier
+                    .align(alignment = Alignment.TopEnd)
+                    .padding(all = 16.dp),
+                onClick = onDismissRequest
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}

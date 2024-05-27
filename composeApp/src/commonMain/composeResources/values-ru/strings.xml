@@ -7,6 +7,7 @@
     <string name="right">Правая Лебедка</string>
     <string name="reconnect">Подключиться заново</string>
     <string name="settings">Настройки</string>
+    <string name="search">Поиск</string>
     <string name="join_queue">Записаться в очередь</string>
 
     <!-- Network Errors-->

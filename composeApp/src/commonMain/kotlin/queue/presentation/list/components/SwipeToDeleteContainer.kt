@@ -13,10 +13,8 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -45,23 +43,18 @@ fun SwipeToDeleteContainer(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(all = 0.8.dp)
+                        .padding(top = 1.dp)
+                        .padding(all = 1.dp)
                         .background(
                             brush = Brush.linearGradient(
                                 colors = listOf(Color(0xFFFF0000), Color(0xFFED4343)),
-                                start = Offset(0f, Float.POSITIVE_INFINITY),
-                                end = Offset(Float.POSITIVE_INFINITY, 0f)
                             ),
                             shape = RoundedCornerShape(size = 16.dp)
                         )
                         .padding(16.dp),
                     contentAlignment = Alignment.CenterEnd
                 ) {
-                    Text(
-                        text = "Удалить",
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 16.sp
-                    )
+                    Text(text = "Удалить", fontSize = 16.sp)
                 }
             },
             content = { content() }

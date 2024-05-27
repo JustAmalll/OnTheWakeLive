@@ -18,7 +18,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.SyncProblem
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -35,7 +34,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,7 +41,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
@@ -52,16 +49,16 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.haze
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import full_size_photo.presentation.FullSizePhotoAssembly
 import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.ic_home
 import onthewakelive.composeapp.generated.resources.queue
 import onthewakelive.composeapp.generated.resources.settings
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -159,7 +156,7 @@ object QueueTab : Tab {
         @Composable
         get() {
             val title = stringResource(resource = Res.string.queue)
-            val icon = rememberVectorPainter(image = Icons.Default.Home)
+            val icon = painterResource(resource = Res.drawable.ic_home)
 
             return remember { TabOptions(index = 0u, title = title, icon = icon) }
         }
@@ -183,11 +180,8 @@ private fun QueueScreen(
     val lazyListState = rememberLazyListState()
     val pagerState = rememberPagerState(initialPage = 1, pageCount = { 2 })
 
-    val hazeState = remember { HazeState() }
-
     state.userProfile?.let {
         QueueItemDetailsDialog(
-            hazeState = hazeState,
             userProfile = state.userProfile,
             onDismissRequest = { onEvent(OnQueueItemDetailsDialogDismissRequest) }
         )
@@ -206,14 +200,13 @@ private fun QueueScreen(
 
     if (state.showLeaveQueueConfirmationDialog) {
         LeaveQueueConfirmationDialog(
-            isUserAdmin = state.isUserAdmin,
+            isUserAdmin = isUserAdmin,
             onDismissRequest = { onEvent(LeaveQueueConfirmationDialogDismissRequest) },
             onLeaveQueue = { onEvent(OnLeaveQueueConfirmed) }
         )
     }
 
     Scaffold(
-        modifier = Modifier.haze(state = hazeState),
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
@@ -224,9 +217,6 @@ private fun QueueScreen(
                         fontSize = 18.sp
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1D1B20)
-                ),
                 actions = {
                     IconButton(
                         onClick = {
@@ -253,14 +243,18 @@ private fun QueueScreen(
             )
         },
         floatingActionButton = {
-            AnimatedContent(targetState = state.isQueueReordered) { isQueueReordered ->
+            AnimatedContent(
+                modifier = Modifier.padding(bottom = 16.dp),
+                targetState = state.isQueueReordered
+            ) { isQueueReordered ->
                 if (isQueueReordered) {
                     ExtendedFloatingActionButton(
                         onClick = { onEvent(OnSaveReorderedQueueClicked) },
                         icon = {
                             Icon(
                                 imageVector = Icons.Default.Check,
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = Color.White
                             )
                         },
                         text = { Text("Save") }
@@ -288,7 +282,8 @@ private fun QueueScreen(
                             if (isLoading) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(24.dp),
-                                    strokeWidth = 2.dp
+                                    strokeWidth = 2.dp,
+                                    color = Color.White
                                 )
                             } else {
                                 Icon(
@@ -301,8 +296,7 @@ private fun QueueScreen(
                     }
                 }
             }
-        },
-        containerColor = Color(0xFF1D1B20)
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -311,10 +305,7 @@ private fun QueueScreen(
         ) {
             TabRow(pagerState = pagerState)
 
-            HorizontalPager(
-                modifier = Modifier.padding(top = 22.dp),
-                state = pagerState
-            ) { page ->
+            HorizontalPager(state = pagerState) { page ->
                 val queue = remember(state.leftQueue, state.rightQueue) {
                     if (page == 0) state.leftQueue else state.rightQueue
                 }
@@ -323,9 +314,11 @@ private fun QueueScreen(
                     EmptyQueueContent()
                 } else {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 24.dp),
                         state = lazyListState,
-                        contentPadding = PaddingValues(12.dp),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(key = { it.id }, items = queue) { item ->
@@ -352,15 +345,9 @@ private fun QueueScreen(
                                         lastName = item.lastName,
                                         photo = item.photo,
                                         showDraggableHandle = isUserAdmin,
+                                        onPhotoClicked = { onEvent(OnUserPhotoClicked(it)) },
                                         onItemClicked = {
-                                            item.userId?.let {
-                                                onEvent(OnQueueItemClicked(it))
-                                            }
-                                        },
-                                        onPhotoClicked = {
-                                            item.photo?.let {
-                                                onEvent(OnUserPhotoClicked(it))
-                                            }
+                                            item.userId?.let { onEvent(OnQueueItemClicked(it)) }
                                         }
                                     )
                                 }

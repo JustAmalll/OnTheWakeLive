@@ -5,6 +5,7 @@ import androidx.compose.runtime.Stable
 @Stable
 data class LoginState(
     val isLoading: Boolean = false,
+    val showPassword: Boolean = false,
 
     val phoneNumber: String = "",
     val phoneNumberError: String? = null,

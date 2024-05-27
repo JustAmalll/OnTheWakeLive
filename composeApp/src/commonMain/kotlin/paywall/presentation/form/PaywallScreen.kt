@@ -7,7 +7,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -329,10 +328,7 @@ private fun PaywallScreen(
                 ),
                 enabled = state.receipt != null,
                 isLoading = state.isLoading,
-                text = stringResource(Res.string.send),
-                fontFamily = StolzlFontFamily(),
-                fontWeight = FontWeight.Normal,
-                innerPaddingValues = PaddingValues(vertical = 8.dp)
+                text = stringResource(Res.string.send)
             )
         }
     }

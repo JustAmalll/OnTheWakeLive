@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.LoginUseCase
 import auth.presentation.login.LoginEvent.OnPhoneNumberChanged
+import auth.presentation.login.LoginEvent.OnTogglePasswordVisibilityClicked
 import auth.presentation.login.LoginViewModel.LoginAction.NavigateToCreateAccountScreen
 import core.domain.model.asString
 import core.domain.use_case.validation.ValidatePasswordUseCase
@@ -41,6 +42,9 @@ class LoginViewModel(
             is LoginEvent.OnPasswordChanged -> _state.update { it.copy(password = event.value) }
             is OnPhoneNumberChanged -> _state.update { it.copy(phoneNumber = event.value) }
             LoginEvent.OnSignInClicked -> signIn()
+            OnTogglePasswordVisibilityClicked -> _state.update {
+                it.copy(showPassword = !it.showPassword)
+            }
         }
     }
 

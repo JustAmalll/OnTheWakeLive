@@ -3,7 +3,6 @@ package paywall.presentation.in_processing
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -117,10 +116,6 @@ fun PaywallInProcessingScreen() {
                         contentColor = Color.White
                     ),
                     text = "В обработке",
-                    fontFamily = StolzlFontFamily(),
-                    fontWeight = FontWeight.Medium,
-                    innerPaddingValues = PaddingValues(vertical = 8.dp),
-                    fontSize = 16.sp,
                     icon = Res.drawable.ic_clock
                 )
             }

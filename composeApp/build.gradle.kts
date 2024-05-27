@@ -86,7 +86,7 @@ kotlin {
 
             api(libs.kmpnotifier)
             api(libs.permissions.compose)
-            implementation("dev.chrisbanes.haze:haze:0.7.1")
+            implementation(libs.haze)
         }
         iosMain.dependencies {
             implementation(libs.ktor.darwin)

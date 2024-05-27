@@ -1,7 +1,6 @@
 package auth.presentation.create_account
 
 import MainScreen
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +13,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -31,8 +37,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import auth.presentation.create_account.CreateAccountEvent.OnLoginClicked
+import auth.presentation.create_account.CreateAccountEvent.OnTogglePasswordVisibilityClicked
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.NavigateToLoginScreen
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.NavigateToQueueScreen
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.ShowError
@@ -41,6 +50,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.StandardButton
 import core.presentation.components.StandardTextField
+import core.presentation.utils.clickableWithoutIndication
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.already_have_an_account
 import onthewakelive.composeapp.generated.resources.create_account
@@ -80,7 +90,7 @@ class CreateAccountAssembly : Screen {
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAccountScreen(
     state: CreateAccountState,
@@ -92,13 +102,24 @@ fun CreateAccountScreen(
     Scaffold(
         modifier = Modifier.imePadding(),
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(resource = Res.string.sign_up),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                }
+            )
+        },
         bottomBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(bottom = 16.dp)
-                    .clickable { onEvent(CreateAccountEvent.OnLoginClicked) },
+                    .clickableWithoutIndication { onEvent(OnLoginClicked) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -118,17 +139,11 @@ fun CreateAccountScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(all = 24.dp)
+                .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = stringResource(resource = Res.string.sign_up),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
             StandardTextField(
-                modifier = Modifier.padding(top = 16.dp),
                 value = state.firstName,
                 onValueChange = { onEvent(CreateAccountEvent.OnFirstNameChanged(it)) },
                 keyboardOptions = KeyboardOptions(
@@ -136,7 +151,7 @@ fun CreateAccountScreen(
                     imeAction = ImeAction.Next
                 ),
                 label = stringResource(resource = Res.string.first_name),
-                error = state.firstNameError
+                supportingText = state.firstNameError
             )
             StandardTextField(
                 modifier = Modifier.padding(top = 16.dp),
@@ -147,7 +162,7 @@ fun CreateAccountScreen(
                     imeAction = ImeAction.Next
                 ),
                 label = stringResource(resource = Res.string.last_name),
-                error = state.lastNameError
+                supportingText = state.lastNameError
             )
             StandardTextField(
                 modifier = Modifier.padding(top = 16.dp),
@@ -158,7 +173,7 @@ fun CreateAccountScreen(
                     imeAction = ImeAction.Next
                 ),
                 label = stringResource(resource = Res.string.phone_number),
-                error = state.phoneNumberError,
+                supportingText = state.phoneNumberError,
                 isPhoneNumberTextField = true
             )
             StandardTextField(
@@ -166,7 +181,19 @@ fun CreateAccountScreen(
                 value = state.password,
                 onValueChange = { onEvent(CreateAccountEvent.OnPasswordChanged(it)) },
                 label = stringResource(resource = Res.string.password),
-                isPasswordTextField = true,
+                visualTransformation = PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { onEvent(OnTogglePasswordVisibilityClicked) }) {
+                        Icon(
+                            imageVector = if (state.showPassword) {
+                                Icons.Default.VisibilityOff
+                            } else {
+                                Icons.Default.Visibility
+                            },
+                            contentDescription = null
+                        )
+                    }
+                },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
@@ -177,12 +204,12 @@ fun CreateAccountScreen(
                         focusManager.clearFocus()
                     }
                 ),
-                error = state.passwordError
+                supportingText = state.passwordError
             )
             StandardButton(
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(top = 16.dp),
+                    .fillMaxWidth()
+                    .padding(top = 40.dp),
                 onClick = {
                     onEvent(CreateAccountEvent.OnCreateAccountClicked)
                     focusManager.clearFocus()

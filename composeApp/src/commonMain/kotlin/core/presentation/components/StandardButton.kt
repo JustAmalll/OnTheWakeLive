@@ -2,10 +2,10 @@ package core.presentation.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -16,11 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -32,11 +31,7 @@ fun StandardButton(
     text: String,
     isLoading: Boolean = false,
     loadingIndicatorSize: Dp = 24.dp,
-    fontSize: TextUnit = TextUnit.Unspecified,
-    innerPaddingValues: PaddingValues = PaddingValues(),
     enabled: Boolean = true,
-    fontWeight: FontWeight? = null,
-    fontFamily: FontFamily? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -45,17 +40,18 @@ fun StandardButton(
     onClick: () -> Unit
 ) {
     Button(
+        modifier = modifier.fillMaxWidth(),
         onClick = {
             if (!isLoading) {
                 onClick()
             }
         },
-        modifier = modifier,
         enabled = enabled,
-        colors = colors
+        colors = colors,
+        shape = RoundedCornerShape(size = 30.dp)
     ) {
         AnimatedContent(
-            modifier = Modifier.padding(paddingValues = innerPaddingValues),
+            modifier = Modifier.padding(vertical = 8.dp),
             targetState = isLoading
         ) { loading ->
             if (loading) {
@@ -69,9 +65,8 @@ fun StandardButton(
                     Text(
                         modifier = Modifier.align(Alignment.Center),
                         text = text,
-                        fontWeight = fontWeight,
-                        fontFamily = fontFamily,
-                        fontSize = fontSize
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp
                     )
                     if (icon != null) {
                         Icon(

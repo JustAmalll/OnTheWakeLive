@@ -1,5 +1,6 @@
 package queue.presentation.list.components
 
+import LocalToggleBackgroundBlur
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -20,11 +20,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
@@ -33,11 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil3.compose.AsyncImage
+import core.presentation.ui.theme.gradientBackground
 import core.presentation.utils.OpenTelegramUtil
 import core.utils.Constants
 import core.utils.Constants.INSTAGRAM_URL
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeChild
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.ic_profile_outlined
 import onthewakelive.composeapp.generated.resources.instagram
@@ -52,30 +50,23 @@ import user_profile.domain.model.UserProfile
 @Composable
 fun QueueItemDetailsDialog(
     userProfile: UserProfile,
-    hazeState: HazeState,
     onDismissRequest: () -> Unit
 ) {
     val openTelegramUtil: OpenTelegramUtil = koinInject()
     val uriHandler = LocalUriHandler.current
+    val localToggleBackgroundBlur = LocalToggleBackgroundBlur.current
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .hazeChild(state = hazeState)
-    )
+    LaunchedEffect(true) {
+        localToggleBackgroundBlur()
+    }
 
-    Dialog(onDismissRequest = onDismissRequest) {
-        Box(
-            modifier = Modifier
-                .clip(shape = RoundedCornerShape(size = 16.dp))
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(Color(0xFF27252A), Color(0xFF302E33)),
-                        start = Offset(0f, Float.POSITIVE_INFINITY),
-                        end = Offset(Float.POSITIVE_INFINITY, 0f)
-                    ),
-                )
-        ) {
+    Dialog(
+        onDismissRequest = {
+            localToggleBackgroundBlur()
+            onDismissRequest()
+        }
+    ) {
+        Box(modifier = Modifier.gradientBackground(radius = 16.dp)) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

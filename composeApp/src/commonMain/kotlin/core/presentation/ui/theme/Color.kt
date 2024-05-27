@@ -2,32 +2,17 @@ package core.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val md_theme_dark_primary = Color(0xFF2E7AD3)
-val md_theme_dark_onPrimary = Color(0xFF003918)
-val md_theme_dark_primaryContainer = Color(0xFF005225)
-val md_theme_dark_onPrimaryContainer = Color(0xFF9EF6AF)
-val md_theme_dark_secondary = Color(0xFFB7CCB7)
-val md_theme_dark_onSecondary = Color(0xFF233426)
-val md_theme_dark_secondaryContainer = Color(0xFF394B3B)
-val md_theme_dark_onSecondaryContainer = Color(0xFFD3E8D2)
-val md_theme_dark_tertiary = Color(0xFFA2CED8)
-val md_theme_dark_onTertiary = Color(0xFF00363E)
-val md_theme_dark_tertiaryContainer = Color(0xFF204D55)
-val md_theme_dark_onTertiaryContainer = Color(0xFFBDEAF4)
+val primary = Color(0xFF2E7AD3)
+val secondary = Color(0xFF1D3E65)
+
+val md_theme_dark_primary = primary
+val md_theme_dark_onPrimary = Color.White
+
+val md_theme_dark_secondary = secondary
+val md_theme_dark_onSecondary = Color.White
+
 val md_theme_dark_error = Color(0xFFFFB4AB)
-val md_theme_dark_errorContainer = Color(0xFF93000A)
 val md_theme_dark_onError = Color(0xFF690005)
-val md_theme_dark_onErrorContainer = Color(0xFFFFDAD6)
+
 val md_theme_dark_background = Color(0xFF1D1B20)
-val md_theme_dark_onBackground = Color(0xFFE2E3DE)
-val md_theme_dark_surface = Color(0xFF1D1B20)
-val md_theme_dark_onSurface = Color(0xFFE2E3DE)
-val md_theme_dark_surfaceVariant = Color(0xFF414941)
-val md_theme_dark_onSurfaceVariant = Color(0xFFC1C9BE)
-val md_theme_dark_outline = Color(0xFF8B9389)
-val md_theme_dark_inverseOnSurface = Color(0xFF191C19)
-val md_theme_dark_inverseSurface = Color(0xFFE2E3DE)
-val md_theme_dark_inversePrimary = Color(0xFF0E6D35)
-val md_theme_dark_surfaceTint = Color(0xFF83D995)
-val md_theme_dark_outlineVariant = Color(0xFF414941)
-val md_theme_dark_scrim = Color(0xFF000000)
+val md_theme_dark_onBackground = Color.White

@@ -14,8 +14,7 @@ import user_profile.domain.use_case.GetQueueItemDetailsUseCase
 import user_profile.domain.use_case.GetUserProfileUseCase
 import user_profile.domain.use_case.IsUserSubscribedUseCase
 import user_profile.domain.use_case.SearchUsersUseCase
-import user_profile.presentation.edit_profile.EditUserProfileViewModel
-import user_profile.presentation.profile.UserProfileViewModel
+import user_profile.presentation.UserProfileViewModel
 
 val userProfileModule = module {
     factory<UserProfileRemoteDataSource> { UserProfileRemoteDataSourceImpl(get()) }
@@ -29,7 +28,6 @@ val userProfileModule = module {
     factory { IsUserSubscribedUseCase(get()) }
     factory { ActivateSubscriptionUseCase(get()) }
 
-    factory { UserProfileViewModel(get(), get(), get()) }
-    factory { EditUserProfileViewModel(get(), get()) }
+    factory { UserProfileViewModel(get(), get(), get(), get()) }
     factory { ActivateSubscriptionViewModel(get(), get()) }
 }

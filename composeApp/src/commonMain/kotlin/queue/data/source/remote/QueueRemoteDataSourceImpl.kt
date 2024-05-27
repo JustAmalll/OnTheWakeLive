@@ -49,6 +49,8 @@ class QueueRemoteDataSourceImpl(
             runCatchingNetwork {
                 session = client.webSocketSession { url(urlString = WS_BASE_URL) }
                 connectionStatus.update { true }
+            }.onFailure {
+                connectionStatus.update { false }
             }
         }
 

@@ -1,7 +1,6 @@
 package auth.presentation.login
 
 import MainScreen
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +11,13 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -28,11 +34,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import auth.presentation.create_account.CreateAccountAssembly
 import auth.presentation.login.LoginEvent.OnCreateAccountClicked
 import auth.presentation.login.LoginEvent.OnPhoneNumberChanged
+import auth.presentation.login.LoginEvent.OnTogglePasswordVisibilityClicked
 import auth.presentation.login.LoginViewModel.LoginAction.NavigateToCreateAccountScreen
 import auth.presentation.login.LoginViewModel.LoginAction.NavigateToQueueScreen
 import auth.presentation.login.LoginViewModel.LoginAction.ShowError
@@ -40,6 +48,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.StandardButton
 import core.presentation.components.StandardTextField
+import core.presentation.utils.clickableWithoutIndication
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.create
 import onthewakelive.composeapp.generated.resources.dont_have_an_account_yet
@@ -76,7 +85,7 @@ class LoginAssembly : Screen {
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginScreen(
     state: LoginState,
@@ -88,13 +97,24 @@ private fun LoginScreen(
     Scaffold(
         modifier = Modifier.imePadding(),
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(resource = Res.string.sign_in),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                }
+            )
+        },
         bottomBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(bottom = 16.dp)
-                    .clickable { onEvent(OnCreateAccountClicked) },
+                    .clickableWithoutIndication { onEvent(OnCreateAccountClicked) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -114,16 +134,10 @@ private fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(all = 24.dp),
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = stringResource(resource = Res.string.sign_in),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
             StandardTextField(
-                modifier = Modifier.padding(top = 16.dp),
                 value = state.phoneNumber,
                 onValueChange = { onEvent(OnPhoneNumberChanged(it)) },
                 keyboardOptions = KeyboardOptions(
@@ -131,7 +145,7 @@ private fun LoginScreen(
                     imeAction = ImeAction.Next
                 ),
                 label = stringResource(resource = Res.string.phone_number),
-                error = state.phoneNumberError,
+                supportingText = state.phoneNumberError,
                 isPhoneNumberTextField = true
             )
             StandardTextField(
@@ -139,7 +153,19 @@ private fun LoginScreen(
                 value = state.password,
                 onValueChange = { onEvent(LoginEvent.OnPasswordChanged(it)) },
                 label = stringResource(resource = Res.string.password),
-                isPasswordTextField = true,
+                visualTransformation = PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(onClick = { onEvent(OnTogglePasswordVisibilityClicked) }) {
+                        Icon(
+                            imageVector = if (state.showPassword) {
+                                Icons.Default.VisibilityOff
+                            } else {
+                                Icons.Default.Visibility
+                            },
+                            contentDescription = null
+                        )
+                    }
+                },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
@@ -150,12 +176,12 @@ private fun LoginScreen(
                         focusManager.clearFocus()
                     }
                 ),
-                error = state.passwordError
+                supportingText = state.passwordError
             )
             StandardButton(
                 modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(top = 16.dp),
+                    .fillMaxWidth()
+                    .padding(top = 40.dp),
                 onClick = {
                     onEvent(LoginEvent.OnSignInClicked)
                     focusManager.clearFocus()

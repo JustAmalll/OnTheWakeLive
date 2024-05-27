@@ -9,6 +9,7 @@ compose = "1.6.6"
 compose-plugin = "1.6.2"
 compose-cropper = "0.4.0"
 firebaseBom = "32.8.1"
+haze = "0.7.1"
 kmpnotifier = "0.4.0"
 kotlin = "1.9.23"
 ktor = "2.3.9"
@@ -26,7 +27,7 @@ multiplatform-settings = "1.1.1"
 reorderable = "1.4.0"
 compottie = "1.1.1"
 google-services = "4.4.1"
-crashlytics-plugin = "2.9.9"
+crashlytics-plugin = "3.0.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -55,6 +56,7 @@ kmpnotifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "kmpn
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics"}
 firebase-analytics = { module = "com.google.firebase:firebase-analytics"}
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
 
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil-compose" }
 coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil-compose" }

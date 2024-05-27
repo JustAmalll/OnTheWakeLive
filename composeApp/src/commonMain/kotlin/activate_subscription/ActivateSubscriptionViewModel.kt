@@ -36,7 +36,7 @@ class ActivateSubscriptionViewModel(
     fun onEvent(event: ActivateSubscriptionEvent) {
         when (event) {
             ActivateSubscriptionEvent.OnChangeSelectedUserClicked -> _state.update {
-                it.copy(selectedUser = null, firstName = "", searchedUsers = persistentListOf())
+                it.copy(selectedUser = null, searchQuery = "", searchedUsers = persistentListOf())
             }
 
             ActivateSubscriptionEvent.OnNavigateBackClicked -> viewModelScope.launch {
@@ -44,7 +44,7 @@ class ActivateSubscriptionViewModel(
             }
 
             is ActivateSubscriptionEvent.OnSearchQueueChanged -> {
-                _state.update { it.copy(firstName = event.value) }
+                _state.update { it.copy(searchQuery = event.value) }
                 searchUser(searchQuery = event.value)
             }
 

@@ -6,6 +6,8 @@ sealed interface CreateAccountEvent {
     data class OnPhoneNumberChanged(val value: String) : CreateAccountEvent
     data class OnPasswordChanged(val value: String) : CreateAccountEvent
 
+    data object OnTogglePasswordVisibilityClicked: CreateAccountEvent
+
     data object OnCreateAccountClicked : CreateAccountEvent
     data object OnLoginClicked : CreateAccountEvent
 }

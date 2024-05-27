@@ -10,6 +10,7 @@ import auth.presentation.create_account.CreateAccountEvent.OnLastNameChanged
 import auth.presentation.create_account.CreateAccountEvent.OnLoginClicked
 import auth.presentation.create_account.CreateAccountEvent.OnPasswordChanged
 import auth.presentation.create_account.CreateAccountEvent.OnPhoneNumberChanged
+import auth.presentation.create_account.CreateAccountEvent.OnTogglePasswordVisibilityClicked
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.NavigateToLoginScreen
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.NavigateToQueueScreen
 import auth.presentation.create_account.CreateAccountViewModel.CreateAccountAction.ShowError
@@ -58,6 +59,10 @@ class CreateAccountViewModel(
             OnCreateAccountClicked -> createAccount()
             OnLoginClicked -> viewModelScope.launch {
                 _action.send(NavigateToLoginScreen)
+            }
+
+            OnTogglePasswordVisibilityClicked -> _state.update {
+                it.copy(showPassword = !it.showPassword)
             }
         }
     }

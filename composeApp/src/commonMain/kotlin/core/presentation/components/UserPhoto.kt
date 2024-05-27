@@ -23,7 +23,7 @@ import core.utils.Constants
 @Composable
 fun UserPhoto(
     photo: String?,
-    onClick: () -> Unit
+    onClick: (String) -> Unit
 ) {
     if (photo != null) {
         AsyncImage(
@@ -32,7 +32,7 @@ fun UserPhoto(
                 .aspectRatio(1f)
                 .background(Color(0xFF424242))
                 .clip(RoundedCornerShape(size = 8.dp))
-                .clickable(onClick = onClick),
+                .clickable(onClick = { onClick(photo) }),
             model = "${Constants.BASE_URL}/storage/$photo",
             contentDescription = null,
             contentScale = ContentScale.Crop

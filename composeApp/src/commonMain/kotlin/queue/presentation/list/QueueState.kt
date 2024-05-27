@@ -13,7 +13,6 @@ data class QueueState(
     val isConnected: Boolean = false,
     val isSessionStarting: Boolean = false,
 
-    val isUserAdmin: Boolean = false,
     val leftQueue: ImmutableList<QueueItem> = persistentListOf(),
     val rightQueue: ImmutableList<QueueItem> = persistentListOf(),
     val showLeaveQueueConfirmationDialog: Boolean = false,

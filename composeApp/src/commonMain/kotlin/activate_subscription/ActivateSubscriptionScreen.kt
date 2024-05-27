@@ -21,18 +21,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,7 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardCapitalization.Companion.Sentences
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -51,13 +49,13 @@ import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.activate
 import onthewakelive.composeapp.generated.resources.activate_subscription
 import onthewakelive.composeapp.generated.resources.edit
-import onthewakelive.composeapp.generated.resources.first_name
+import onthewakelive.composeapp.generated.resources.search
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import queue.presentation.admin.components.UserItem
 
-class ActivateSubscriptionAssembly: Screen {
+class ActivateSubscriptionAssembly : Screen {
 
     @Composable
     override fun Content() {
@@ -109,10 +107,7 @@ private fun ActivateSubscriptionScreen(
                             contentDescription = null
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
-                )
+                }
             )
         }
     ) { paddingValues ->
@@ -127,9 +122,7 @@ private fun ActivateSubscriptionScreen(
                     firstName = state.selectedUser.firstName,
                     lastName = state.selectedUser.lastName,
                     photo = state.selectedUser.photo,
-                    onPhotoClicked = {
-                        state.selectedUser.photo?.let { onEvent(OnUserPhotoClicked(photo = it)) }
-                    }
+                    onPhotoClicked = { onEvent(OnUserPhotoClicked(photo = it)) }
                 )
                 TextButton(
                     modifier = Modifier
@@ -141,15 +134,19 @@ private fun ActivateSubscriptionScreen(
                 }
             } else {
                 StandardTextField(
-                    value = state.firstName,
+                    value = state.searchQuery,
                     onValueChange = { onEvent(OnSearchQueueChanged(it)) },
-                    label = stringResource(resource = Res.string.first_name),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences
-                    )
+                    placeholder = stringResource(resource = Res.string.search),
+                    keyboardOptions = KeyboardOptions(capitalization = Sentences),
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null
+                        )
+                    }
                 )
                 LazyColumn(
-                    modifier = Modifier.heightIn(max = 400.dp),
+                    modifier = Modifier.heightIn(max = 440.dp),
                     contentPadding = PaddingValues(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -158,9 +155,7 @@ private fun ActivateSubscriptionScreen(
                             firstName = user.firstName,
                             lastName = user.lastName,
                             photo = user.photo,
-                            onPhotoClicked = {
-                                user.photo?.let { onEvent(OnUserPhotoClicked(photo = it)) }
-                            },
+                            onPhotoClicked = { onEvent(OnUserPhotoClicked(photo = it)) },
                             onItemClicked = { onEvent(OnUserSelected(user = user)) }
                         )
                     }

@@ -1,11 +1,12 @@
-package user_profile.presentation.edit_profile
+package user_profile.presentation
 
 import androidx.compose.runtime.Stable
 
 @Suppress("ArrayInDataClass")
 @Stable
-data class EditUserProfileState(
+data class UserProfileState(
     val isLoading: Boolean = false,
+    val hasChanges: Boolean = false,
 
     val firstName: String = "",
     val firsNameError: String? = null,

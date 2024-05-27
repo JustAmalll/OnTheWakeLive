@@ -43,6 +43,7 @@ val appModule = module {
 
             install(HttpTimeout) {
                 connectTimeoutMillis = 10.seconds.inWholeMilliseconds
+                socketTimeoutMillis =  10.seconds.inWholeMilliseconds
             }
 
             install(ContentNegotiation) {

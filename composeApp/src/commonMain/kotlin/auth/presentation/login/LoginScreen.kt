@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -107,27 +106,6 @@ private fun LoginScreen(
                     )
                 }
             )
-        },
-        bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(bottom = 16.dp)
-                    .clickableWithoutIndication { onEvent(OnCreateAccountClicked) },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = stringResource(resource = Res.string.dont_have_an_account_yet),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    modifier = Modifier.padding(start = 4.dp),
-                    text = stringResource(resource = Res.string.create),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
         }
     ) { paddingValues ->
         Column(
@@ -189,6 +167,24 @@ private fun LoginScreen(
                 text = stringResource(resource = Res.string.sign_in),
                 isLoading = state.isLoading
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 26.dp)
+                    .clickableWithoutIndication { onEvent(OnCreateAccountClicked) },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(resource = Res.string.dont_have_an_account_yet),
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = stringResource(resource = Res.string.create),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

@@ -28,6 +28,6 @@ val userProfileModule = module {
     factory { IsUserSubscribedUseCase(get()) }
     factory { ActivateSubscriptionUseCase(get()) }
 
-    single { UserProfileViewModel(get(), get(), get(), get()) }
+    factory { UserProfileViewModel(get(), get(), get(), get()) }
     factory { ActivateSubscriptionViewModel(get(), get()) }
 }

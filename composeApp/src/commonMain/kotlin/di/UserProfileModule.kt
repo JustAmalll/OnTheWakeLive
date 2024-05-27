@@ -17,9 +17,9 @@ import user_profile.domain.use_case.SearchUsersUseCase
 import user_profile.presentation.UserProfileViewModel
 
 val userProfileModule = module {
-    factory<UserProfileRemoteDataSource> { UserProfileRemoteDataSourceImpl(get()) }
-    factory<UserProfileCacheDataSource> { UserProfileCacheDataSourceImpl(get()) }
-    factory<UserProfileRepository> { UserProfileRepositoryImpl(get(), get()) }
+    single<UserProfileRemoteDataSource> { UserProfileRemoteDataSourceImpl(get()) }
+    single<UserProfileCacheDataSource> { UserProfileCacheDataSourceImpl(get()) }
+    single<UserProfileRepository> { UserProfileRepositoryImpl(get(), get()) }
 
     factory { GetUserProfileUseCase(get()) }
     factory { EditProfileUseCase(get()) }
@@ -28,6 +28,6 @@ val userProfileModule = module {
     factory { IsUserSubscribedUseCase(get()) }
     factory { ActivateSubscriptionUseCase(get()) }
 
-    factory { UserProfileViewModel(get(), get(), get(), get()) }
+    single { UserProfileViewModel(get(), get(), get(), get()) }
     factory { ActivateSubscriptionViewModel(get(), get()) }
 }

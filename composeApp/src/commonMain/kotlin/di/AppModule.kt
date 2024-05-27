@@ -6,6 +6,7 @@ import core.presentation.MainViewModel
 import core.presentation.utils.OpenTelegramUtil
 import core.utils.Constants
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -20,6 +21,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import kotlin.time.Duration.Companion.seconds
 
 expect fun Scope.provideObservableSettings(): ObservableSettings
 expect fun Scope.provideOpenTelegramUtil(): OpenTelegramUtil
@@ -38,6 +40,10 @@ val appModule = module {
                 level = LogLevel.ALL
             }
             install(WebSockets)
+
+            install(HttpTimeout) {
+                connectTimeoutMillis = 10.seconds.inWholeMilliseconds
+            }
 
             install(ContentNegotiation) {
                 json()

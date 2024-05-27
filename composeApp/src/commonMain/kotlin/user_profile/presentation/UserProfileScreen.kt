@@ -54,6 +54,7 @@ import core.utils.Constants
 import full_size_photo.presentation.FullSizePhotoAssembly
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.edit
+import onthewakelive.composeapp.generated.resources.field_not_required
 import onthewakelive.composeapp.generated.resources.first_name
 import onthewakelive.composeapp.generated.resources.ic_delete
 import onthewakelive.composeapp.generated.resources.ic_profile_outlined
@@ -256,14 +257,14 @@ private fun UserProfileScreen(
                     value = state.instagram,
                     onValueChange = { onEvent(UserProfileEvent.OnInstagramChanged(it)) },
                     label = stringResource(resource = Res.string.instagram),
-                    supportingText = "Поле, не требующее обязательного заполнения"
+                    supportingText = stringResource(Res.string.field_not_required)
                 )
                 StandardTextField(
                     modifier = Modifier.padding(top = 16.dp),
                     value = state.telegram,
                     onValueChange = { onEvent(OnTelegramChanged(it)) },
                     label = stringResource(resource = Res.string.telegram),
-                    supportingText = "Поле, не требующее обязательного заполнения"
+                    supportingText = stringResource(Res.string.field_not_required)
                 )
             }
         }

@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -41,8 +43,8 @@ kotlin {
             implementation(libs.compose.image.cropper)
 
             implementation(project.dependencies.platform(libs.firebase.bom))
-//            implementation(libs.firebase.crashlytics)
-//            implementation(libs.firebase.analytics)
+            implementation(libs.firebase.crashlytics)
+            implementation(libs.firebase.analytics)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -117,6 +119,17 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
+        }
+    }
+    bundle {
+        density {
+            enableSplit = false
+        }
+        abi {
+            enableSplit = false
+        }
+        language {
+            enableSplit = false
         }
     }
     compileOptions {

@@ -318,7 +318,12 @@ private fun QueueScreen(
                             .fillMaxSize()
                             .padding(top = 24.dp),
                         state = lazyListState,
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 16.dp,
+                            top = 2.dp
+                        ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(key = { it.id }, items = queue) { item ->

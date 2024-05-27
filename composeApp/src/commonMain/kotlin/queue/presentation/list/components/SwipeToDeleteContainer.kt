@@ -17,8 +17,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.delete
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun SwipeToDeleteContainer(
     onDelete: () -> Unit,
@@ -54,7 +58,10 @@ fun SwipeToDeleteContainer(
                         .padding(16.dp),
                     contentAlignment = Alignment.CenterEnd
                 ) {
-                    Text(text = "Удалить", fontSize = 16.sp)
+                    Text(
+                        text = stringResource(Res.string.delete),
+                        fontSize = 16.sp
+                    )
                 }
             },
             content = { content() }

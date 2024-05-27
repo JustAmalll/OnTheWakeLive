@@ -28,10 +28,15 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import core.presentation.components.StandardButton
 import core.presentation.ui.theme.StolzlFontFamily
 import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.application_being_processed
+import onthewakelive.composeapp.generated.resources.application_successfully_submitted
 import onthewakelive.composeapp.generated.resources.ic_clock
+import onthewakelive.composeapp.generated.resources.processing
+import onthewakelive.composeapp.generated.resources.subscription_activated_soon
 import onthewakelive.composeapp.generated.resources.wakeboard_illustration
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import paywall.presentation.failure.PaywallFailureAssembly
 import paywall.presentation.in_processing.PaywallInProcessingViewModel.PaywallInProcessingAction.NavigateToPaywallFailureScreen
@@ -66,7 +71,7 @@ fun PaywallInProcessingScreen() {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Заявка успешно оформлена!",
+                        text = stringResource(Res.string.application_successfully_submitted),
                         fontFamily = StolzlFontFamily(),
                         fontWeight = FontWeight.Normal,
                         fontSize = 20.sp,
@@ -87,7 +92,7 @@ fun PaywallInProcessingScreen() {
                     .padding(bottom = 40.dp)
             ) {
                 Text(
-                    text = "Ваша заявка находится в обработке. Пожалуйста, ожидайте!",
+                    text = stringResource(Res.string.application_being_processed),
                     color = Color.White,
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Medium,
@@ -99,7 +104,7 @@ fun PaywallInProcessingScreen() {
                     modifier = Modifier
                         .padding(top = 30.dp)
                         .padding(horizontal = 32.dp),
-                    text = "Ваша подписка будет активирована в течение нескольких минут",
+                    text = stringResource(Res.string.subscription_activated_soon),
                     color = Color.White,
                     fontFamily = StolzlFontFamily(),
                     fontWeight = FontWeight.Light,
@@ -115,7 +120,7 @@ fun PaywallInProcessingScreen() {
                         containerColor = Color(0xFFD39B2E),
                         contentColor = Color.White
                     ),
-                    text = "В обработке",
+                    text = stringResource(Res.string.processing),
                     icon = Res.drawable.ic_clock
                 )
             }

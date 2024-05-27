@@ -8,7 +8,9 @@
     <string name="reconnect">Подключиться заново</string>
     <string name="settings">Настройки</string>
     <string name="search">Поиск</string>
+    <string name="delete">Удалить</string>
     <string name="join_queue">Записаться в очередь</string>
+    <string name="field_not_required">Поле, не требующее обязательного заполнения</string>
 
     <!-- Network Errors-->
     <string name="unknown_error">Упс! Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз позже или свяжитесь с поддержкой, если проблема сохраняется.</string>
@@ -77,6 +79,12 @@
     <string name="upload_receipt">Загрузите квитанцию</string>
     <string name="ready">Готово</string>
     <string name="send">Отправить</string>
+
+    <!-- Paywall In Processing Screen -->
+    <string name="application_successfully_submitted">Заявка успешно оформлена!</string>
+    <string name="application_being_processed">Ваша заявка находится в обработке. Пожалуйста, ожидайте!</string>
+    <string name="subscription_activated_soon">Ваша подписка будет активирована в течение нескольких минут</string>
+    <string name="processing">В обработке</string>
 
     <!-- Paywall Failure Screen -->
     <string name="payment_error">Ошибка оплаты!</string>

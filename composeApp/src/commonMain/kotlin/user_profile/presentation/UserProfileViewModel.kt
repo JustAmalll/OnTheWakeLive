@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import onthewakelive.composeapp.generated.resources.Res
+import onthewakelive.composeapp.generated.resources.successfully_updated_profile
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.getString
 import queue.domain.use_case.CloseSessionUseCase
 import user_profile.domain.model.UpdateUserProfileRequest
 import user_profile.domain.use_case.EditProfileUseCase
@@ -29,6 +33,7 @@ import user_profile.presentation.UserProfileEvent.OnUserPhotoClicked
 import user_profile.presentation.UserProfileEvent.OnUserPhotoCropped
 import user_profile.presentation.UserProfileEvent.OnUserPhotoSelected
 import user_profile.presentation.UserProfileViewModel.UserProfileAction.NavigateToFullSizePhotoScreen
+import user_profile.presentation.UserProfileViewModel.UserProfileAction.ShowError
 
 class UserProfileViewModel(
     private val getUserProfileUseCase: GetUserProfileUseCase,
@@ -99,6 +104,7 @@ class UserProfileViewModel(
         }
     }
 
+    @OptIn(ExperimentalResourceApi::class)
     private fun editUserProfile() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
@@ -115,9 +121,9 @@ class UserProfileViewModel(
                 newPhotoBytes = state.value.newPhotoBytes
             ).onSuccess {
                 _state.update { it.copy(hasChanges = false) }
-                _action.send(UserProfileAction.ShowError("Success!"))
+                _action.send(ShowError(getString(Res.string.successfully_updated_profile)))
             }.onFailure { error ->
-                _action.send(UserProfileAction.ShowError(error.asString()))
+                _action.send(ShowError(error.asString()))
             }
             _state.update { it.copy(isLoading = false) }
         }
@@ -139,7 +145,7 @@ class UserProfileViewModel(
                     )
                 }
             }.onFailure { error ->
-                _action.send(UserProfileAction.ShowError(error.asString()))
+                _action.send(ShowError(error.asString()))
             }
         }
     }

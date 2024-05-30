@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import auth.presentation.login.LoginAssembly
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -57,6 +58,7 @@ import onthewakelive.composeapp.generated.resources.edit
 import onthewakelive.composeapp.generated.resources.field_not_required
 import onthewakelive.composeapp.generated.resources.first_name
 import onthewakelive.composeapp.generated.resources.ic_delete
+import onthewakelive.composeapp.generated.resources.ic_profile_nav_bar
 import onthewakelive.composeapp.generated.resources.ic_profile_outlined
 import onthewakelive.composeapp.generated.resources.instagram
 import onthewakelive.composeapp.generated.resources.last_name
@@ -109,7 +111,7 @@ object UserProfileTab : Tab {
         @Composable
         get() {
             val title = stringResource(resource = Res.string.profile)
-            val icon = painterResource(resource = Res.drawable.ic_profile_outlined)
+            val icon = painterResource(resource = Res.drawable.ic_profile_nav_bar)
 
             return remember { TabOptions(index = 1u, title = title, icon = icon) }
         }
@@ -132,7 +134,12 @@ private fun UserProfileScreen(
             snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text(text = stringResource(resource = Res.string.profile)) },
+                    title = {
+                        Text(
+                            text = stringResource(resource = Res.string.profile),
+                            fontSize = 20.sp
+                        )
+                    },
                     actions = {
                         IconButton(onClick = { onEvent(OnLogoutClicked) }) {
                             Icon(
@@ -249,8 +256,8 @@ private fun UserProfileScreen(
                     value = state.phoneNumber,
                     onValueChange = {},
                     label = stringResource(resource = Res.string.phone_number),
-                    isPhoneNumberTextField = true,
-                    enabled = false
+                    enabled = false,
+                    prefix = { Text("+") }
                 )
                 StandardTextField(
                     modifier = Modifier.padding(top = 16.dp),
@@ -264,7 +271,8 @@ private fun UserProfileScreen(
                     value = state.telegram,
                     onValueChange = { onEvent(OnTelegramChanged(it)) },
                     label = stringResource(resource = Res.string.telegram),
-                    supportingText = stringResource(Res.string.field_not_required)
+                    supportingText = stringResource(Res.string.field_not_required),
+                    prefix = { Text("t.me/") }
                 )
             }
         }

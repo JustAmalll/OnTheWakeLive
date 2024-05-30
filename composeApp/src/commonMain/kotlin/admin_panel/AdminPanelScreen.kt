@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
@@ -62,7 +63,12 @@ private fun AdminPanelScreen(onActivateSubscriptionClicked: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = stringResource(Res.string.admin_panel)) }
+                title = {
+                    Text(
+                        text = stringResource(Res.string.admin_panel),
+                        fontSize = 20.sp
+                    )
+                }
             )
         }
     ) { paddingValues ->

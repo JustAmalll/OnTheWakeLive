@@ -69,7 +69,7 @@
     <string name="telegram" translatable="false">Telegram</string>
     <string name="instagram" translatable="false">Instagram</string>
     <string name="edit">Редактировать</string>
-    <string name="successfully_updated_profile">Профиль успешно обновлен!</string>
+    <string name="successfully_updated_profile">Ваш профиль успешно обновлен!</string>
 
     <!-- Paywall Screen -->
     <string name="subscription_required">Чтобы добавиться в очередь необходимо оформить подписку</string>
@@ -100,6 +100,10 @@
     <!-- Activate Subscription Screen -->
     <string name="activate_subscription">Активировать подписку</string>
     <string name="activate">Активировать</string>
+
+    <!-- Statistics Screen -->
+    <string name="statistics">Статистика</string>
+    <string name="statistics_screen_in_development">Упс, этот раздел находится в разработке! Скоро мы его добавим! Приносим свои извинения.</string>
 
     <!-- Server Unavailable Screen-->
     <string name="server_unavailable_title">Невозможно подключиться к серверу</string>

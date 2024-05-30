@@ -31,7 +31,7 @@ class PaywallInProcessingViewModel(
                 _action.send(PaywallInProcessingAction.NavigateToPaywallFailureScreen)
                 return@launch
             }
-            delay(10.seconds)
+            delay(20.seconds)
 
             while (
                 isUserSubscribed(userId = userId).onFailure {
@@ -39,7 +39,7 @@ class PaywallInProcessingViewModel(
                     return@launch
                 }.getOrNull() != true
             ) {
-                delay(5.seconds)
+                delay(8.seconds)
             }
             paywallRepository.setPaywallInProcessingState(isProcessing = false)
             _action.send(PaywallInProcessingAction.NavigateToPaywallSuccessScreen)

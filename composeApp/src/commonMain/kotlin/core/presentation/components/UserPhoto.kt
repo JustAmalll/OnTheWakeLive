@@ -30,7 +30,6 @@ fun UserPhoto(
             modifier = Modifier
                 .fillMaxHeight()
                 .aspectRatio(1f)
-                .background(Color(0xFF424242))
                 .clip(RoundedCornerShape(size = 8.dp))
                 .clickable(onClick = { onClick(photo) }),
             model = "${Constants.BASE_URL}/storage/$photo",

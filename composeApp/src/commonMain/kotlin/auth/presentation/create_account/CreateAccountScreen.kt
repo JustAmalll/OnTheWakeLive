@@ -152,7 +152,7 @@ fun CreateAccountScreen(
                 ),
                 label = stringResource(resource = Res.string.phone_number),
                 supportingText = state.phoneNumberError,
-                isPhoneNumberTextField = true
+                prefix = { Text("+") }
             )
             StandardTextField(
                 modifier = Modifier.padding(top = 16.dp),

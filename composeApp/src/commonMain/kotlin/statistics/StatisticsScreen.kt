@@ -22,8 +22,11 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import onthewakelive.composeapp.generated.resources.Res
 import onthewakelive.composeapp.generated.resources.ic_cat
 import onthewakelive.composeapp.generated.resources.ic_statistics
+import onthewakelive.composeapp.generated.resources.statistics
+import onthewakelive.composeapp.generated.resources.statistics_screen_in_development
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 object StatisticsAssembly : Tab {
 
@@ -36,7 +39,7 @@ object StatisticsAssembly : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Statistics"
+            val title = stringResource(Res.string.statistics)
             val icon = painterResource(resource = Res.drawable.ic_statistics)
 
             return remember { TabOptions(index = 0u, title = title, icon = icon) }
@@ -51,7 +54,12 @@ private fun StatisticsScreen() {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "Статистика") }
+                title = {
+                    Text(
+                        text = stringResource(Res.string.statistics),
+                        fontSize = 20.sp
+                    )
+                }
             )
         },
         bottomBar = {
@@ -61,7 +69,7 @@ private fun StatisticsScreen() {
                     .padding(bottom = 80.dp)
             ) {
                 Text(
-                    text = "Упс, этот раздел находится в разработке! Скоро мы его добавим! Приносим свои извинения",
+                    text = stringResource(Res.string.statistics_screen_in_development),
                     fontWeight = FontWeight.Medium,
                     fontSize = 23.sp,
                     textAlign = TextAlign.Center

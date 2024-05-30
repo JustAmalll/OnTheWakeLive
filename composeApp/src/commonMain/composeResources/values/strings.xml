@@ -69,7 +69,7 @@
     <string name="telegram" translatable="false">Telegram</string>
     <string name="instagram" translatable="false">Instagram</string>
     <string name="edit">Edit</string>
-    <string name="successfully_updated_profile">Successfully updated profile!</string>
+    <string name="successfully_updated_profile">Your profile has been successfully updated!</string>
 
     <!-- Activate Subscription Screen -->
     <string name="activate_subscription">Activate Subscription</string>
@@ -100,6 +100,10 @@
     <!-- Paywall Success Screen -->
     <string name="subscription_success">Your subscription has been successfully submitted!</string>
     <string name="subscription_congrats">Congratulations, you can now join the queue!</string>
+
+    <!-- Statistics Screen -->
+    <string name="statistics">Statistics</string>
+    <string name="statistics_screen_in_development">Oops, this section is under development! We will add it soon! We apologize for the inconvenience.</string>
 
     <!-- Server Unavailable Screen-->
     <string name="server_unavailable_title">Unable to connect to server</string>

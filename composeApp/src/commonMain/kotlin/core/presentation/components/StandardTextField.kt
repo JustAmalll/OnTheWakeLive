@@ -33,7 +33,7 @@ fun StandardTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    isPhoneNumberTextField: Boolean = false,
+    prefix: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     enabled: Boolean = true
 ) {
@@ -64,11 +64,7 @@ fun StandardTextField(
             keyboardActions = keyboardActions,
             visualTransformation = visualTransformation,
             trailingIcon = trailingIcon,
-            prefix = if (isPhoneNumberTextField) {
-                { Text(text = "+") }
-            } else {
-                null
-            },
+            prefix = prefix,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,

@@ -48,6 +48,7 @@ import core.presentation.components.SplashLoadingScreen
 import core.presentation.components.StandardButton
 import core.presentation.components.StandardTextField
 import core.presentation.ui.theme.gradientBackground
+import core.presentation.utils.ImageCropper
 import core.presentation.utils.clickableWithoutIndication
 import core.presentation.utils.rememberBitmapFromBytes
 import core.presentation.utils.rememberImagePickerLauncher
@@ -73,6 +74,7 @@ import user_profile.presentation.UserProfileEvent.OnDeleteUserPhotoClicked
 import user_profile.presentation.UserProfileEvent.OnEditProfileClicked
 import user_profile.presentation.UserProfileEvent.OnLogoutClicked
 import user_profile.presentation.UserProfileEvent.OnTelegramChanged
+import user_profile.presentation.UserProfileEvent.OnUserPhotoCropped
 import user_profile.presentation.UserProfileViewModel.UserProfileAction.NavigateToFullSizePhotoScreen
 import user_profile.presentation.UserProfileViewModel.UserProfileAction.NavigateToLoginScreen
 import user_profile.presentation.UserProfileViewModel.UserProfileAction.ShowError
@@ -278,5 +280,12 @@ private fun UserProfileScreen(
         }
     } else {
         SplashLoadingScreen()
+    }
+
+    if (state.showImageCropper && state.newPhotoBytes != null) {
+        ImageCropper(
+            photo = state.newPhotoBytes,
+            onImageCropped = { onEvent(OnUserPhotoCropped(byteArray = it)) }
+        )
     }
 }

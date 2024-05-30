@@ -4,29 +4,33 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Rotate90DegreesCw
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.dp
 import com.smarttoolfactory.cropper.ImageCropper
 import com.smarttoolfactory.cropper.model.AspectRatio
 import com.smarttoolfactory.cropper.model.OutlineType
@@ -34,6 +38,9 @@ import com.smarttoolfactory.cropper.model.RectCropShape
 import com.smarttoolfactory.cropper.settings.CropDefaults
 import com.smarttoolfactory.cropper.settings.CropOutlineProperty
 import com.smarttoolfactory.cropper.settings.CropType
+import core.presentation.MainEvent.ToggleNavigationBarVisibility
+import core.presentation.MainViewModel
+import org.koin.compose.koinInject
 import java.io.ByteArrayOutputStream
 
 @Composable
@@ -41,6 +48,12 @@ actual fun ImageCropper(
     photo: ByteArray,
     onImageCropped: (ByteArray) -> Unit
 ) {
+    val viewModel: MainViewModel = koinInject()
+
+    LaunchedEffect(true) {
+        viewModel.onEvent(ToggleNavigationBarVisibility)
+    }
+
     var bitmap by remember(photo) {
         mutableStateOf(photo.toBitmap())
     }
@@ -63,32 +76,34 @@ actual fun ImageCropper(
 
     Scaffold(
         bottomBar = {
-            BottomAppBar(
-                actions = {
-                    IconButton(onClick = { bitmap = bitmap?.rotate() }) {
-                        Icon(
-                            imageVector = Icons.Filled.Rotate90DegreesCw,
-                            contentDescription = null
-                        )
-                    }
-                },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { crop = true },
-                        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-                        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-                    ) {
-                        Icon(imageVector = Icons.Filled.Crop, contentDescription = null)
-                    }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(vertical = 10.dp, horizontal = 16.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(onClick = { bitmap = bitmap?.rotate() }) {
+                    Icon(
+                        imageVector = Icons.Filled.Rotate90DegreesCw,
+                        contentDescription = null
+                    )
                 }
-            )
+                FloatingActionButton(onClick = { crop = true }) {
+                    Icon(
+                        imageVector = Icons.Filled.Crop,
+                        contentDescription = null
+                    )
+                }
+            }
         }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color.DarkGray)
         ) {
             bitmap?.let {
                 ImageCropper(
@@ -102,6 +117,7 @@ actual fun ImageCropper(
                     onCropSuccess = { image ->
                         onImageCropped(image.toByteArray())
                         crop = false
+                        viewModel.onEvent(ToggleNavigationBarVisibility)
                     }
                 )
             }

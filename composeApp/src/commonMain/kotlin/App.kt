@@ -125,6 +125,7 @@ object MainScreen : Screen {
     @Composable
     override fun Content() {
         val viewModel: MainViewModel = koinInject()
+        val state by viewModel.state.collectAsState()
         val isPortraitOrientation = isPortraitOrientation()
         val isUserAdmin = LocalIsUserAdmin.current
 
@@ -137,14 +138,18 @@ object MainScreen : Screen {
                 content = {
                     Box(
                         modifier = Modifier.padding(
-                            bottom = if (isPortraitOrientation) 80.dp else 0.dp
+                            bottom = if (isPortraitOrientation && state.isNavigationBarVisible) {
+                                80.dp
+                            } else {
+                                0.dp
+                            }
                         )
                     ) {
                         CurrentTab()
                     }
                 },
                 bottomBar = {
-                    if (isPortraitOrientation) {
+                    if (isPortraitOrientation && state.isNavigationBarVisible) {
                         Box(
                             modifier = Modifier
                                 .windowInsetsPadding(windowInsets)

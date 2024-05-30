@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import auth.presentation.create_account.CreateAccountEvent.OnLoginClicked
@@ -159,7 +160,11 @@ fun CreateAccountScreen(
                 value = state.password,
                 onValueChange = { onEvent(CreateAccountEvent.OnPasswordChanged(it)) },
                 label = stringResource(resource = Res.string.password),
-                visualTransformation = PasswordVisualTransformation(),
+                visualTransformation = if (state.showPassword) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
                 trailingIcon = {
                     IconButton(onClick = { onEvent(OnTogglePasswordVisibilityClicked) }) {
                         Icon(

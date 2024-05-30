@@ -95,11 +95,7 @@ class UserProfileViewModel(
             }
 
             is OnUserPhotoSelected -> _state.update {
-                it.copy(
-                    newPhotoBytes = event.byteArray,
-                    showImageCropper = true,
-                    hasChanges = true
-                )
+                it.copy(newPhotoBytes = event.byteArray, showImageCropper = true)
             }
         }
     }

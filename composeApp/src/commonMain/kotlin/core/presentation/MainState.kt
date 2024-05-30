@@ -8,5 +8,6 @@ data class MainState(
     val isLoading: Boolean = false,
     val startScreen: Screen? = null,
     val isUserAdmin: Boolean = false,
-    val userId: Int? = null
+    val userId: Int? = null,
+    val isNavigationBarVisible: Boolean = true,
 )

@@ -12,6 +12,7 @@ import core.domain.utils.DataError
 import core.domain.utils.onFailure
 import core.domain.utils.onSuccess
 import core.presentation.MainEvent.OnMainScreenAppeared
+import core.presentation.MainEvent.ToggleNavigationBarVisibility
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,6 +43,10 @@ class MainViewModel(
             OnMainScreenAppeared -> {
                 isUserAdmin()
                 getUserId()
+            }
+
+            ToggleNavigationBarVisibility -> _state.update {
+                it.copy(isNavigationBarVisible = !it.isNavigationBarVisible)
             }
         }
     }

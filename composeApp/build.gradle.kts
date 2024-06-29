@@ -108,7 +108,7 @@ android {
         applicationId = "com.onthewake.onthewakelive"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 6
+        versionCode = 7
         versionName = "5.1.0"
     }
     packaging {
@@ -126,6 +126,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     bundle {

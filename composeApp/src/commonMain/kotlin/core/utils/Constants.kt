@@ -1,7 +1,7 @@
 package core.utils
 
 object Constants {
-    private const val HOST = "176.126.166.53"
+    private const val HOST = "176.126.164.214"
 
     const val BASE_URL = "http://$HOST"
     const val WS_BASE_URL = "ws://$HOST/queue-socket"

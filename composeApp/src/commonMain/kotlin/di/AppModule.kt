@@ -29,7 +29,7 @@ expect fun Scope.provideOpenTelegramUtil(): OpenTelegramUtil
 val appModule = module {
     single { provideObservableSettings() }
     factory { provideOpenTelegramUtil() }
-    single { MainViewModel(get(), get(), get(), get(), get()) }
+    single { MainViewModel(get(), get(), get(), get(), get(), get()) }
 
     single {
         HttpClient {

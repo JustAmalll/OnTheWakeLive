@@ -236,7 +236,7 @@ private fun PaywallScreen(
                                     )
                                 )
                             ) {
-                                append("800")
+                                append("700")
                             }
                             withStyle(style = SpanStyle(color = Color(0xFFFABF00))) {
                                 append("с.")

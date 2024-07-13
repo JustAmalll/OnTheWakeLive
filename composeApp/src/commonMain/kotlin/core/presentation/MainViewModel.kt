@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import auth.domain.use_case.AuthenticationUseCase
 import auth.domain.use_case.GetUserIdUseCase
 import auth.domain.use_case.IsUserAdminUseCase
+import auth.domain.use_case.LogoutUseCase
 import auth.presentation.login.LoginAssembly
 import com.mmk.kmpnotifier.notification.NotifierManager
 import core.domain.utils.DataError
@@ -28,7 +29,8 @@ class MainViewModel(
     private val authenticationUseCase: AuthenticationUseCase,
     private val isUserAdminUseCase: IsUserAdminUseCase,
     private val getUserIdUseCase: GetUserIdUseCase,
-    private val updateNotificationTokenUseCase: UpdateNotificationTokenUseCase
+    private val updateNotificationTokenUseCase: UpdateNotificationTokenUseCase,
+    private val logoutUseCase: LogoutUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MainState())
@@ -84,6 +86,7 @@ class MainViewModel(
                 } else {
                     _state.update { it.copy(startScreen = ServerUnavailableAssembly()) }
                 }
+                logoutUseCase()
             }
             _state.update { it.copy(isLoading = false) }
         }
